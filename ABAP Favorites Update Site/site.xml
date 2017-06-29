@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description name="ABAP Favorites Update Site" url="http://abapblog.com/eclipse/plugin/ABAPFavorites/">
+      ABAP Favorites Update Site
+   </description>
+   <feature url="features/ABAP_Favorites_Feature_Project_1.0.0.2.jar" id="ABAP_Favorites_Feature_Project" version="1.0.0.2"/>
+</site>
