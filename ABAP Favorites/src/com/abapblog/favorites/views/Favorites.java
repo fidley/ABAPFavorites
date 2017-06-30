@@ -833,7 +833,7 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 
 	@Override
 	public void editorActivated(IEditorPart activeEditor) {
-		if (linkingActive && !getViewSite().getPage().isPartVisible(this)) {
+		if (linkingActive) { // && !getViewSite().getPage().isPartVisible(this)) {
 
 			if (!LinkedEditorProject.equals(getProjectName())) {
 
