@@ -1095,6 +1095,7 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 					ISelection ADTselection = window.getSelectionService().getSelection();
 					LinkedProject = ProjectUtil.getActiveAdtCoreProject(ADTselection, null, null,
 							IAdtCoreProject.ABAP_PROJECT_NATURE);
+					LinkedEditorProject = LinkedProject.getName();
 				}
 
 				if (LinkedProject != null) {
