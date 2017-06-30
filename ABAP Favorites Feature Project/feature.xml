@@ -2,7 +2,7 @@
 <feature
       id="ABAP_Favorites_Feature_Project"
       label="ABAP Favorites"
-      version="1.0.0.3"
+      version="1.0.0.4"
       provider-name="ABAPBlog.com"
       plugin="com.abapblog.favorites">
 
@@ -113,7 +113,7 @@ END OF TERMS AND CONDITIONS
          id="com.abapblog.favorites"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0.3"
          unpack="false"/>
 
 </feature>

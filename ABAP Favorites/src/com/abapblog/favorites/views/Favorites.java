@@ -722,11 +722,9 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 				if (element instanceof TreeParent)
 					imageKey = ISharedImages.IMG_OBJ_FOLDER;
 
-				if (element instanceof TreeObject)
-				{
-					TreeObject Node = (TreeObject)element;
-					switch (Node.Type)
-					{
+				if (element instanceof TreeObject) {
+					TreeObject Node = (TreeObject) element;
+					switch (Node.Type) {
 					case Transaction:
 						imageKey = ISharedImages.IMG_DEF_VIEW;
 						break;
@@ -736,7 +734,6 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 					}
 
 				}
-
 
 				return PlatformUI.getWorkbench().getSharedImages().getImage(imageKey);
 			case 1:
@@ -829,10 +826,9 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		linkWithEditorAction.setText("Link with Editor");
 		linkWithEditorAction.setImageDescriptor(
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ELCL_SYNCED));
-		linkWithEditorAction.setChecked(linkingActive);
 		getViewSite().getActionBars().getToolBarManager().add(linkWithEditorAction);
 		getSite().getPage().addPartListener(linkWithEditorPartListener);
-
+		linkWithEditorAction.setChecked(linkingActive);
 	}
 
 	@Override
@@ -846,9 +842,10 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 				ISelection ADTselection = window.getSelectionService().getSelection();
 				LinkedProject = ProjectUtil.getActiveAdtCoreProject(ADTselection, null, null,
 						IAdtCoreProject.ABAP_PROJECT_NATURE);
-				LinkedEditorProject = LinkedProject.getName();
-
-				refreshViewer();
+				if (LinkedProject != null) {
+					LinkedEditorProject = LinkedProject.getName();
+					refreshViewer();
+				}
 			}
 			return;
 		}
