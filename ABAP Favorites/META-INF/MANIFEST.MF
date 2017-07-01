@@ -10,9 +10,7 @@ Require-Bundle: org.eclipse.ui,
  com.sap.adt.project;bundle-version="2.73.0",
  com.sap.adt.sapgui.ui;bundle-version="2.73.1",
  com.sap.adt.project.ui;bundle-version="2.73.0",
- org.eclipse.core.resources,
- com.sap.adt.util,
- com.sap.adt.util.ui;bundle-version="2.77.1"
+ org.eclipse.core.resources
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: com.abapblog.favorites,
