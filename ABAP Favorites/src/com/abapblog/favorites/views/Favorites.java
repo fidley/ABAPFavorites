@@ -668,7 +668,7 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		 * We will set up a dummy model to initialize tree heararchy. In a real
 		 * code, you will connect to a real model and expose its hierarchy.
 		 */
-
+ 
 		public void createTreeNodes() {
 
 			invisibleRoot = new TreeParent("", "", true, "");
