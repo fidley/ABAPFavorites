@@ -1,6 +1,7 @@
 package com.abapblog.favorites.views;
 
 import java.io.File;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,9 +26,15 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.resources.IProject;
+
+//import com.sap.adt.project.AdtCoreProjectServiceFactory;
 import com.sap.adt.project.IAdtCoreProject;
 import com.sap.adt.project.ui.util.ProjectUtil;
 import com.sap.adt.sapgui.ui.editors.AdtSapGuiEditorUtilityFactory;
+//import com.sap.adt.sapgui.ui.internal.AdtGuiNavigationState;
+//import com.sap.adt.sapgui.ui.editors.*;
+//import com.sap.adt.sapgui.ui.*;
+//import com.sap.adt.util.ui.*;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -67,7 +74,7 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 	public static final String ID = "com.abapblog.favorites.views.Favorites";
 
 	public static enum TypeOfEntry {
-		Folder, Transaction, URL
+		Folder, Transaction, URL, Program
 	};
 
 	public static enum TypeOfXMLNode {
@@ -86,7 +93,12 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 			public String toString() {
 				return "url";
 			}
-		}
+		},
+		program {
+			public String toString() {
+				return "program";
+			}
+		}		
 	}
 
 	public static enum TypeOfXMLAttr {
@@ -125,6 +137,8 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 	private TreeViewer viewer;
 	private DrillDownAdapter drillDownAdapter;
 	private Action actAddFolder;
+	private Action actSortDown;
+	private Action actSortUP;
 	private Action actAddTransaction;
 	private Action actAddURL;
 	private Action actDelFolder;
@@ -474,6 +488,55 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 	}
 
 	class TreeObject implements IAdaptable {
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result + ((Description == null) ? 0 : Description.hashCode());
+			result = prime * result + ((Name == null) ? 0 : Name.hashCode());
+			result = prime * result + ((TechnicalName == null) ? 0 : TechnicalName.hashCode());
+			result = prime * result + ((Type == null) ? 0 : Type.hashCode());
+			result = prime * result + ((parent == null) ? 0 : parent.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			TreeObject other = (TreeObject) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
+			if (Description == null) {
+				if (other.Description != null)
+					return false;
+			} else if (!Description.equals(other.Description))
+				return false;
+			if (Name == null) {
+				if (other.Name != null)
+					return false;
+			} else if (!Name.equals(other.Name))
+				return false;
+			if (TechnicalName == null) {
+				if (other.TechnicalName != null)
+					return false;
+			} else if (!TechnicalName.equals(other.TechnicalName))
+				return false;
+			if (Type != other.Type)
+				return false;
+			if (parent == null) {
+				if (other.parent != null)
+					return false;
+			} else if (!parent.equals(other.parent))
+				return false;
+			return true;
+		}
+
 		private TreeParent parent;
 
 		public String Name;
@@ -530,6 +593,10 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 
 		public void setDescription(String description) {
 			Description = description;
+		}
+
+		private Favorites getOuterType() {
+			return Favorites.this;
 		}
 	}
 
@@ -798,14 +865,14 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		tree.setHeaderVisible(true);
 		TreeColumn columnName = new TreeColumn(tree, SWT.LEFT);
 		columnName.setText("Name");
-		columnName.setWidth(100);
+		columnName.setWidth(200);
 		TreeColumn columnDescr = new TreeColumn(tree, SWT.LEFT);
 		columnDescr.setText("Description");
 		columnDescr.setWidth(300);
 		viewer.setContentProvider(new ViewContentProvider());
 		viewer.setInput(getViewSite());
 		viewer.setLabelProvider(new ViewLabelProvider());
-
+		
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), "com.abapblog.favorites.viewer");
 		getSite().setSelectionProvider(viewer);
@@ -813,6 +880,7 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		hookContextMenu();
 		hookDoubleClickAction();
 		contributeToActionBars();
+		
 		// Linking with editor
 		linkWithEditorAction = new Action("Link with Editor", SWT.TOGGLE) {
 			public void run() {
@@ -829,11 +897,15 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		getViewSite().getActionBars().getToolBarManager().add(linkWithEditorAction);
 		getSite().getPage().addPartListener(linkWithEditorPartListener);
 		linkWithEditorAction.setChecked(linkingActive);
+		
+		//set up comparisor to be used in tree
+		sortTable();
 	}
 
 	@Override
 	public void editorActivated(IEditorPart activeEditor) {
-		if (linkingActive) { // && !getViewSite().getPage().isPartVisible(this)) {
+		if (linkingActive) { // && !getViewSite().getPage().isPartVisible(this))
+								// {
 
 			if (!LinkedEditorProject.equals(getProjectName())) {
 
@@ -942,11 +1014,48 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(actAddFolder);
+		//manager.add(actSortUP);
+		// manager.add(actSortDown);
 		manager.add(new Separator());
 		drillDownAdapter.addNavigationActions(manager);
 	}
 
+	public void sortTable() {
+
+		viewer.setComparator(new ViewerComparator() {
+			@Override
+			public int compare(Viewer viewer, Object e1, Object e2) {
+
+				if (e1 instanceof TreeParent && e2 instanceof TreeParent) {
+					return ((TreeParent) e1).getName().compareToIgnoreCase(((TreeParent) e2).getName());
+				} else if (e1 instanceof TreeObject && e2 instanceof TreeObject) {
+					return ((TreeObject) e1).getName().compareToIgnoreCase(((TreeObject) e2).getName());
+				} else {
+					throw new IllegalArgumentException("Not comparable: " + e1 + " " + e2);
+				}
+			}
+		});
+	}
+
 	private void makeActions() {
+
+		actSortUP = new Action("", SWT.TOGGLE) {
+			public void run() {
+				//Tree TreeData = viewer.getTree();
+				//TreeData.setSortColumn(TreeData.getColumn(0));
+				//TreeData.setSortDirection(SWT.UP);
+				
+				viewer.refresh();
+
+			}
+
+		};
+
+		actSortUP.setText("Sort Ascending");
+		actSortUP.setToolTipText("Sort Ascending");
+		actSortUP.setImageDescriptor(
+				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_UP));
+
 		actAddFolder = new Action() {
 			public void run() {
 				FolderDialog FolderDialog = new FolderDialog(viewer.getControl().getShell());
@@ -982,7 +1091,11 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 							addTransactionToXML(TrDialog.getName(), TrDialog.getDescription(), object.Name);
 							System.out.println(TrDialog.getName());
 							System.out.println(TrDialog.getDescription());
+							// ((TreeParent) object).addChild( new
+							// TreeObject(TrDialog.getName(),TypeOfEntry.Transaction,
+							// TrDialog.getDescription(),""));
 							refreshViewer();
+							// viewer.refresh();
 						}
 
 					}
@@ -1102,8 +1215,9 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 						case Transaction:
 							AdtSapGuiEditorUtilityFactory.createSapGuiEditorUtility()
 									.openEditorAndStartTransaction(LinkedProject, obj.toString(), true);
-							;
+							break;
 						case Folder:
+							break;
 						case URL:
 							try {
 								PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser()
@@ -1112,6 +1226,11 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
+							break;
+						case Program:      
+							// TODO How to run program directly with passing only name
+							AdtSapGuiEditorUtilityFactory.createSapGuiEditorUtility().openEditorAndStartTransaction(LinkedProject, obj.toString(), true);
+							break;
 						}
 					}
 
