@@ -1,4 +1,4 @@
-package com.abapblog.favorites;
+package com.abapblog.favoritesDO;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -11,10 +11,8 @@ import com.abapblog.favorites.common.Common;
  */
 public class Activator extends AbstractUIPlugin {
 
-	// public IPath stateLoc;
-
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.abapblog.favorites"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "com.abapblog.favoritesDO"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;
@@ -25,6 +23,7 @@ public class Activator extends AbstractUIPlugin {
 	public Activator() {
 
 		Common.createFavFile();
+
 	}
 
 	/*

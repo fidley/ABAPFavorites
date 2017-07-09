@@ -1,6 +1,5 @@
-package com.abapblog.favorites.views;
+package com.abapblog.favoritesDO.views;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,7 +16,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -55,8 +53,6 @@ import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.ViewPart;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -91,12 +87,12 @@ import com.sap.adt.util.AdapterUtil;
  * For more go to ABAPBlog.com
  */
 
-public class Favorites extends ViewPart implements ILinkedWithEditorView {
+public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
-	public static final String ID = "com.abapblog.favorites.views.Favorites";
+	public static final String ID = "com.abapblog.favoritesDO.views.FavoritesDO";
 
 	private String LinkedEditorProject = "";
 	private IProject LinkedProject;
@@ -118,8 +114,8 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 	private Action doubleClickAction;
 	private AFIcons AFIcon;
 
-	public Favorites getFav() {
-		return Favorites.this;
+	public FavoritesDO getFav() {
+		return FavoritesDO.this;
 	}
 
 	public class ViewContentProvider implements ITreeContentProvider {
@@ -164,19 +160,6 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 
 			invisibleRoot = new TreeParent("", "", true, "", getFav(), false);
 
-			Bundle bundle = FrameworkUtil.getBundle(getClass());
-			stateLoc = Platform.getStateLocation(bundle);
-
-			Common.favFile = new File(stateLoc.toFile(), Common.favFileName);
-			if (Common.favFile.exists() == false) {
-				try {
-					Common.favFile.createNewFile();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder;
 			try {
@@ -197,15 +180,13 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 
 							Element eElement = (Element) nNode;
 
-							if (eElement.getNodeName().equalsIgnoreCase(TypeOfXMLNode.folderNode.toString())) {
+							if (eElement.getNodeName().equalsIgnoreCase(TypeOfXMLNode.folderDONode.toString())) {
 
 								TreeParent parent = new TreeParent(eElement.getAttribute(TypeOfXMLAttr.name.toString()),
 										eElement.getAttribute(TypeOfXMLAttr.description.toString()),
 										Boolean.parseBoolean(
 												eElement.getAttribute(TypeOfXMLAttr.projectIndependent.toString())),
-										eElement.getAttribute(TypeOfXMLAttr.project.toString()), getFav(),
-										Boolean.parseBoolean(
-												eElement.getAttribute(TypeOfXMLAttr.devObjFolder.toString())));
+										eElement.getAttribute(TypeOfXMLAttr.project.toString()), getFav(), true);
 								boolean projectIsIndependent = Boolean.parseBoolean(
 										eElement.getAttribute(TypeOfXMLAttr.projectIndependent.toString()));
 								if (projectIsIndependent == false) {
@@ -353,7 +334,7 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 	/**
 	 * The constructor.
 	 */
-	public Favorites() {
+	public FavoritesDO() {
 		AFIcon = new AFIcons();
 	}
 
@@ -457,7 +438,7 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
-				Favorites.this.fillContextMenu(manager);
+				FavoritesDO.this.fillContextMenu(manager);
 			}
 		});
 		Menu menu = menuMgr.createContextMenu(viewer.getControl());
@@ -553,11 +534,11 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 
 		actAddFolder = new Action() {
 			public void run() {
-				FolderDialog FolderDialog = new FolderDialog(viewer.getControl().getShell());
+				FolderDialog FolderDialog = new FolderDialog(viewer.getControl().getShell(), true);
 				FolderDialog.create();
 				if (FolderDialog.open() == Window.OK) {
-					Common.addFolderToXML(FolderDialog.getName(), FolderDialog.getDescription(),
-							FolderDialog.getPrjInd(), getProjectName(), FolderDialog.getDevObjectFolder());
+					Common.addFolderDOToXML(FolderDialog.getName(), FolderDialog.getDescription(),
+							FolderDialog.getPrjInd(), getProjectName(), true);
 					Common.refreshViewer(viewer);
 				}
 

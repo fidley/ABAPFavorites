@@ -1,4 +1,4 @@
-package com.abapblog.favorites.views;
+package com.abapblog.favorites.common;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
