@@ -663,7 +663,7 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 					TreeObject object = (TreeObject) selection.getFirstElement();
 
 					if (object instanceof TreeParent) {
-						Common.delFolderFromXML(object.Name);
+						Common.delFolderFromXML(object.Name, ((TreeParent) object).getTypeOfFolder());
 						Common.refreshViewer(viewer);
 					}
 

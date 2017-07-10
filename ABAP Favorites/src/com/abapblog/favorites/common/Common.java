@@ -108,6 +108,11 @@ public class Common {
 			return TypeOfXMLNode.transactionNode;
 		case URL:
 			return TypeOfXMLNode.urlNode;
+		case Folder:
+			return TypeOfXMLNode.folderNode;
+		case FolderDO:
+			return TypeOfXMLNode.folderDONode;
+
 		default:
 			return TypeOfXMLNode.programNode;
 		}
@@ -171,7 +176,7 @@ public class Common {
 
 	}
 
-	public static void delObjectFromXML(TypeOfEntry Type, String Name, String Parent) {
+	public static void delObjectFromXML(TypeOfEntry Type, String Name, String Parent, TypeOfXMLNode ParentNodeType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {
@@ -181,7 +186,7 @@ public class Common {
 				doc = dBuilder.parse(favFile);
 
 				doc.getDocumentElement().normalize();
-				NodeList folders = doc.getElementsByTagName(TypeOfXMLNode.folderNode.toString());
+				NodeList folders = doc.getElementsByTagName(ParentNodeType.toString());
 
 				for (int temp = 0; temp < folders.getLength(); temp++) {
 
@@ -202,30 +207,25 @@ public class Common {
 
 								{
 									nNode.removeChild(nNodeFol);
+
+									DOMSource source = new DOMSource(doc);
+
+									TransformerFactory transformerFactory = TransformerFactory.newInstance();
+									Transformer transformer = transformerFactory.newTransformer();
+									StreamResult result = new StreamResult(favFile.getPath());
+									transformer.transform(source, result);
 								}
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
 						}
 
-						DOMSource source = new DOMSource(doc);
-
-						TransformerFactory transformerFactory = TransformerFactory.newInstance();
-						Transformer transformer = transformerFactory.newTransformer();
-						StreamResult result = new StreamResult(favFile.getPath());
-						transformer.transform(source, result);
 					}
 				}
 			} catch (SAXException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -337,7 +337,7 @@ public class Common {
 
 	}
 
-	public static void delFolderFromXML(String Name) {
+	public static void delFolderFromXML(String Name, TypeOfXMLNode ParentNodeType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {
@@ -347,7 +347,7 @@ public class Common {
 				doc = dBuilder.parse(favFile);
 				Element root = doc.getDocumentElement();
 				doc.getDocumentElement().normalize();
-				NodeList folders = doc.getElementsByTagName(TypeOfXMLNode.folderNode.toString());
+				NodeList folders = doc.getElementsByTagName(ParentNodeType.toString());
 
 				for (int temp = 0; temp < folders.getLength(); temp++) {
 
@@ -358,15 +358,14 @@ public class Common {
 					if (FolderName.getNodeValue().equals(Name)) {
 
 						root.removeChild(nNode);
+						DOMSource source = new DOMSource(doc);
 
+						TransformerFactory transformerFactory = TransformerFactory.newInstance();
+						Transformer transformer = transformerFactory.newTransformer();
+						StreamResult result = new StreamResult(favFile.getPath());
+						transformer.transform(source, result);
 					}
 
-					DOMSource source = new DOMSource(doc);
-
-					TransformerFactory transformerFactory = TransformerFactory.newInstance();
-					Transformer transformer = transformerFactory.newTransformer();
-					StreamResult result = new StreamResult(favFile.getPath());
-					transformer.transform(source, result);
 				}
 
 			} catch (SAXException e) {
@@ -528,7 +527,7 @@ public class Common {
 
 			if (object instanceof TreeObject) {
 				TreeObject treeObj = (TreeObject) object;
-				delObjectFromXML(treeObj.Type, object.Name, object.parent.Name);
+				delObjectFromXML(treeObj.Type, object.Name, object.parent.Name, object.parent.getTypeOfFolder());
 				refreshViewer(viewer);
 			}
 		}

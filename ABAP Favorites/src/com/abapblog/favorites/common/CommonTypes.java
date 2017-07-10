@@ -4,7 +4,7 @@ package com.abapblog.favorites.common;
 public class CommonTypes {
 
 	public static enum TypeOfEntry {
-		Folder, Transaction, URL, Program, Class, Interface, FunctionGroup, FunctionModule, Include
+		Folder, Transaction, URL, Program, Class, Interface, FunctionGroup, FunctionModule, Include, FolderDO
 	};
 
 	public static enum TypeOfXMLNode {
