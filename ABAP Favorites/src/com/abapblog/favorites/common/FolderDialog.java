@@ -41,6 +41,16 @@ public class FolderDialog extends TitleAreaDialog {
 		setMessage("Please fill all fields", IMessageProvider.INFORMATION);
 	}
 
+	public void create(Boolean Edit) {
+		super.create();
+		if (Edit == false) {
+			setTitle("Add new folder to list");
+		} else {
+			setTitle("Change existing folder");
+		}
+		setMessage("Please fill all fields", IMessageProvider.INFORMATION);
+	}
+
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite area = (Composite) super.createDialogArea(parent);
@@ -153,11 +163,28 @@ public class FolderDialog extends TitleAreaDialog {
 		return Description;
 	}
 
+	public void setName(String Name) {
+		this.Name = Name;
+		txtName.setText(Name);
+	}
+
+	public void setPrjInd(Boolean PrjInd) {
+		this.ProjectIndependent = PrjInd;
+		butPrjInd.setSelection(ProjectIndependent);
+	}
+
+	public void setDescription(String Description) {
+		this.Description = Description;
+		txtDescription.setText(Description);
+	}
+
 	public boolean getDevObjectFolder() {
 		return DevObjectFolder;
 	}
 
 	public void setDevObjectFolder(boolean devObjectProject) {
 		DevObjectFolder = devObjectProject;
+		if (butDevObj != null)
+			butDevObj.setSelection(DevObjectFolder);
 	}
 }

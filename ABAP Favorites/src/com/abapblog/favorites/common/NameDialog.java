@@ -38,10 +38,14 @@ public class NameDialog extends TitleAreaDialog {
 		setMessage("Please fill all fields", IMessageProvider.INFORMATION);
 	}
 
-	public void create(TypeOfEntry ObjectType) {
+	public void create(TypeOfEntry ObjectType, Boolean Edit) {
 		super.create();
 		ObjectName = Common.getObjectName(ObjectType);
-		setTitle("Add new " + ObjectName + " to list");
+		if (Edit == false) {
+			setTitle("Add new " + ObjectName + " to list");
+		} else {
+			setTitle("Change existing " + ObjectName);
+		}
 		setMessage("Please fill all fields", IMessageProvider.INFORMATION);
 	}
 
@@ -107,5 +111,15 @@ public class NameDialog extends TitleAreaDialog {
 
 	public String getDescription() {
 		return Description;
+	}
+
+	public void setName(String Name) {
+		this.Name = Name;
+		txtName.setText(Name);
+	}
+
+	public void setDescription(String Description) {
+		this.Description = Description;
+		txtDescription.setText(Description);
 	}
 }

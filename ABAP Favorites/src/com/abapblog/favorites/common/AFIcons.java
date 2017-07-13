@@ -29,6 +29,10 @@ public class AFIcons {
 		return getIcon("transaction.png");
 	}
 
+	public Image getRenameIcon() {
+		return getIcon("rename-box.png");
+	}
+
 	public Image getURLIcon() {
 		return getIcon("url.png");
 	}
@@ -95,6 +99,10 @@ public class AFIcons {
 
 	public ImageDescriptor getFunctionGroupIconImgDescr() {
 		return getImageDescriptor("functiongroup.png");
+	}
+
+	public ImageDescriptor getRenameIconImgDescr() {
+		return getImageDescriptor("rename-box.png");
 	}
 
 	public ImageDescriptor getFunctionGroupIncludeIconImgDescr() {

@@ -110,6 +110,7 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 	private Action actAddProgram;
 	private Action actAddURL;
 	private Action actDelFolder;
+	private Action actEdit;
 	private Action actDelete;
 	private Action doubleClickAction;
 	private AFIcons AFIcon;
@@ -485,6 +486,8 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 					}
 					manager.add(actDelFolder);
 					manager.add(new Separator());
+					manager.add(actEdit);
+					manager.add(new Separator());
 					drillDownAdapter.addNavigationActions(manager);
 					// Other plug-ins can contribute there actions here
 					manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -492,6 +495,8 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 
 					manager.add(new Separator());
 					manager.add(actDelete);
+					manager.add(new Separator());
+					manager.add(actEdit);
 					manager.add(new Separator());
 					drillDownAdapter.addNavigationActions(manager);
 					// Other plug-ins can contribute there actions here
@@ -655,6 +660,22 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 		actDelFolder.setToolTipText("Folder");
 		actDelFolder.setImageDescriptor(
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
+
+		actEdit = new Action() {
+			public void run() {
+				if (viewer.getSelection() instanceof IStructuredSelection) {
+					IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+
+					TreeObject object = (TreeObject) selection.getFirstElement();
+					Common.editObjectFromAction(object.getType(),
+							Common.getObjectXMLNode(object.getType()).isNameToUpper(), viewer);
+
+				}
+			}
+		};
+		actEdit.setText("Edit");
+		actEdit.setToolTipText("Edit");
+		actEdit.setImageDescriptor(AFIcon.getRenameIconImgDescr());
 
 		actDelete = new Action() {
 			public void run() {

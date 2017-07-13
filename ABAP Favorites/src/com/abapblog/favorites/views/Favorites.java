@@ -116,6 +116,8 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 	private Action actDelFolder;
 	private Action actDelete;
 	private Action doubleClickAction;
+	private Action actEdit;
+
 	private AFIcons AFIcon;
 
 	public Favorites getFav() {
@@ -209,7 +211,7 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 								boolean projectIsIndependent = Boolean.parseBoolean(
 										eElement.getAttribute(TypeOfXMLAttr.projectIndependent.toString()));
 								if (projectIsIndependent == false) {
-									String ProjectName = getProjectName();
+									String ProjectName = Common.getProjectName();
 
 									if (!parent.getProject().equals(ProjectName)) {
 										continue;
@@ -361,18 +363,6 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 	 * This is a callback that will allow us to create the viewer and initialize
 	 * it.
 	 */
-	public String getProjectName() {
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		IWorkbenchWindow window = page.getWorkbenchWindow();
-		ISelection ADTselection = window.getSelectionService().getSelection();
-		IProject project = ProjectUtil.getActiveAdtCoreProject(ADTselection, null, null,
-				IAdtCoreProject.ABAP_PROJECT_NATURE);
-		if (project != null) {
-			return project.getName();
-		} else {
-			return "";
-		}
-	}
 
 	public void createPartControl(Composite parent) {
 		// viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL |
@@ -426,7 +416,7 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		if (linkingActive) { // && !getViewSite().getPage().isPartVisible(this))
 								// {
 
-			if (!LinkedEditorProject.equals(getProjectName())) {
+			if (!LinkedEditorProject.equals(Common.getProjectName())) {
 
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				IWorkbenchWindow window = page.getWorkbenchWindow();
@@ -504,6 +494,8 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 					}
 					manager.add(actDelFolder);
 					manager.add(new Separator());
+					manager.add(actEdit);
+					manager.add(new Separator());
 					drillDownAdapter.addNavigationActions(manager);
 					// Other plug-ins can contribute there actions here
 					manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -511,6 +503,8 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 
 					manager.add(new Separator());
 					manager.add(actDelete);
+					manager.add(new Separator());
+					manager.add(actEdit);
 					manager.add(new Separator());
 					drillDownAdapter.addNavigationActions(manager);
 					// Other plug-ins can contribute there actions here
@@ -557,7 +551,7 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 				FolderDialog.create();
 				if (FolderDialog.open() == Window.OK) {
 					Common.addFolderToXML(FolderDialog.getName(), FolderDialog.getDescription(),
-							FolderDialog.getPrjInd(), getProjectName(), FolderDialog.getDevObjectFolder());
+							FolderDialog.getPrjInd(), Common.getProjectName(), FolderDialog.getDevObjectFolder());
 					Common.refreshViewer(viewer);
 				}
 
@@ -674,6 +668,22 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		actDelFolder.setToolTipText("Folder");
 		actDelFolder.setImageDescriptor(
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
+
+		actEdit = new Action() {
+			public void run() {
+				if (viewer.getSelection() instanceof IStructuredSelection) {
+					IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+
+					TreeObject object = (TreeObject) selection.getFirstElement();
+					Common.editObjectFromAction(object.getType(),
+							Common.getObjectXMLNode(object.getType()).isNameToUpper(), viewer);
+
+				}
+			}
+		};
+		actEdit.setText("Edit");
+		actEdit.setToolTipText("Edit");
+		actEdit.setImageDescriptor(AFIcon.getRenameIconImgDescr());
 
 		actDelete = new Action() {
 			public void run() {

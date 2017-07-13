@@ -13,11 +13,16 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.w3c.dom.Document;
@@ -31,11 +36,26 @@ import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.common.CommonTypes.TypeOfObject;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLAttr;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
+import com.sap.adt.project.IAdtCoreProject;
+import com.sap.adt.project.ui.util.ProjectUtil;
 
 public class Common {
 
 	public static final String favFileName = "favorites.xml";
 	public static File favFile;
+
+	public static String getProjectName() {
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IWorkbenchWindow window = page.getWorkbenchWindow();
+		ISelection ADTselection = window.getSelectionService().getSelection();
+		IProject project = ProjectUtil.getActiveAdtCoreProject(ADTselection, null, null,
+				IAdtCoreProject.ABAP_PROJECT_NATURE);
+		if (project != null) {
+			return project.getName();
+		} else {
+			return "";
+		}
+	}
 
 	public static String getObjectName(TypeOfEntry ObjectType) {
 
@@ -389,6 +409,67 @@ public class Common {
 
 	}
 
+	public static void editFolderInXML(String OldName, String Name, String Description, Boolean ProjectIndependent,
+			String ProjectName, Boolean DevObjFolder, TypeOfXMLNode ParentNodeType) {
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder;
+		try {
+			dBuilder = dbFactory.newDocumentBuilder();
+			Document doc;
+			try {
+				doc = dBuilder.parse(favFile);
+				// Element root = doc.getDocumentElement();
+				doc.getDocumentElement().normalize();
+				NodeList folders = doc.getElementsByTagName(ParentNodeType.toString());
+
+				for (int temp = 0; temp < folders.getLength(); temp++) {
+
+					Node nNode = folders.item(temp);
+
+					NamedNodeMap attributes = nNode.getAttributes();
+					Node FolderName = attributes.getNamedItem(TypeOfXMLAttr.name.toString());
+					if (FolderName.getNodeValue().equals(OldName)) {
+
+						Element FolderEl = (Element) nNode;
+						FolderEl.setAttribute(TypeOfXMLAttr.name.toString(), Name);
+						FolderEl.setAttribute(TypeOfXMLAttr.description.toString(), Description);
+						FolderEl.setAttribute(TypeOfXMLAttr.projectIndependent.toString(),
+								ProjectIndependent.toString());
+						FolderEl.setAttribute(TypeOfXMLAttr.project.toString(), ProjectName);
+						FolderEl.setAttribute(TypeOfXMLAttr.devObjFolder.toString(), DevObjFolder.toString());
+
+						// root.removeChild(nNode);
+						DOMSource source = new DOMSource(doc);
+
+						TransformerFactory transformerFactory = TransformerFactory.newInstance();
+						Transformer transformer = transformerFactory.newTransformer();
+						StreamResult result = new StreamResult(favFile.getPath());
+						transformer.transform(source, result);
+					}
+
+				}
+
+			} catch (SAXException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TransformerConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TransformerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 	public static void addURLToXML(String Name, String Description, String URL, String Parent) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
@@ -447,22 +528,126 @@ public class Common {
 
 	public static void addObjectFromAction(TypeOfEntry Type, Boolean NameToUpper, TreeViewer viewer) {
 		NameDialog NaDialog = new NameDialog(viewer.getControl().getShell(), Type);
-		NaDialog.create(Type);
+		NaDialog.create(Type, false);
 		if (NaDialog.open() == Window.OK) {
 
 			if (viewer.getSelection() instanceof IStructuredSelection) {
 				IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 
-				TreeObject object = (TreeObject) selection.getFirstElement();
+				TreeObject Folder = (TreeObject) selection.getFirstElement();
 
-				if (object instanceof TreeParent) {
+				if (Folder instanceof TreeParent) {
 					String Name = NaDialog.getName();
 					if (NameToUpper) {
 						Name = Name.toUpperCase();
 					}
-					Common.addObjectToXML(Type, Name, NaDialog.getDescription(), object.Name,
-							((TreeParent) object).getTypeOfFolder());
+					Common.addObjectToXML(Type, Name, NaDialog.getDescription(), Folder.Name,
+							((TreeParent) Folder).getTypeOfFolder());
 					refreshViewer(viewer);
+				}
+
+			}
+		}
+	}
+
+	public static void editObjectFromAction(TypeOfEntry Type, Boolean NameToUpper, TreeViewer viewer) {
+
+		if (viewer.getSelection() instanceof IStructuredSelection) {
+			IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+
+			TreeObject Object = (TreeObject) selection.getFirstElement();
+
+			if (Object instanceof TreeParent) {
+				TreeParent Folder = (TreeParent) Object;
+				Boolean DevObjFolder = Folder.getDevObjProject();
+				FolderDialog FoDialog = new FolderDialog(viewer.getControl().getShell(), DevObjFolder);
+				FoDialog.create(true);
+				String Name = Folder.getName();
+				if (NameToUpper) {
+					Name = Name.toUpperCase();
+				}
+
+				FoDialog.setName(Name);
+				FoDialog.setDescription(Folder.getDescription());
+				FoDialog.setPrjInd(Folder.getProjectIndependent());
+				FoDialog.setDevObjectFolder(Folder.getDevObjProject());
+				if (FoDialog.open() == Window.OK) {
+
+					Name = FoDialog.getName();
+					if (NameToUpper) {
+						Name = Name.toUpperCase();
+					}
+
+					editFolderInXML(Folder.getName(), Name, FoDialog.getDescription(), FoDialog.getPrjInd(),
+							getProjectName(), FoDialog.getDevObjectFolder(), Folder.getTypeOfFolder());
+					/*
+					 * Common.delFolderFromXML(Folder.getName(),
+					 * Folder.getTypeOfFolder());
+					 *
+					 * if (Folder.getTypeOfFolder() == TypeOfXMLNode.folderNode)
+					 * { Common.addFolderToXML(Name, FoDialog.getDescription(),
+					 * FoDialog.getPrjInd(), getProjectName(),
+					 * FoDialog.getDevObjectFolder());
+					 *
+					 * } else { Common.addFolderDOToXML(Name,
+					 * FoDialog.getDescription(), FoDialog.getPrjInd(),
+					 * getProjectName(), FoDialog.getDevObjectFolder()); }
+					 */
+					refreshViewer(viewer);
+				}
+
+			} else {
+
+				switch (Object.getType()) {
+				case URL:
+					URLDialog UrlDialog = new URLDialog(viewer.getControl().getShell());
+					UrlDialog.create(true);
+
+					String Name = Object.getName();
+					if (NameToUpper) {
+						Name = Name.toUpperCase();
+					}
+
+					UrlDialog.setName(Name);
+					UrlDialog.SetDescription(Object.getDescription());
+					UrlDialog.setURL(Object.getTechnicalName());
+
+					if (UrlDialog.open() == Window.OK) {
+						Name = UrlDialog.getName();
+						if (NameToUpper) {
+							Name = Name.toUpperCase();
+						}
+
+						Common.delObjectFromXML(Type, Object.getName(), Object.getParent().getName(),
+								Object.getParent().getTypeOfFolder());
+						Common.addURLToXML(Name, UrlDialog.getDescription(), UrlDialog.getURL(),
+								Object.getParent().getName());
+
+						refreshViewer(viewer);
+					}
+					break;
+				default:
+					NameDialog NaDialog = new NameDialog(viewer.getControl().getShell(), Type);
+					NaDialog.create(Type, true);
+					Name = Object.getName();
+					if (NameToUpper) {
+						Name = Name.toUpperCase();
+					}
+					NaDialog.setName(Name);
+					NaDialog.setDescription(Object.getDescription());
+
+					if (NaDialog.open() == Window.OK) {
+						Name = NaDialog.getName();
+						if (NameToUpper) {
+							Name = Name.toUpperCase();
+						}
+						Common.delObjectFromXML(Type, Object.getName(), Object.getParent().getName(),
+								Object.getParent().getTypeOfFolder());
+						Common.addObjectToXML(Type, Name, NaDialog.getDescription(), Object.getParent().getName(),
+								Object.getParent().getTypeOfFolder());
+						refreshViewer(viewer);
+					}
+					break;
 				}
 
 			}

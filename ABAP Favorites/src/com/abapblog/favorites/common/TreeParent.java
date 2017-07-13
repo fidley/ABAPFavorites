@@ -68,4 +68,8 @@ public class TreeParent extends TreeObject {
 	public void setTypeOfFolder(TypeOfXMLNode typeOfFolder) {
 		TypeOfFolder = typeOfFolder;
 	}
+
+	public Boolean getProjectIndependent() {
+		return ProjectIndependent;
+	}
 }
