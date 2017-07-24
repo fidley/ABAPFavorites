@@ -18,6 +18,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -37,6 +39,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -98,12 +102,12 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 	 */
 	public static final String ID = "com.abapblog.favorites.views.Favorites";
 
-	private String LinkedEditorProject = "";
+	private static String LinkedEditorProject = "";
 	private IProject LinkedProject;
 	private IPartListener2 linkWithEditorPartListener = new LinkWithEditorPartListener(this);
 	private Action linkWithEditorAction;
-	private boolean linkingActive = true;
-	public TreeViewer viewer;
+	private static boolean linkingActive = true;
+	public static TreeViewer viewer;
 	private DrillDownAdapter drillDownAdapter;
 	private Action actAddFolder;
 	private Action actAddClass;
@@ -117,11 +121,45 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 	private Action actDelete;
 	private Action doubleClickAction;
 	private Action actEdit;
+	public static String partName;
 
 	private AFIcons AFIcon;
 
 	public Favorites getFav() {
 		return Favorites.this;
+	}
+
+	public static void savePluginSettings() {
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ID);
+
+		prefs.putBoolean("linking_active", linkingActive);
+		prefs.put("linked_project", LinkedEditorProject);
+
+		try {
+			// prefs are automatically flushed during a plugin's "super.stop()".
+			prefs.flush();
+		} catch (org.osgi.service.prefs.BackingStoreException e) {
+			// TODO write a real exception handler.
+			e.printStackTrace();
+		}
+	}
+
+	public class ColumnControlListener implements ControlListener {
+
+		@Override
+		public void controlMoved(ControlEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void controlResized(ControlEvent arg0) {
+			// TODO Auto-generated method stub
+			IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ID);
+			TreeColumn column = (TreeColumn) arg0.getSource();
+			prefs.putInt("column_width" + column.getText(), column.getWidth());
+		}
+
 	}
 
 	public class ViewContentProvider implements ITreeContentProvider {
@@ -211,7 +249,10 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 								boolean projectIsIndependent = Boolean.parseBoolean(
 										eElement.getAttribute(TypeOfXMLAttr.projectIndependent.toString()));
 								if (projectIsIndependent == false) {
-									String ProjectName = Common.getProjectName();
+
+									String ProjectName = LinkedEditorProject;
+									if (ProjectName.equals(""))
+										ProjectName = Common.getProjectName();
 
 									if (!parent.getProject().equals(ProjectName)) {
 										continue;
@@ -364,12 +405,21 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 	 * it.
 	 */
 
+	private void setNewPartName() {
+		if (linkingActive) {
+			setPartName(partName);
+		} else {
+			setPartName(partName + " (" + LinkedEditorProject + ")");
+		}
+	}
+
 	public void createPartControl(Composite parent) {
-		// viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL |
-		// SWT.V_SCROLL);
 
 		AFPatternFilter filter = new AFPatternFilter();
 		FilteredTree filteredTree = new FilteredTree(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL, filter, true);
+		ColumnControlListener columnListener = new ColumnControlListener();
+
+		partName = getPartName();
 
 		viewer = filteredTree.getViewer();
 		drillDownAdapter = new DrillDownAdapter(viewer);
@@ -377,13 +427,17 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		tree.setHeaderVisible(true);
 		TreeColumn columnName = new TreeColumn(tree, SWT.LEFT);
 		columnName.setText("Name");
-		columnName.setWidth(200);
+		columnName.addControlListener(columnListener);
+		loadColumnSettings(columnName);
 		TreeColumn columnDescr = new TreeColumn(tree, SWT.LEFT);
 		columnDescr.setText("Description");
-		columnDescr.setWidth(300);
+		columnDescr.addControlListener(columnListener);
+		loadColumnSettings(columnDescr);
 		viewer.setContentProvider(new ViewContentProvider());
 		viewer.setInput(getViewSite());
 		viewer.setLabelProvider(new ViewLabelProvider());
+
+		loadPluginSettings();
 
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), "com.abapblog.favorites.viewer");
@@ -407,8 +461,10 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		getSite().getPage().addPartListener(linkWithEditorPartListener);
 		linkWithEditorAction.setChecked(linkingActive);
 
+		setNewPartName();
 		// set up comparisor to be used in tree
 		sortTable();
+		Common.refreshViewer(viewer);
 	}
 
 	@Override
@@ -433,13 +489,23 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 
 	}
 
+	// protected void setPartName(String partName) {
+	// if (linkingActive == false) {
+	// partName = partName + " " + LinkedEditorProject;
+	// } else {
+	//
+	// }
+	// }
+
 	protected void toggleLinking() {
 		if (linkingActive) {
 			linkingActive = false;
+
 		} else {
 			linkingActive = true;
 			editorActivated(getSite().getPage().getActiveEditor());
 		}
+		setNewPartName();
 	}
 
 	private void hookContextMenu() {
@@ -519,10 +585,10 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
+
 		manager.add(actAddFolder);
-		// manager.add(actSortUP);
-		// manager.add(actSortDown);
 		manager.add(new Separator());
+
 		drillDownAdapter.addNavigationActions(manager);
 	}
 
@@ -838,5 +904,23 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 	 */
 	public void setFocus() {
 		viewer.getControl().setFocus();
+	}
+
+	private void loadColumnSettings(TreeColumn Column) {
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ID);
+		Column.setWidth(prefs.getInt("column_width" + Column.getText(), 300));
+	}
+
+	private void loadPluginSettings() {
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ID);
+		try {
+			prefs.sync();
+		} catch (org.osgi.service.prefs.BackingStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		linkingActive = prefs.getBoolean("linking_active", true);
+		LinkedEditorProject = prefs.get("linked_project", "");
+		LinkedProject = Common.getProjectByName(LinkedEditorProject);
 	}
 }

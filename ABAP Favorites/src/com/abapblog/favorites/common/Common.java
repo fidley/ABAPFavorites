@@ -14,6 +14,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
@@ -55,6 +56,16 @@ public class Common {
 		} else {
 			return "";
 		}
+	}
+
+	public static IProject getProjectByName(String projectName) {
+		try {
+			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+			return project;
+		} catch (Exception e) {
+			return null;
+		}
+
 	}
 
 	public static String getObjectName(TypeOfEntry ObjectType) {

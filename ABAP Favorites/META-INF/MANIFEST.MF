@@ -2,12 +2,10 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.abapblog.favorites;singleton:=true
-Bundle-Version: 1.0.8
+Bundle-Version: 1.0.10
 Bundle-Activator: com.abapblog.favorites.Activator
 Bundle-Vendor: %Bundle-Vendor
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
- com.sap.adt.project;bundle-version="2.73.0",
+Require-Bundle: org.eclipse.core.runtime,
  com.sap.adt.sapgui.ui;bundle-version="2.73.1",
  com.sap.adt.project.ui;bundle-version="2.73.0",
  org.eclipse.core.resources,
@@ -15,8 +13,7 @@ Require-Bundle: org.eclipse.ui,
  com.sap.adt.ris.search;bundle-version="2.73.1",
  com.sap.adt.logging;bundle-version="2.73.0",
  com.sap.adt.util;bundle-version="2.73.0",
- com.sap.adt.tools.core.ui;bundle-version="2.73.1",
- org.eclipse.ui.workbench
+ com.sap.adt.tools.core.ui;bundle-version="2.73.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: com.abapblog.favorites,
