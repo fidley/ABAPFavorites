@@ -1,21 +1,19 @@
-package com.abapblog.favorites;
+package com.abapblog.favoritesDO;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import com.abapblog.favorites.common.Common;
-import com.abapblog.favorites.views.Favorites;
+import com.abapblog.favoritesDO.views.FavoritesDO;
 
 /**
  * The activator class controls the plug-in life cycle
  */
 public class Activator extends AbstractUIPlugin {
 
-	// public IPath stateLoc;
-
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.abapblog.favorites"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "com.abapblog.favoritesDO"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;
@@ -26,6 +24,7 @@ public class Activator extends AbstractUIPlugin {
 	public Activator() {
 
 		Common.createFavFile();
+
 	}
 
 	/*
@@ -46,7 +45,7 @@ public class Activator extends AbstractUIPlugin {
 	 * BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		Favorites.savePluginSettings();
+		FavoritesDO.savePluginSettings();
 		plugin = null;
 		super.stop(context);
 	}

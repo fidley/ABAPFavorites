@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="ABAP"
+            id="com.abapblog.favoritesDO">
+      </category>
+      <view
+            name="Favorites Dev Objects"
+            icon="icons/favorite16.png"
+            category="com.abapblog.favoritesDO"
+            class="com.abapblog.favoritesDO.views.FavoritesDO"
+            id="com.abapblog.favoritesDO.views.FavoritesDO">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               ratio="0.5"
+               relative="org.eclipse.ui.views.ProblemView"
+               relationship="right"
+               id="com.abapblog.favoritesDO.views.FavoritesDO">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+
+</plugin>
