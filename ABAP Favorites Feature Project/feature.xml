@@ -2,7 +2,7 @@
 <feature
       id="ABAP_Favorites_Feature_Project"
       label="ABAP Favorites"
-      version="1.0.10"
+      version="1.0.13"
       provider-name="ABAPBlog.com">
 
    <description>
@@ -65,13 +65,6 @@ END OF TERMS AND CONDITIONS
 
    <plugin
          id="com.abapblog.favorites"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.abapblog.favoritesDO"
          download-size="0"
          install-size="0"
          version="0.0.0"

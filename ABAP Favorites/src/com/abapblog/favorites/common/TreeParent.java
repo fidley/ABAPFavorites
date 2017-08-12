@@ -1,6 +1,7 @@
 package com.abapblog.favorites.common;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
@@ -12,9 +13,10 @@ public class TreeParent extends TreeObject {
 	private boolean DevObjProject;
 	private String Project;
 	private TypeOfXMLNode TypeOfFolder;
+	private String FolderID;
 
 	public TreeParent(String name, String description, boolean ProjectIndependent, String Project, Object Favorite,
-			boolean DevObjProj) {
+			boolean DevObjProj, String FolderID) {
 		super(name, TypeOfEntry.Folder, description, "", Favorite);
 		children = new ArrayList();
 		this.ProjectIndependent = ProjectIndependent;
@@ -24,6 +26,10 @@ public class TreeParent extends TreeObject {
 			setTypeOfFolder(TypeOfXMLNode.folderNode);
 		} else {
 			setTypeOfFolder(TypeOfXMLNode.folderDONode);
+		}
+		this.setFolderID(FolderID);
+		if (this.getFolderID() == "") {
+			this.setFolderID(UUID.randomUUID().toString());
 		}
 	}
 
@@ -71,5 +77,13 @@ public class TreeParent extends TreeObject {
 
 	public Boolean getProjectIndependent() {
 		return ProjectIndependent;
+	}
+
+	public String getFolderID() {
+		return FolderID;
+	}
+
+	public void setFolderID(String folderID) {
+		FolderID = folderID;
 	}
 }

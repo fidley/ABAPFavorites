@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/ABAP_Favorites_Feature_Project_1.0.0.10.jar" id="ABAP_Favorites_Feature_Project" version="1.0.0.10">
-      <category name="ABAP Favorites"/>
-   </feature>
-   <feature url="features/ABAP_Favorites_Feature_Project_1.0.10.jar" id="ABAP_Favorites_Feature_Project" version="1.0.10">
+   <feature url="features/ABAP_Favorites_Feature_Project_1.0.13.jar" id="ABAP_Favorites_Feature_Project" version="1.0.13">
       <category name="ABAP Favorites"/>
    </feature>
    <category-def name="ABAP Favorites" label="ABAP Favorites"/>
