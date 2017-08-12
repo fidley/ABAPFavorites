@@ -73,6 +73,18 @@ public class AFIcons {
 		return getIcon("folderDev.png");
 	}
 
+	public Image getViewIcon() {
+		return getIcon("view.png");
+	}
+
+	public Image getTableIcon() {
+		return getIcon("table.png");
+	}
+
+	public Image getMessageClassIcon() {
+		return getIcon("message_class.png");
+	}
+
 	public ImageDescriptor getTransactionImgDescr() {
 		return getImageDescriptor("transaction.png");
 	}
@@ -120,4 +132,17 @@ public class AFIcons {
 	public ImageDescriptor getFodlerDevObjIconImgDescr() {
 		return getImageDescriptor("folderDev.png");
 	}
+
+	public ImageDescriptor getViewIconImgDescr() {
+		return getImageDescriptor("view.png");
+	}
+
+	public ImageDescriptor getTableIconImgDescr() {
+		return getImageDescriptor("table.png");
+	}
+
+	public ImageDescriptor getMessageClassIconImgDescr() {
+		return getImageDescriptor("message_class.png");
+	}
+
 }

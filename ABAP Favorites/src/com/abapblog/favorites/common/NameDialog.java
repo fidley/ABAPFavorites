@@ -21,6 +21,7 @@ public class NameDialog extends TitleAreaDialog {
 	private String ObjectName;
 	private String Name;
 	private String Description;
+	private TypeOfEntry typeOfObject;
 
 	public NameDialog(Shell parentShell) {
 		super(parentShell);
@@ -29,6 +30,7 @@ public class NameDialog extends TitleAreaDialog {
 	public NameDialog(Shell shell, TypeOfEntry type) {
 		super(shell);
 		ObjectName = Common.getObjectName(type);
+		typeOfObject = type;
 	}
 
 	@Override
@@ -40,6 +42,7 @@ public class NameDialog extends TitleAreaDialog {
 
 	public void create(TypeOfEntry ObjectType, Boolean Edit) {
 		super.create();
+		typeOfObject = ObjectType;
 		ObjectName = Common.getObjectName(ObjectType);
 		if (Edit == false) {
 			setTitle("Add new " + ObjectName + " to list");
@@ -83,6 +86,19 @@ public class NameDialog extends TitleAreaDialog {
 		dataLastName.horizontalAlignment = GridData.FILL;
 		txtDescription = new Text(container, SWT.BORDER);
 		txtDescription.setLayoutData(dataLastName);
+
+		// Button button = new Button(container, SWT.PUSH);
+		// button.setLayoutData(new GridData(SWT.RIGHT, SWT.RIGHT, false, false));
+		// button.setText("Get Description from SAP");
+		// button.addSelectionListener(new SelectionAdapter() {
+		// @Override
+		// public void widgetSelected(SelectionEvent e) {
+		// String SAPDescr =
+		// Common.getObjectDescription(Common.getProjectByName(Common.getProjectName()),
+		// txtName.getText(), typeOfObject);
+		// txtDescription.setText(SAPDescr);
+		// }
+		// });
 	}
 
 	@Override

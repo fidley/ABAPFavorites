@@ -2,6 +2,13 @@ package com.abapblog.favorites.common;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -16,13 +23,21 @@ import javax.xml.transform.stream.StreamResult;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
@@ -37,13 +52,50 @@ import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.common.CommonTypes.TypeOfObject;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLAttr;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
+import com.sap.adt.logging.AdtLogging;
 import com.sap.adt.project.IAdtCoreProject;
 import com.sap.adt.project.ui.util.ProjectUtil;
+import com.sap.adt.ris.search.AdtRisQuickSearchFactory;
+import com.sap.adt.ris.search.RisQuickSearchNotSupportedException;
+import com.sap.adt.sapgui.ui.SapGuiPlugin;
+import com.sap.adt.sapgui.ui.editors.AdtSapGuiEditorUtilityFactory;
+import com.sap.adt.tools.core.model.adtcore.IAdtObjectReference;
+import com.sap.adt.tools.core.ui.navigation.AdtNavigationServiceFactory;
+import com.sap.adt.tools.core.wbtyperegistry.WorkbenchAction;
+import com.sap.adt.util.AdapterUtil;
 
 public class Common {
 
 	public static final String favFileName = "favorites.xml";
 	public static File favFile;
+	public static TreeViewer ViewerFavorites;
+	public static TreeViewer ViewerFavoritesDO;
+
+	public Action actAddFolder;
+	public Action actAddRootFolder;
+	public Action actAddClass;
+	public Action actAddInterface;
+	public Action actAddFunctionGroup;
+	public Action actAddFunctionModule;
+	public Action actAddTransaction;
+	public Action actAddProgram;
+	public Action actAddURL;
+	public Action actDelFolder;
+	public Action actDelete;
+	public Action actAddView;
+	public Action actAddTable;
+	public Action actAddMessageClass;
+	public Action doubleClickAction;
+	public Action actEdit;
+	public Action actExportFavorites;
+	public Action actImportFavorites;
+	public String TempLinkedEditorProject;
+	public IProject TempLinkedProject;
+	private TypeOfXMLNode FolderNode;
+
+	public Common(TypeOfXMLNode FolderNode) {
+		this.FolderNode = FolderNode;
+	}
 
 	public static String getProjectName() {
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -85,6 +137,12 @@ public class Common {
 			return "Program";
 		case Transaction:
 			return "Transaction";
+		case View:
+			return "View";
+		case Table:
+			return "Table";
+		case MessageClass:
+			return "Message class";
 		default:
 			return "object";
 		}
@@ -143,6 +201,12 @@ public class Common {
 			return TypeOfXMLNode.folderNode;
 		case FolderDO:
 			return TypeOfXMLNode.folderDONode;
+		case View:
+			return TypeOfXMLNode.viewNode;
+		case Table:
+			return TypeOfXMLNode.tableNode;
+		case MessageClass:
+			return TypeOfXMLNode.messageClassNode;
 
 		default:
 			return TypeOfXMLNode.programNode;
@@ -168,9 +232,9 @@ public class Common {
 					Node nNode = folders.item(temp);
 
 					NamedNodeMap attributes = nNode.getAttributes();
-					Node FolderName = attributes.getNamedItem(TypeOfXMLAttr.name.toString());
+					Node FolderID = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
 
-					if (FolderName.getNodeValue().contentEquals(Parent)) {
+					if (FolderID.getNodeValue().contentEquals(Parent)) {
 
 						Element ObjectElement = doc.createElement(getObjectXMLNode(Type).toString());
 						ObjectElement.setAttribute(TypeOfXMLAttr.name.toString(), Name);
@@ -207,7 +271,7 @@ public class Common {
 
 	}
 
-	public static void delObjectFromXML(TypeOfEntry Type, String Name, String Parent, TypeOfXMLNode ParentNodeType) {
+	public static void delObjectFromXML(TypeOfEntry Type, String Name, String ParentID, TypeOfXMLNode ParentNodeType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {
@@ -224,8 +288,8 @@ public class Common {
 					Node nNode = folders.item(temp);
 
 					NamedNodeMap attributes = nNode.getAttributes();
-					Node FolderName = attributes.getNamedItem(TypeOfXMLAttr.name.toString());
-					if (FolderName.getNodeValue().equals(Parent)) {
+					Node FolderName = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
+					if (FolderName.getNodeValue().equals(ParentID)) {
 
 						NodeList FolderEntries = nNode.getChildNodes();
 						for (int tempfol = 0; tempfol < FolderEntries.getLength(); tempfol++) {
@@ -269,7 +333,7 @@ public class Common {
 	}
 
 	public static void addFolderToXML(String Name, String Description, Boolean ProjectIndependent, String ProjectName,
-			Boolean DevObjFolder) {
+			Boolean DevObjFolder, String ParentID, TypeOfXMLNode ParentType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {
@@ -279,66 +343,33 @@ public class Common {
 				doc = dBuilder.parse(favFile);
 
 				doc.getDocumentElement().normalize();
-				Element root = doc.getDocumentElement();
-
-				Element FolderEl = doc.createElement(TypeOfXMLNode.folderNode.toString());
+				Element FolderEl = doc.createElement(ParentType.toString());
 				FolderEl.setAttribute(TypeOfXMLAttr.name.toString(), Name);
 				FolderEl.setAttribute(TypeOfXMLAttr.description.toString(), Description);
 				FolderEl.setAttribute(TypeOfXMLAttr.projectIndependent.toString(), ProjectIndependent.toString());
 				FolderEl.setAttribute(TypeOfXMLAttr.project.toString(), ProjectName);
 				FolderEl.setAttribute(TypeOfXMLAttr.devObjFolder.toString(), DevObjFolder.toString());
+				FolderEl.setAttribute(TypeOfXMLAttr.folderID.toString(), UUID.randomUUID().toString());
 
-				root.appendChild(FolderEl);
+				if (ParentID == "") {
+					Element root = doc.getDocumentElement();
+					root.appendChild(FolderEl);
+				} else {
+					NodeList folders = doc.getElementsByTagName(ParentType.toString());
 
-				DOMSource source = new DOMSource(doc);
+					for (int temp = 0; temp < folders.getLength(); temp++) {
 
-				TransformerFactory transformerFactory = TransformerFactory.newInstance();
-				Transformer transformer = transformerFactory.newTransformer();
-				StreamResult result = new StreamResult(favFile.getPath());
-				transformer.transform(source, result);
+						Node nNode = folders.item(temp);
 
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+						NamedNodeMap attributes = nNode.getAttributes();
+						Node FolderID = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
 
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	public static void addFolderDOToXML(String Name, String Description, Boolean ProjectIndependent, String ProjectName,
-			Boolean DevObjFolder) {
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder;
-		try {
-			dBuilder = dbFactory.newDocumentBuilder();
-			Document doc;
-			try {
-				doc = dBuilder.parse(favFile);
-
-				doc.getDocumentElement().normalize();
-				Element root = doc.getDocumentElement();
-
-				Element FolderEl = doc.createElement(TypeOfXMLNode.folderDONode.toString());
-				FolderEl.setAttribute(TypeOfXMLAttr.name.toString(), Name);
-				FolderEl.setAttribute(TypeOfXMLAttr.description.toString(), Description);
-				FolderEl.setAttribute(TypeOfXMLAttr.projectIndependent.toString(), ProjectIndependent.toString());
-				FolderEl.setAttribute(TypeOfXMLAttr.project.toString(), ProjectName);
-				FolderEl.setAttribute(TypeOfXMLAttr.devObjFolder.toString(), "true");
-
-				root.appendChild(FolderEl);
+						if (FolderID.getNodeValue().contentEquals(ParentID)) {
+							nNode.appendChild(FolderEl);
+							break;
+						}
+					}
+				}
 
 				DOMSource source = new DOMSource(doc);
 
@@ -368,7 +399,59 @@ public class Common {
 
 	}
 
-	public static void delFolderFromXML(String Name, TypeOfXMLNode ParentNodeType) {
+	// public static void addFolderDOToXML(String Name, String Description, Boolean
+	// ProjectIndependent, String ProjectName,
+	// Boolean DevObjFolder) {
+	// DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+	// DocumentBuilder dBuilder;
+	// try {
+	// dBuilder = dbFactory.newDocumentBuilder();
+	// Document doc;
+	// try {
+	// doc = dBuilder.parse(favFile);
+	//
+	// doc.getDocumentElement().normalize();
+	// Element root = doc.getDocumentElement();
+	//
+	// Element FolderEl = doc.createElement(TypeOfXMLNode.folderDONode.toString());
+	// FolderEl.setAttribute(TypeOfXMLAttr.name.toString(), Name);
+	// FolderEl.setAttribute(TypeOfXMLAttr.description.toString(), Description);
+	// FolderEl.setAttribute(TypeOfXMLAttr.projectIndependent.toString(),
+	// ProjectIndependent.toString());
+	// FolderEl.setAttribute(TypeOfXMLAttr.project.toString(), ProjectName);
+	// FolderEl.setAttribute(TypeOfXMLAttr.devObjFolder.toString(), "true");
+	//
+	// root.appendChild(FolderEl);
+	//
+	// DOMSource source = new DOMSource(doc);
+	//
+	// TransformerFactory transformerFactory = TransformerFactory.newInstance();
+	// Transformer transformer = transformerFactory.newTransformer();
+	// StreamResult result = new StreamResult(favFile.getPath());
+	// transformer.transform(source, result);
+	//
+	// } catch (SAXException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// } catch (IOException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// } catch (TransformerConfigurationException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// } catch (TransformerException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// }
+	//
+	// } catch (ParserConfigurationException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// }
+	//
+	// }
+
+	public static void delFolderFromXML(String FolderId, TypeOfXMLNode ParentNodeType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {
@@ -385,10 +468,10 @@ public class Common {
 					Node nNode = folders.item(temp);
 
 					NamedNodeMap attributes = nNode.getAttributes();
-					Node FolderName = attributes.getNamedItem(TypeOfXMLAttr.name.toString());
-					if (FolderName.getNodeValue().equals(Name)) {
-
-						root.removeChild(nNode);
+					Node FolderName = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
+					if (FolderName.getNodeValue().equals(FolderId)) {
+						Node parent = nNode.getParentNode();
+						parent.removeChild(nNode);
 						DOMSource source = new DOMSource(doc);
 
 						TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -420,7 +503,7 @@ public class Common {
 
 	}
 
-	public static void editFolderInXML(String OldName, String Name, String Description, Boolean ProjectIndependent,
+	public static void editFolderInXML(String FolderID, String Name, String Description, Boolean ProjectIndependent,
 			String ProjectName, Boolean DevObjFolder, TypeOfXMLNode ParentNodeType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
@@ -438,8 +521,8 @@ public class Common {
 					Node nNode = folders.item(temp);
 
 					NamedNodeMap attributes = nNode.getAttributes();
-					Node FolderName = attributes.getNamedItem(TypeOfXMLAttr.name.toString());
-					if (FolderName.getNodeValue().equals(OldName)) {
+					Node FolderName = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
+					if (FolderName.getNodeValue().equals(FolderID)) {
 
 						Element FolderEl = (Element) nNode;
 						FolderEl.setAttribute(TypeOfXMLAttr.name.toString(), Name);
@@ -498,8 +581,8 @@ public class Common {
 					Node nNode = folders.item(temp);
 
 					NamedNodeMap attributes = nNode.getAttributes();
-					Node FolderName = attributes.getNamedItem(TypeOfXMLAttr.name.toString());
-					if (FolderName.getNodeValue().toString().equals(Parent)) {
+					Node FolderID = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
+					if (FolderID.getNodeValue().contentEquals(Parent)) {
 
 						Element URLEl = doc.createElement(TypeOfXMLNode.urlNode.toString());
 						URLEl.setAttribute(TypeOfXMLAttr.name.toString(), Name);
@@ -552,7 +635,7 @@ public class Common {
 					if (NameToUpper) {
 						Name = Name.toUpperCase();
 					}
-					Common.addObjectToXML(Type, Name, NaDialog.getDescription(), Folder.Name,
+					Common.addObjectToXML(Type, Name, NaDialog.getDescription(), ((TreeParent) Folder).getFolderID(),
 							((TreeParent) Folder).getTypeOfFolder());
 					refreshViewer(viewer);
 				}
@@ -589,20 +672,17 @@ public class Common {
 						Name = Name.toUpperCase();
 					}
 
-					editFolderInXML(Folder.getName(), Name, FoDialog.getDescription(), FoDialog.getPrjInd(),
+					editFolderInXML(Folder.getFolderID(), Name, FoDialog.getDescription(), FoDialog.getPrjInd(),
 							getProjectName(), FoDialog.getDevObjectFolder(), Folder.getTypeOfFolder());
 					/*
-					 * Common.delFolderFromXML(Folder.getName(),
-					 * Folder.getTypeOfFolder());
+					 * Common.delFolderFromXML(Folder.getName(), Folder.getTypeOfFolder());
 					 *
-					 * if (Folder.getTypeOfFolder() == TypeOfXMLNode.folderNode)
-					 * { Common.addFolderToXML(Name, FoDialog.getDescription(),
-					 * FoDialog.getPrjInd(), getProjectName(),
-					 * FoDialog.getDevObjectFolder());
+					 * if (Folder.getTypeOfFolder() == TypeOfXMLNode.folderNode) {
+					 * Common.addFolderToXML(Name, FoDialog.getDescription(), FoDialog.getPrjInd(),
+					 * getProjectName(), FoDialog.getDevObjectFolder());
 					 *
-					 * } else { Common.addFolderDOToXML(Name,
-					 * FoDialog.getDescription(), FoDialog.getPrjInd(),
-					 * getProjectName(), FoDialog.getDevObjectFolder()); }
+					 * } else { Common.addFolderDOToXML(Name, FoDialog.getDescription(),
+					 * FoDialog.getPrjInd(), getProjectName(), FoDialog.getDevObjectFolder()); }
 					 */
 					refreshViewer(viewer);
 				}
@@ -629,10 +709,10 @@ public class Common {
 							Name = Name.toUpperCase();
 						}
 
-						Common.delObjectFromXML(Type, Object.getName(), Object.getParent().getName(),
+						Common.delObjectFromXML(Type, Object.getName(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
 						Common.addURLToXML(Name, UrlDialog.getDescription(), UrlDialog.getURL(),
-								Object.getParent().getName());
+								Object.getParent().getFolderID());
 
 						refreshViewer(viewer);
 					}
@@ -652,9 +732,9 @@ public class Common {
 						if (NameToUpper) {
 							Name = Name.toUpperCase();
 						}
-						Common.delObjectFromXML(Type, Object.getName(), Object.getParent().getName(),
+						Common.delObjectFromXML(Type, Object.getName(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
-						Common.addObjectToXML(Type, Name, NaDialog.getDescription(), Object.getParent().getName(),
+						Common.addObjectToXML(Type, Name, NaDialog.getDescription(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
 						refreshViewer(viewer);
 					}
@@ -712,6 +792,15 @@ public class Common {
 			return TypeOfEntry.URL;
 		}
 
+		if (nodeName.equals(TypeOfXMLNode.viewNode.toString())) {
+			return TypeOfEntry.View;
+		}
+		if (nodeName.equals(TypeOfXMLNode.tableNode.toString())) {
+			return TypeOfEntry.Table;
+		}
+		if (nodeName.equals(TypeOfXMLNode.messageClassNode.toString())) {
+			return TypeOfEntry.MessageClass;
+		}
 		return null;
 	}
 
@@ -723,7 +812,8 @@ public class Common {
 
 			if (object instanceof TreeObject) {
 				TreeObject treeObj = (TreeObject) object;
-				delObjectFromXML(treeObj.Type, object.Name, object.parent.Name, object.parent.getTypeOfFolder());
+				delObjectFromXML(treeObj.Type, object.Name, object.parent.getFolderID(),
+						object.parent.getTypeOfFolder());
 				refreshViewer(viewer);
 			}
 		}
@@ -758,6 +848,18 @@ public class Common {
 		}
 
 		if (sapType.equals(TypeOfObject.programType.toString()) && type == TypeOfEntry.Program) {
+			return true;
+		}
+
+		if (sapType.equals(TypeOfObject.ViewType.toString()) && type == TypeOfEntry.View) {
+			return true;
+		}
+
+		if (sapType.equals(TypeOfObject.TableType.toString()) && type == TypeOfEntry.Table) {
+			return true;
+		}
+
+		if (sapType.equals(TypeOfObject.MessageClassType.toString()) && type == TypeOfEntry.MessageClass) {
 			return true;
 		}
 
@@ -802,5 +904,673 @@ public class Common {
 			}
 		}
 		;
+	}
+
+	public static void copyFavFile(String Path) {
+		Bundle bundle = FrameworkUtil.getBundle((com.abapblog.favorites.views.Favorites.class));
+		IPath stateLoc = Platform.getStateLocation(bundle);
+
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder;
+		try {
+			dBuilder = dbFactory.newDocumentBuilder();
+
+			Document doc = null;
+			Common.favFile = new File(stateLoc.toFile(), Common.favFileName);
+			if (Common.favFile.exists() == false) {
+				try {
+					Common.favFile.createNewFile();
+					doc = dBuilder.newDocument();
+					Node root = doc.createElement("root");
+					doc.appendChild(root);
+
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				doc = dBuilder.parse(favFile);
+
+			}
+			;
+
+			DOMSource source = new DOMSource(doc);
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			StreamResult result = new StreamResult(Path);
+			transformer.transform(source, result);
+
+		} catch (ParserConfigurationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static void replaceFavFile(String Path) {
+
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder;
+		try {
+			dBuilder = dbFactory.newDocumentBuilder();
+
+			Document doc = null;
+			File SourceFile = new File(Path);
+			if (SourceFile.exists() == false) {
+				return;
+			}
+
+			doc = dBuilder.parse(SourceFile);
+			DOMSource source = new DOMSource(doc);
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			StreamResult result = new StreamResult(Common.favFile.getPath());
+			transformer.transform(source, result);
+			if (ViewerFavorites != null)
+				refreshViewer(ViewerFavorites);
+			if (ViewerFavoritesDO != null)
+				refreshViewer(ViewerFavoritesDO);
+
+		} catch (ParserConfigurationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	};
+
+	public void makeActions(TreeViewer viewer) {
+		AFIcons AFIcon = new AFIcons();
+		actAddFolder = new Action() {
+			@Override
+			public void run() {
+				Boolean FolderDO = false;
+				switch (FolderNode) {
+				case folderNode:
+					FolderDO = false;
+					break;
+				case folderDONode:
+					FolderDO = true;
+					break;
+				}
+				;
+				FolderDialog FolderDialog = new FolderDialog(viewer.getControl().getShell(), FolderDO);
+				FolderDialog.create();
+				if (FolderDialog.open() == Window.OK) {
+
+					if (viewer.getSelection() instanceof IStructuredSelection) {
+						IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+
+						TreeObject Folder = (TreeObject) selection.getFirstElement();
+
+						if (Folder instanceof TreeParent) {
+							Common.addFolderToXML(FolderDialog.getName(), FolderDialog.getDescription(),
+									FolderDialog.getPrjInd(), Common.getProjectName(),
+									FolderDialog.getDevObjectFolder(), ((TreeParent) Folder).getFolderID(),
+									((TreeParent) Folder).getTypeOfFolder());
+							Common.refreshViewer(viewer);
+						}
+
+					}
+
+				}
+
+			}
+		};
+		actAddFolder.setText("Add New Folder");
+		actAddFolder.setToolTipText("Add New Folder");
+		actAddFolder.setImageDescriptor(
+				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
+
+		actAddRootFolder = new Action() {
+			@Override
+			public void run() {
+				Boolean FolderDO = false;
+				switch (FolderNode) {
+				case folderNode:
+					FolderDO = false;
+					break;
+				case folderDONode:
+					FolderDO = true;
+					break;
+				}
+				;
+				FolderDialog FolderDialog = new FolderDialog(viewer.getControl().getShell(), FolderDO);
+				FolderDialog.create();
+				if (FolderDialog.open() == Window.OK) {
+
+					Common.addFolderToXML(FolderDialog.getName(), FolderDialog.getDescription(),
+							FolderDialog.getPrjInd(), Common.getProjectName(), FolderDialog.getDevObjectFolder(), "",
+							FolderNode);
+					Common.refreshViewer(viewer);
+				}
+
+			}
+
+		};
+
+		actAddRootFolder.setText("Add New Folder");
+		actAddRootFolder.setToolTipText("Add New Folder");
+		actAddRootFolder.setImageDescriptor(
+				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
+
+		actAddTransaction = new Action() {
+			@Override
+			public void run() {
+				Common.addObjectFromAction(TypeOfEntry.Transaction, true, viewer);
+			}
+
+		};
+		actAddTransaction.setText("Add Transaction");
+		actAddTransaction.setToolTipText("Transaction");
+		actAddTransaction.setImageDescriptor(AFIcon.getTransactionImgDescr());
+
+		actAddProgram = new Action() {
+			@Override
+			public void run() {
+				Common.addObjectFromAction(TypeOfEntry.Program, true, viewer);
+			}
+
+		};
+		actAddProgram.setText("Add Program");
+		actAddProgram.setToolTipText("Program");
+		actAddProgram.setImageDescriptor(AFIcon.getProgramIconImgDescr());
+
+		actAddView = new Action() {
+			@Override
+			public void run() {
+				Common.addObjectFromAction(TypeOfEntry.View, true, viewer);
+			}
+
+		};
+		actAddView.setText("Add View");
+		actAddView.setToolTipText("View");
+		actAddView.setImageDescriptor(AFIcon.getViewIconImgDescr());
+
+		actAddTable = new Action() {
+			@Override
+			public void run() {
+				Common.addObjectFromAction(TypeOfEntry.Table, true, viewer);
+			}
+
+		};
+		actAddTable.setText("Add Table");
+		actAddTable.setToolTipText("Table");
+		actAddTable.setImageDescriptor(AFIcon.getTableIconImgDescr());
+
+		actAddMessageClass = new Action() {
+			@Override
+			public void run() {
+				Common.addObjectFromAction(TypeOfEntry.MessageClass, true, viewer);
+			}
+
+		};
+		actAddMessageClass.setText("Add Message Class");
+		actAddMessageClass.setToolTipText("Message Class");
+		actAddMessageClass.setImageDescriptor(AFIcon.getMessageClassIconImgDescr());
+
+		actAddURL = new Action() {
+			@Override
+			public void run() {
+				URLDialog URLDialog = new URLDialog(viewer.getControl().getShell());
+				URLDialog.create();
+				if (URLDialog.open() == Window.OK) {
+					if (viewer.getSelection() instanceof IStructuredSelection) {
+						IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+
+						TreeObject object = (TreeObject) selection.getFirstElement();
+
+						if (object instanceof TreeParent) {
+
+							Common.addURLToXML(URLDialog.getName(), URLDialog.getDescription(), URLDialog.getURL(),
+									((TreeParent) object).getFolderID());
+							System.out.println(URLDialog.getName());
+							System.out.println(URLDialog.getDescription());
+							Common.refreshViewer(viewer);
+						}
+
+					}
+				}
+			}
+		};
+		actAddURL.setText("Add URL");
+		actAddURL.setToolTipText("URL");
+		actAddURL.setImageDescriptor(AFIcon.getURLIconImgDescr());
+
+		actAddClass = new Action() {
+			@Override
+			public void run() {
+				Common.addObjectFromAction(TypeOfEntry.Class, true, viewer);
+			}
+
+		};
+		actAddClass.setText("Add class");
+		actAddClass.setToolTipText("Class");
+		actAddClass.setImageDescriptor(AFIcon.getClassIconImgDescr());
+
+		actAddInterface = new Action() {
+			@Override
+			public void run() {
+				Common.addObjectFromAction(TypeOfEntry.Interface, true, viewer);
+			}
+
+		};
+		actAddInterface.setText("Add interface");
+		actAddInterface.setToolTipText("Interface");
+		actAddInterface.setImageDescriptor(AFIcon.getInterfaceIconImgDescr());
+
+		actAddFunctionGroup = new Action() {
+			@Override
+			public void run() {
+				Common.addObjectFromAction(TypeOfEntry.FunctionGroup, true, viewer);
+			}
+
+		};
+		actAddFunctionGroup.setText("Add function group");
+		actAddFunctionGroup.setToolTipText("Function Group");
+		actAddFunctionGroup.setImageDescriptor(AFIcon.getFunctionGroupIconImgDescr());
+
+		actAddFunctionModule = new Action() {
+			@Override
+			public void run() {
+				Common.addObjectFromAction(TypeOfEntry.FunctionModule, true, viewer);
+			}
+
+		};
+		actAddFunctionModule.setText("Add function module");
+		actAddFunctionModule.setToolTipText("Function Module");
+		actAddFunctionModule.setImageDescriptor(AFIcon.getFunctionModuleIconImgDescr());
+
+		actDelFolder = new Action() {
+			@Override
+			public void run() {
+				if (viewer.getSelection() instanceof IStructuredSelection) {
+					IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+
+					TreeObject object = (TreeObject) selection.getFirstElement();
+
+					if (object instanceof TreeParent) {
+						Common.delFolderFromXML(((TreeParent) object).getFolderID(),
+								((TreeParent) object).getTypeOfFolder());
+						Common.refreshViewer(viewer);
+					}
+
+				}
+			}
+		};
+		actDelFolder.setText("Delete Folder");
+		actDelFolder.setToolTipText("Folder");
+		actDelFolder.setImageDescriptor(
+				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
+
+		actEdit = new Action() {
+			@Override
+			public void run() {
+				if (viewer.getSelection() instanceof IStructuredSelection) {
+					IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+
+					TreeObject object = (TreeObject) selection.getFirstElement();
+					Common.editObjectFromAction(object.getType(),
+							Common.getObjectXMLNode(object.getType()).isNameToUpper(), viewer);
+
+				}
+			}
+		};
+		actEdit.setText("Edit");
+		actEdit.setToolTipText("Edit");
+		actEdit.setImageDescriptor(AFIcon.getRenameIconImgDescr());
+
+		actDelete = new Action() {
+			@Override
+			public void run() {
+				Common.deleteObjectFromAction(viewer);
+			}
+		};
+		actDelete.setText("Delete");
+		actDelete.setToolTipText("Delete");
+		actDelete.setImageDescriptor(
+				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
+
+		doubleClickAction = new Action() {
+			@Override
+			public void run() {
+
+				ISelection selection = viewer.getSelection();
+				Object obj = ((IStructuredSelection) selection).getFirstElement();
+
+				if (TempLinkedProject == null) {
+					IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+					IWorkbenchWindow window = page.getWorkbenchWindow();
+					ISelection ADTselection = window.getSelectionService().getSelection();
+					TempLinkedProject = ProjectUtil.getActiveAdtCoreProject(ADTselection, null, null,
+							IAdtCoreProject.ABAP_PROJECT_NATURE);
+				}
+
+				if (TempLinkedProject != null) {
+					TempLinkedEditorProject = TempLinkedProject.getName();
+
+					if (obj instanceof TreeObject) {
+
+						TreeObject nodeObject = ((TreeObject) obj);
+						TypeOfEntry NodeType = nodeObject.getType();
+						TreeParent nodeParent = nodeObject.parent;
+						switch (NodeType) {
+						case Transaction:
+							AdtSapGuiEditorUtilityFactory.createSapGuiEditorUtility()
+									.openEditorAndStartTransaction(TempLinkedProject, obj.toString(), true);
+							break;
+						case Folder:
+							break;
+						case URL:
+							try {
+								PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser()
+										.openURL(new URL(((TreeObject) obj).getTechnicalName()));
+							} catch (PartInitException | MalformedURLException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							break;
+						case Program:
+							if (nodeParent.getDevObjProject() == false) {
+								runObject(TempLinkedProject, nodeObject.getName(), nodeObject.Type);
+								break;
+							} else {
+								openObject(TempLinkedProject, nodeObject.getName(), nodeObject.Type);
+								break;
+							}
+
+						default:
+							if (nodeParent.getDevObjProject() == false) {
+								runObject(TempLinkedProject, nodeObject.getName(), nodeObject.Type);
+								break;
+							} else {
+								openObject(TempLinkedProject, nodeObject.getName(), nodeObject.Type);
+								break;
+							}
+						}
+					}
+
+				} else {
+					if (obj instanceof TreeObject) {
+						TypeOfEntry NodeType = ((TreeObject) obj).getType();
+						if (NodeType == TypeOfEntry.URL) {
+							try {
+								PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser()
+										.openURL(new URL(((TreeObject) obj).getTechnicalName()));
+							} catch (PartInitException | MalformedURLException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					}
+				}
+			}
+		};
+		actExportFavorites = new Action() {
+			@Override
+			public void run() {
+				exportFavorites(viewer);
+			}
+
+		};
+		actExportFavorites.setText("Export Favorites");
+		actExportFavorites.setImageDescriptor(
+				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_SAVEAS_EDIT));
+		actImportFavorites = new Action() {
+			@Override
+			public void run() {
+				importFavorites(viewer);
+			}
+
+		};
+		actImportFavorites.setText("Import Favorites");
+		actImportFavorites.setImageDescriptor(
+				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
+	}
+
+	private static void exportFavorites(TreeViewer viewer) {
+		Shell shell = viewer.getControl().getShell();
+		FileDialog dialog = new FileDialog(shell, SWT.SAVE);
+		dialog.setFilterNames(new String[] { "XML", "All Files (*.*)" });
+		dialog.setFilterExtensions(new String[] { "*.xml", "*.*" }); // Windows
+		// wild
+		// cards
+		// ColumnControlListener.dialog.setFilterPath("c:\\"); // Windows path
+		dialog.setFileName("favorites.xml");
+		// System.out.println("Save to: " + dialog.open());
+
+		String ExportFileName = dialog.open();
+		if (!ExportFileName.equals(""))
+			Common.copyFavFile(ExportFileName);
+	}
+
+	private static void importFavorites(TreeViewer viewer) {
+		Shell shell = viewer.getControl().getShell();
+		FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+		dialog.setFilterNames(new String[] { "XML", "All Files (*.*)" });
+		dialog.setFilterExtensions(new String[] { "*.xml", "*.*" });
+		dialog.setFileName("favorites.xml");
+
+		String ImportFileName = dialog.open();
+		if (!ImportFileName.equals(""))
+			Common.replaceFavFile(ImportFileName);
+	};
+
+	public static void openObject(IProject project, String reportName, TypeOfEntry type) {
+		String programName = "";
+		try {
+			List<IAdtObjectReference> res = AdtRisQuickSearchFactory
+					.createQuickSearch(project, new NullProgressMonitor()).execute(reportName, 10);
+			for (IAdtObjectReference ref : res) {
+				if (Common.checkType(ref.getType(), type)) {
+
+					Pattern regexPatern = Pattern.compile("^\\S*");
+					Matcher regexMatch = regexPatern.matcher(ref.getName());
+					while (regexMatch.find()) {
+						programName = regexMatch.group(0);
+					}
+					if (programName.equalsIgnoreCase(reportName)) {
+						AdtNavigationServiceFactory.createNavigationService().navigate(project, ref, true);
+						return;
+					}
+				}
+			}
+		} catch (OperationCanceledException | RisQuickSearchNotSupportedException e) {
+			// AdtLogging.getLogger(getClass()).error(e);
+		}
+	}
+
+	public static String getObjectDescription(IProject project, String objectName, TypeOfEntry type) {
+		String Name = "";
+
+		try {
+
+			List<IAdtObjectReference> res = AdtRisQuickSearchFactory
+					.createQuickSearch(project, new NullProgressMonitor()).execute(objectName, 10, false, false, null);
+			for (IAdtObjectReference ref : res) {
+				if (Common.checkType(ref.getType(), type)) {
+
+					Pattern regexPatern = Pattern.compile("^\\S*");
+					Matcher regexMatch = regexPatern.matcher(ref.getName());
+					while (regexMatch.find()) {
+						Name = regexMatch.group(0);
+					}
+					if (Name.equalsIgnoreCase(objectName)) {
+						return ref.getDescription();
+					}
+				}
+			}
+		} catch (OperationCanceledException | RisQuickSearchNotSupportedException e) {
+			AdtLogging.getLogger(AdtRisQuickSearchFactory.class).error(e);
+		}
+		return "";
+	}
+
+	@SuppressWarnings("restriction")
+	public static void runObject(IProject project, String reportName, TypeOfEntry type) {
+		String programName = "";
+		try {
+			List<IAdtObjectReference> res = AdtRisQuickSearchFactory
+					.createQuickSearch(project, new NullProgressMonitor()).execute(reportName, 10);
+			for (IAdtObjectReference ref : res) {
+				if (Common.checkType(ref.getType(), type)) {
+					Pattern regexPatern = Pattern.compile("^\\S*");
+					Matcher regexMatch = regexPatern.matcher(ref.getName());
+					while (regexMatch.find()) {
+						programName = regexMatch.group(0);
+					}
+					if (programName.equalsIgnoreCase(reportName)) {
+						SapGuiPlugin.getDefault().openEditorForObject(project,
+								AdapterUtil.getAdapter(ref, com.sap.adt.tools.core.IAdtObjectReference.class), true,
+								WorkbenchAction.EXECUTE.toString(), null, Collections.<String, String>emptyMap());
+						return;
+					}
+				}
+			}
+		} catch (OperationCanceledException | RisQuickSearchNotSupportedException e) {
+			// AdtLogging.getLogger(getClass()).error(e);
+		}
+	}
+
+	public TreeParent createTreeNodes(TypeOfXMLNode FolderXMLNode, Object Favorite, String LinkedEditorProject) {
+
+		TreeParent invisibleRoot = new TreeParent("", "", true, "", Favorite, false, "root");
+
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder;
+		try {
+			dBuilder = dbFactory.newDocumentBuilder();
+			Document doc;
+			try {
+				doc = dBuilder.parse(Common.favFile);
+
+				doc.getDocumentElement().normalize();
+
+				NodeList nList = doc.getDocumentElement().getChildNodes();
+
+				for (int temp = 0; temp < nList.getLength(); temp++) {
+
+					Node nNode = nList.item(temp);
+
+					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+						Element eElement = (Element) nNode;
+						Common.createSubNodes(FolderXMLNode, eElement, invisibleRoot, LinkedEditorProject, Favorite);
+					}
+				}
+
+				DOMSource source = new DOMSource(doc);
+
+				TransformerFactory transformerFactory = TransformerFactory.newInstance();
+				Transformer transformer = transformerFactory.newTransformer();
+				StreamResult result = new StreamResult(favFile.getPath());
+				transformer.transform(source, result);
+				return invisibleRoot;
+			} catch (SAXException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TransformerConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TransformerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private static void createSubNodes(TypeOfXMLNode folderXMLNode, Element subNode, TreeParent subNodeParent,
+			String linkedEditorProject, Object favorite) {
+
+		if (subNode.getNodeName().equalsIgnoreCase(folderXMLNode.toString())) {
+
+			TreeParent parent = new TreeParent(subNode.getAttribute(TypeOfXMLAttr.name.toString()),
+					subNode.getAttribute(TypeOfXMLAttr.description.toString()),
+					Boolean.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.projectIndependent.toString())),
+					subNode.getAttribute(TypeOfXMLAttr.project.toString()), favorite,
+					Boolean.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.devObjFolder.toString())),
+					subNode.getAttribute(TypeOfXMLAttr.folderID.toString())
+			// ,
+			// subNode.getAttribute(TypeOfXMLAttr.parentFolderID.toString())
+			);
+			String FolderID = "";
+			FolderID = subNode.getAttribute(TypeOfXMLAttr.folderID.toString());
+			if (FolderID == "") {
+				FolderID = parent.getFolderID();
+				subNode.setAttribute(TypeOfXMLAttr.folderID.toString(), FolderID);
+			}
+			boolean projectIsIndependent = Boolean
+					.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.projectIndependent.toString()));
+			if (projectIsIndependent == false) {
+				String ProjectName = linkedEditorProject;
+				if (ProjectName.equals(""))
+					ProjectName = Common.getProjectName();
+
+				if (!parent.getProject().equals(ProjectName)) {
+					return;
+				}
+			}
+
+			subNodeParent.addChild(parent);
+
+			NodeList Children = subNode.getChildNodes();
+
+			for (int tempChild = 0; tempChild < Children.getLength(); tempChild++) {
+
+				Node nNodeChild = Children.item(tempChild);
+
+				if (nNodeChild.getNodeType() == Node.ELEMENT_NODE) {
+
+					Element eElementChild = (Element) nNodeChild;
+
+					if (eElementChild.getNodeName().equalsIgnoreCase(folderXMLNode.toString())) {
+						Common.createSubNodes(folderXMLNode, eElementChild, parent, linkedEditorProject, favorite);
+					}
+
+					else {
+
+						String childName = eElementChild.getAttribute(TypeOfXMLAttr.name.toString());
+						if (Common.isXMLNodeNameToUpper(eElementChild.getTagName())) {
+							childName = childName.toUpperCase();
+						}
+						parent.addChild(
+								new TreeObject(childName, Common.getEntryTypeFromXMLNode(nNodeChild.getNodeName()),
+										eElementChild.getAttribute(TypeOfXMLAttr.description.toString()),
+										eElementChild.getAttribute(TypeOfXMLAttr.technicalName.toString()), favorite));
+					}
+				}
+			}
+		}
+
 	}
 }

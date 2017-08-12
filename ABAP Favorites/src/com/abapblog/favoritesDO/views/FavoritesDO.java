@@ -1,4 +1,4 @@
-package com.abapblog.favorites.views;
+package com.abapblog.favoritesDO.views;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -57,26 +57,25 @@ import com.sap.adt.project.ui.util.ProjectUtil;
  * For more go to ABAPBlog.com
  */
 
-public class Favorites extends ViewPart implements ILinkedWithEditorView {
+public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
-	public static final String ID = "com.abapblog.favorites.views.Favorites";
+	public static final String ID = "com.abapblog.favoritesDO.views.FavoritesDO";
 
 	private static String LinkedEditorProject = "";
 	private IProject LinkedProject;
 	private IPartListener2 linkWithEditorPartListener = new LinkWithEditorPartListener(this);
 	private Action linkWithEditorAction;
 	private static boolean linkingActive = true;
-	public static TreeViewer viewer;
-	private Common Utils;
+	public TreeViewer viewer;
 	private DrillDownAdapter drillDownAdapter;
-
+	private Common Utils;
 	public static String partName;
 
-	public Favorites getFav() {
-		return Favorites.this;
+	public FavoritesDO getFav() {
+		return FavoritesDO.this;
 	}
 
 	public static void savePluginSettings() {
@@ -156,20 +155,7 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 
 		// public void createTreeNodes() {
 		//
-		// invisibleRoot = new TreeParent("", "", true, "", getFav(), false, "root");
-		//
-		// Bundle bundle = FrameworkUtil.getBundle(getClass());
-		// stateLoc = Platform.getStateLocation(bundle);
-		//
-		// Common.favFile = new File(stateLoc.toFile(), Common.favFileName);
-		// if (Common.favFile.exists() == false) {
-		// try {
-		// Common.favFile.createNewFile();
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// }
+		// invisibleRoot = new TreeParent("", "", true, "", getFav(), false);
 		//
 		// DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		// DocumentBuilder dBuilder;
@@ -192,7 +178,7 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		// Element eElement = (Element) nNode;
 		//
 		// if
-		// (eElement.getNodeName().equalsIgnoreCase(TypeOfXMLNode.folderNode.toString()))
+		// (eElement.getNodeName().equalsIgnoreCase(TypeOfXMLNode.folderDONode.toString()))
 		// {
 		//
 		// TreeParent parent = new
@@ -200,13 +186,10 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		// eElement.getAttribute(TypeOfXMLAttr.description.toString()),
 		// Boolean.parseBoolean(
 		// eElement.getAttribute(TypeOfXMLAttr.projectIndependent.toString())),
-		// eElement.getAttribute(TypeOfXMLAttr.project.toString()), getFav(),
-		// Boolean.parseBoolean(
-		// eElement.getAttribute(TypeOfXMLAttr.devObjFolder.toString())));
+		// eElement.getAttribute(TypeOfXMLAttr.project.toString()), getFav(), true);
 		// boolean projectIsIndependent = Boolean.parseBoolean(
 		// eElement.getAttribute(TypeOfXMLAttr.projectIndependent.toString()));
 		// if (projectIsIndependent == false) {
-		//
 		// String ProjectName = LinkedEditorProject;
 		// if (ProjectName.equals(""))
 		// ProjectName = Common.getProjectName();
@@ -259,15 +242,15 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		// }
 
 		public void initialize() {
-			invisibleRoot = Utils.createTreeNodes(TypeOfXMLNode.folderNode, getFav(), LinkedEditorProject);
+			invisibleRoot = Utils.createTreeNodes(TypeOfXMLNode.folderDONode, getFav(), LinkedEditorProject);
 		}
 	}
 
 	class AFPatternFilter extends PatternFilter {
 		@Override
 		protected boolean isLeafMatch(final Viewer viewer, final Object element) {
-			// TreeViewer treeViewer = (TreeViewer) viewer;
-			// int numberOfColumns = treeViewer.getTree().getColumnCount();
+			TreeViewer treeViewer = (TreeViewer) viewer;
+			int numberOfColumns = treeViewer.getTree().getColumnCount();
 			boolean isMatch = false;
 			if (element instanceof TreeObject) {
 				TreeObject leaf = (TreeObject) element;
@@ -315,18 +298,13 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 						return AFIcons.getFunctionGroupIcon();
 					case FunctionModule:
 						return AFIcons.getFunctionModuleIcon();
-					case Folder:
-						return AFIcons.getFolderIcon();
-					case FolderDO:
-						return AFIcons.getFodlerDevObjIcon();
 					case MessageClass:
 						return AFIcons.getMessageClassIcon();
 					case View:
 						return AFIcons.getViewIcon();
 					case Table:
 						return AFIcons.getTableIcon();
-					default:
-						break;
+
 					}
 
 				}
@@ -372,19 +350,31 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 	/**
 	 * The constructor.
 	 */
-	public Favorites() {
-		Utils = new Common(TypeOfXMLNode.folderNode);
+	public FavoritesDO() {
+		Utils = new Common(TypeOfXMLNode.folderDONode);
 	}
 
 	/**
 	 * This is a callback that will allow us to create the viewer and initialize it.
 	 */
-
 	private void setNewPartName() {
 		if (linkingActive) {
 			setPartName(partName);
 		} else {
 			setPartName(partName + " (" + LinkedEditorProject + ")");
+		}
+	}
+
+	public String getProjectName() {
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IWorkbenchWindow window = page.getWorkbenchWindow();
+		ISelection ADTselection = window.getSelectionService().getSelection();
+		IProject project = ProjectUtil.getActiveAdtCoreProject(ADTselection, null, null,
+				IAdtCoreProject.ABAP_PROJECT_NATURE);
+		if (project != null) {
+			return project.getName();
+		} else {
+			return "";
 		}
 	}
 
@@ -394,7 +384,6 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		AFPatternFilter filter = new AFPatternFilter();
 		FilteredTree filteredTree = new FilteredTree(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL, filter, true);
 		ColumnControlListener columnListener = new ColumnControlListener();
-
 		partName = getPartName();
 
 		viewer = filteredTree.getViewer();
@@ -413,18 +402,18 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		viewer.setInput(getViewSite());
 		viewer.setLabelProvider(new ViewLabelProvider());
 
-		loadPluginSettings();
-		//
-
-		Common.ViewerFavorites = viewer;
-
 		// Create the help context id for the viewer's control
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), "com.abapblog.favorites.viewer");
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), "com.abapblog.favoritesDO.viewer");
 		getSite().setSelectionProvider(viewer);
 		Utils.makeActions(viewer);
 		hookContextMenu();
 		hookDoubleClickAction();
 		contributeToActionBars();
+
+		loadPluginSettings();
+
+		//
+		Common.ViewerFavoritesDO = viewer;
 
 		// Linking with editor
 		linkWithEditorAction = new Action("Link with Editor", SWT.TOGGLE) {
@@ -444,15 +433,13 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		setNewPartName();
 		// set up comparisor to be used in tree
 		sortTable();
-		Common.refreshViewer(viewer);
 	}
 
 	@Override
 	public void editorActivated(IEditorPart activeEditor) {
-		if (linkingActive) { // && !getViewSite().getPage().isPartVisible(this))
-								// {
+		if (linkingActive) {
 
-			if (!LinkedEditorProject.equals(Common.getProjectName())) {
+			if (!LinkedEditorProject.equals(getProjectName())) {
 
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				IWorkbenchWindow window = page.getWorkbenchWindow();
@@ -469,18 +456,9 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 
 	}
 
-	// protected void setPartName(String partName) {
-	// if (linkingActive == false) {
-	// partName = partName + " " + LinkedEditorProject;
-	// } else {
-	//
-	// }
-	// }
-
 	protected void toggleLinking() {
 		if (linkingActive) {
 			linkingActive = false;
-
 		} else {
 			linkingActive = true;
 			editorActivated(getSite().getPage().getActiveEditor());
@@ -494,7 +472,7 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		menuMgr.addMenuListener(new IMenuListener() {
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
-				Favorites.this.fillContextMenu(manager);
+				FavoritesDO.this.fillContextMenu(manager);
 			}
 		});
 		Menu menu = menuMgr.createContextMenu(viewer.getControl());
@@ -511,7 +489,6 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 	private void fillLocalPullDown(IMenuManager manager) {
 		manager.add(Utils.actExportFavorites);
 		manager.add(Utils.actImportFavorites);
-
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
@@ -569,9 +546,10 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
-
 		manager.add(Utils.actAddRootFolder);
-
+		// manager.add(actSortUP);
+		// manager.add(actSortDown);
+		manager.add(new Separator());
 		drillDownAdapter.addNavigationActions(manager);
 	}
 
@@ -588,6 +566,17 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 				} else {
 					throw new IllegalArgumentException("Not comparable: " + e1 + " " + e2);
 				}
+			}
+		});
+	}
+
+	private void hookDoubleClickAction() {
+		viewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				Utils.TempLinkedEditorProject = LinkedEditorProject;
+				Utils.TempLinkedProject = LinkedProject;
+				Utils.doubleClickAction.run();
 			}
 		});
 	}
@@ -620,16 +609,5 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 		linkingActive = prefs.getBoolean("linking_active", true);
 		LinkedEditorProject = prefs.get("linked_project", "");
 		LinkedProject = Common.getProjectByName(LinkedEditorProject);
-	};
-
-	private void hookDoubleClickAction() {
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(DoubleClickEvent event) {
-				Utils.TempLinkedEditorProject = LinkedEditorProject;
-				Utils.TempLinkedProject = LinkedProject;
-				Utils.doubleClickAction.run();
-			}
-		});
-	};
+	}
 }

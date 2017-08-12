@@ -31,7 +31,7 @@ public class FolderDialog extends TitleAreaDialog {
 
 	public FolderDialog(Shell parentShell, Boolean DevObjectFolder) {
 		super(parentShell);
-		setDevObjectFolder(true);
+		setDevObjectFolder(DevObjectFolder);
 	}
 
 	@Override
