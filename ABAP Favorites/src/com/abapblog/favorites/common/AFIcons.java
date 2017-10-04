@@ -85,8 +85,20 @@ public class AFIcons {
 		return getIcon("message_class.png");
 	}
 
+	public Image getADTLinkIcon() {
+		return getIcon("adt_link.png");
+	}
+
+	public Image getSearchHelpIcon() {
+		return getIcon("search_help.png");
+	}
+
 	public ImageDescriptor getTransactionImgDescr() {
 		return getImageDescriptor("transaction.png");
+	}
+
+	public ImageDescriptor getADTLinkImgDescr() {
+		return getImageDescriptor("adt_link.png");
 	}
 
 	public ImageDescriptor getURLIconImgDescr() {
@@ -143,6 +155,10 @@ public class AFIcons {
 
 	public ImageDescriptor getMessageClassIconImgDescr() {
 		return getImageDescriptor("message_class.png");
+	}
+
+	public ImageDescriptor getSearchHelpIconImgDescr() {
+		return getImageDescriptor("search_help.png");
 	}
 
 }

@@ -304,7 +304,10 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 						return AFIcons.getViewIcon();
 					case Table:
 						return AFIcons.getTableIcon();
-
+					case SearchHelp:
+						return AFIcons.getSearchHelpIcon();
+					case ADTLink:
+						return AFIcons.getADTLinkIcon();
 					}
 
 				}
@@ -511,6 +514,8 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 						manager.add(Utils.actAddView);
 						manager.add(Utils.actAddTable);
 						manager.add(Utils.actAddMessageClass);
+						manager.add(Utils.actAddSearchHelp);
+						manager.add(Utils.actAddADTLink);
 						manager.add(new Separator());
 					} else {
 						manager.add(Utils.actAddFolder);
@@ -561,8 +566,13 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 
 				if (e1 instanceof TreeParent && e2 instanceof TreeParent) {
 					return ((TreeParent) e1).getName().compareToIgnoreCase(((TreeParent) e2).getName());
+				} else if (e1 instanceof TreeParent && e2 instanceof TreeObject) {
+					return (-1);
+				} else if (e1 instanceof TreeObject && e2 instanceof TreeParent) {
+					return (1);
 				} else if (e1 instanceof TreeObject && e2 instanceof TreeObject) {
 					return ((TreeObject) e1).getName().compareToIgnoreCase(((TreeObject) e2).getName());
+
 				} else {
 					throw new IllegalArgumentException("Not comparable: " + e1 + " " + e2);
 				}

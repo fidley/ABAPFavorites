@@ -2,7 +2,7 @@
 <feature
       id="ABAP_Favorites_Feature_Project"
       label="ABAP Favorites"
-      version="1.0.13"
+      version="1.0.17"
       provider-name="ABAPBlog.com">
 
    <description>

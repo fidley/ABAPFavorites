@@ -80,11 +80,13 @@ public class Common {
 	public Action actAddTransaction;
 	public Action actAddProgram;
 	public Action actAddURL;
-	public Action actDelFolder;
+	public Action actAddADTLink;
 	public Action actDelete;
+	public Action actDelFolder;
 	public Action actAddView;
 	public Action actAddTable;
 	public Action actAddMessageClass;
+	public Action actAddSearchHelp;
 	public Action doubleClickAction;
 	public Action actEdit;
 	public Action actExportFavorites;
@@ -143,6 +145,10 @@ public class Common {
 			return "Table";
 		case MessageClass:
 			return "Message class";
+		case SearchHelp:
+			return "Search Help";
+		case ADTLink:
+			return "ADT Link";
 		default:
 			return "object";
 		}
@@ -157,26 +163,26 @@ public class Common {
 
 	}
 
-	public static String getObjectInternalName(TypeOfEntry ObjectType) {
-
-		switch (ObjectType) {
-		case Class:
-			return TypeOfObject.classType.toString();
-		case Include:
-			return TypeOfObject.includeType.toString();
-		case FunctionGroup:
-			return TypeOfObject.FunctionGroupType.toString();
-		case FunctionModule:
-			return TypeOfObject.FunctionModuleType.toString();
-		case Interface:
-			return TypeOfObject.interfaceType.toString();
-		case Program:
-			return TypeOfObject.programType.toString();
-		default:
-			return "object";
-		}
-
-	}
+	// public static String getObjectInternalName(TypeOfEntry ObjectType) {
+	//
+	// switch (ObjectType) {
+	// case Class:
+	// return TypeOfObject.classType.toString();
+	// case Include:
+	// return TypeOfObject.includeType.toString();
+	// case FunctionGroup:
+	// return TypeOfObject.FunctionGroupType.toString();
+	// case FunctionModule:
+	// return TypeOfObject.FunctionModuleType.toString();
+	// case Interface:
+	// return TypeOfObject.interfaceType.toString();
+	// case Program:
+	// return TypeOfObject.programType.toString();
+	// default:
+	// return "object";
+	// }
+	//
+	// }
 
 	public static TypeOfXMLNode getObjectXMLNode(TypeOfEntry ObjectType) {
 
@@ -207,7 +213,10 @@ public class Common {
 			return TypeOfXMLNode.tableNode;
 		case MessageClass:
 			return TypeOfXMLNode.messageClassNode;
-
+		case SearchHelp:
+			return TypeOfXMLNode.searchHelpNode;
+		case ADTLink:
+			return TypeOfXMLNode.ADTLinkNode;
 		default:
 			return TypeOfXMLNode.programNode;
 		}
@@ -564,7 +573,8 @@ public class Common {
 
 	}
 
-	public static void addURLToXML(String Name, String Description, String URL, String Parent) {
+	public static void addURLToXML(String Name, String Description, String URL, String Parent, TypeOfXMLNode NodeType,
+			TypeOfXMLNode ParentNodeType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {
@@ -574,7 +584,7 @@ public class Common {
 				doc = dBuilder.parse(favFile);
 
 				doc.getDocumentElement().normalize();
-				NodeList folders = doc.getElementsByTagName(TypeOfXMLNode.folderNode.toString());
+				NodeList folders = doc.getElementsByTagName(ParentNodeType.toString());
 
 				for (int temp = 0; temp < folders.getLength(); temp++) {
 
@@ -584,7 +594,7 @@ public class Common {
 					Node FolderID = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
 					if (FolderID.getNodeValue().contentEquals(Parent)) {
 
-						Element URLEl = doc.createElement(TypeOfXMLNode.urlNode.toString());
+						Element URLEl = doc.createElement(NodeType.toString());
 						URLEl.setAttribute(TypeOfXMLAttr.name.toString(), Name);
 						URLEl.setAttribute(TypeOfXMLAttr.description.toString(), Description);
 						URLEl.setAttribute(TypeOfXMLAttr.technicalName.toString(), URL);
@@ -692,7 +702,7 @@ public class Common {
 				switch (Object.getType()) {
 				case URL:
 					URLDialog UrlDialog = new URLDialog(viewer.getControl().getShell());
-					UrlDialog.create(true);
+					UrlDialog.create(TypeOfEntry.URL, true);
 
 					String Name = Object.getName();
 					if (NameToUpper) {
@@ -712,7 +722,36 @@ public class Common {
 						Common.delObjectFromXML(Type, Object.getName(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
 						Common.addURLToXML(Name, UrlDialog.getDescription(), UrlDialog.getURL(),
-								Object.getParent().getFolderID());
+								Object.getParent().getFolderID(), TypeOfXMLNode.urlNode,
+								Object.getParent().getTypeOfFolder());
+
+						refreshViewer(viewer);
+					}
+					break;
+				case ADTLink:
+					UrlDialog = new URLDialog(viewer.getControl().getShell());
+					UrlDialog.create(TypeOfEntry.ADTLink, true);
+
+					Name = Object.getName();
+					if (NameToUpper) {
+						Name = Name.toUpperCase();
+					}
+
+					UrlDialog.setName(Name);
+					UrlDialog.SetDescription(Object.getDescription());
+					UrlDialog.setURL(Object.getTechnicalName());
+
+					if (UrlDialog.open() == Window.OK) {
+						Name = UrlDialog.getName();
+						if (NameToUpper) {
+							Name = Name.toUpperCase();
+						}
+
+						Common.delObjectFromXML(Type, Object.getName(), Object.getParent().getFolderID(),
+								Object.getParent().getTypeOfFolder());
+						Common.addURLToXML(Name, UrlDialog.getDescription(), UrlDialog.getURL(),
+								Object.getParent().getFolderID(), TypeOfXMLNode.ADTLinkNode,
+								Object.getParent().getTypeOfFolder());
 
 						refreshViewer(viewer);
 					}
@@ -801,6 +840,12 @@ public class Common {
 		if (nodeName.equals(TypeOfXMLNode.messageClassNode.toString())) {
 			return TypeOfEntry.MessageClass;
 		}
+		if (nodeName.equals(TypeOfXMLNode.searchHelpNode.toString())) {
+			return TypeOfEntry.SearchHelp;
+		}
+		if (nodeName.equals(TypeOfXMLNode.ADTLinkNode.toString())) {
+			return TypeOfEntry.ADTLink;
+		}
 		return null;
 	}
 
@@ -860,6 +905,10 @@ public class Common {
 		}
 
 		if (sapType.equals(TypeOfObject.MessageClassType.toString()) && type == TypeOfEntry.MessageClass) {
+			return true;
+		}
+
+		if (sapType.equals(TypeOfObject.SearchHelpType.toString()) && type == TypeOfEntry.SearchHelp) {
 			return true;
 		}
 
@@ -1130,11 +1179,23 @@ public class Common {
 		actAddMessageClass.setToolTipText("Message Class");
 		actAddMessageClass.setImageDescriptor(AFIcon.getMessageClassIconImgDescr());
 
+		actAddSearchHelp = new Action() {
+			@Override
+			public void run() {
+				Common.addObjectFromAction(TypeOfEntry.SearchHelp, true, viewer);
+			}
+
+		};
+		actAddSearchHelp.setText("Add Search Help");
+		actAddSearchHelp.setToolTipText("Search Help");
+		actAddSearchHelp.setImageDescriptor(AFIcon.getSearchHelpIconImgDescr());
+		;
+
 		actAddURL = new Action() {
 			@Override
 			public void run() {
 				URLDialog URLDialog = new URLDialog(viewer.getControl().getShell());
-				URLDialog.create();
+				URLDialog.create(TypeOfEntry.URL, false);
 				if (URLDialog.open() == Window.OK) {
 					if (viewer.getSelection() instanceof IStructuredSelection) {
 						IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
@@ -1144,7 +1205,8 @@ public class Common {
 						if (object instanceof TreeParent) {
 
 							Common.addURLToXML(URLDialog.getName(), URLDialog.getDescription(), URLDialog.getURL(),
-									((TreeParent) object).getFolderID());
+									((TreeParent) object).getFolderID(), TypeOfXMLNode.urlNode,
+									object.getParent().getTypeOfFolder());
 							System.out.println(URLDialog.getName());
 							System.out.println(URLDialog.getDescription());
 							Common.refreshViewer(viewer);
@@ -1157,6 +1219,36 @@ public class Common {
 		actAddURL.setText("Add URL");
 		actAddURL.setToolTipText("URL");
 		actAddURL.setImageDescriptor(AFIcon.getURLIconImgDescr());
+
+		actAddADTLink = new Action() {
+			@Override
+			public void run() {
+				URLDialog URLDialog = new URLDialog(viewer.getControl().getShell());
+				URLDialog.create(TypeOfEntry.ADTLink, false);
+				if (URLDialog.open() == Window.OK) {
+					if (viewer.getSelection() instanceof IStructuredSelection) {
+						IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+
+						TreeObject object = (TreeObject) selection.getFirstElement();
+
+						if (object instanceof TreeParent) {
+							String ADTLink = URLDialog.getURL();
+							ADTLink = ADTLink.replace("(?<=\'/\'/)(.*?)(?=\'/)", "$system");
+							Common.addURLToXML(URLDialog.getName(), URLDialog.getDescription(), ADTLink,
+									((TreeParent) object).getFolderID(), TypeOfXMLNode.ADTLinkNode,
+									object.getParent().getTypeOfFolder());
+							System.out.println(URLDialog.getName());
+							System.out.println(URLDialog.getDescription());
+							Common.refreshViewer(viewer);
+						}
+
+					}
+				}
+			}
+		};
+		actAddADTLink.setText("Add ADT Link");
+		actAddADTLink.setToolTipText("ADT Link");
+		actAddADTLink.setImageDescriptor(AFIcon.getADTLinkImgDescr());
 
 		actAddClass = new Action() {
 			@Override
@@ -1289,7 +1381,11 @@ public class Common {
 							} catch (PartInitException | MalformedURLException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
+
 							}
+							break;
+						case ADTLink:
+							openAdtLink(TempLinkedProject, new String(((TreeObject) obj).getTechnicalName()));
 							break;
 						case Program:
 							if (nodeParent.getDevObjProject() == false) {
@@ -1299,6 +1395,7 @@ public class Common {
 								openObject(TempLinkedProject, nodeObject.getName(), nodeObject.Type);
 								break;
 							}
+						case Table:
 
 						default:
 							if (nodeParent.getDevObjProject() == false) {
@@ -1427,6 +1524,12 @@ public class Common {
 		return "";
 	}
 
+	public static void openAdtLink(IProject project, String adtLink) {
+		adtLink = adtLink.replace("(?<=\'/\'/)(.*?)(?=\'/)", project.getName().toString());
+		AdtNavigationServiceFactory.createNavigationService().navigateWithExternalLink(adtLink, project);
+		return;
+	}
+
 	@SuppressWarnings("restriction")
 	public static void runObject(IProject project, String reportName, TypeOfEntry type) {
 		String programName = "";
@@ -1519,10 +1622,7 @@ public class Common {
 					Boolean.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.projectIndependent.toString())),
 					subNode.getAttribute(TypeOfXMLAttr.project.toString()), favorite,
 					Boolean.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.devObjFolder.toString())),
-					subNode.getAttribute(TypeOfXMLAttr.folderID.toString())
-			// ,
-			// subNode.getAttribute(TypeOfXMLAttr.parentFolderID.toString())
-			);
+					subNode.getAttribute(TypeOfXMLAttr.folderID.toString()));
 			String FolderID = "";
 			FolderID = subNode.getAttribute(TypeOfXMLAttr.folderID.toString());
 			if (FolderID == "") {

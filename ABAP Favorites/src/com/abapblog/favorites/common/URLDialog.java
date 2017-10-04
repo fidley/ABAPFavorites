@@ -11,15 +11,19 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
+
 public class URLDialog extends TitleAreaDialog {
 
 	private Text txtName;
 	private Text txtDescription;
 	private Text txtTechnicalName;
 
+	private String ObjectName;
 	private String Name;
 	private String Description;
 	private String TechnicalName;
+	private TypeOfEntry typeOfObject;
 
 	public URLDialog(Shell parentShell) {
 		super(parentShell);
@@ -32,12 +36,14 @@ public class URLDialog extends TitleAreaDialog {
 		setMessage("Please fill all fields", IMessageProvider.INFORMATION);
 	}
 
-	public void create(Boolean Edit) {
+	public void create(TypeOfEntry ObjectType, Boolean Edit) {
 		super.create();
+		typeOfObject = ObjectType;
+		ObjectName = Common.getObjectName(ObjectType);
 		if (Edit == false) {
-			setTitle("Add new URL to list");
+			setTitle("Add new " + ObjectName + " to list");
 		} else {
-			setTitle("Change existing URL");
+			setTitle("Change existing " + ObjectName);
 		}
 		setMessage("Please fill all fields", IMessageProvider.INFORMATION);
 	}
