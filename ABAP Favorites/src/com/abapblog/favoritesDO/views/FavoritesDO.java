@@ -293,8 +293,6 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(Utils.actAddRootFolder);
-		// manager.add(actSortUP);
-		// manager.add(actSortDown);
 		manager.add(new Separator());
 		drillDownAdapter.addNavigationActions(manager);
 	}
@@ -369,63 +367,4 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 	public void setLinkedEditorProject(String linkedEditorProject) {
 		LinkedEditorProject = linkedEditorProject;
 	}
-
-	// @Override
-	// public void createPartControl(Composite parent) {
-	//
-	// AFPatternFilter filter = new AFPatternFilter();
-	// FilteredTree filteredTree = new FilteredTree(parent, SWT.MULTI | SWT.H_SCROLL
-	// | SWT.V_SCROLL, filter, true);
-	// ColumnControlListener columnListener = new ColumnControlListener();
-	// partName = getPartName();
-	//
-	// viewer = filteredTree.getViewer();
-	// drillDownAdapter = new DrillDownAdapter(viewer);
-	// Tree tree = viewer.getTree();
-	// tree.setHeaderVisible(true);
-	// TreeColumn columnName = new TreeColumn(tree, SWT.LEFT);
-	// columnName.setText("Name");
-	// columnName.addControlListener(columnListener);
-	// loadColumnSettings(columnName);
-	// TreeColumn columnDescr = new TreeColumn(tree, SWT.LEFT);
-	// columnDescr.setText("Description");
-	// columnDescr.addControlListener(columnListener);
-	// loadColumnSettings(columnDescr);
-	// viewer.setContentProvider(new ViewContentProvider());
-	// viewer.setInput(getViewSite());
-	// viewer.setLabelProvider(new ViewLabelProvider());
-	//
-	// // Create the help context id for the viewer's control
-	// PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(),
-	// "com.abapblog.favoritesDO.viewer");
-	// getSite().setSelectionProvider(viewer);
-	// Utils.makeActions(viewer);
-	// hookContextMenu();
-	// hookDoubleClickAction();
-	// contributeToActionBars();
-	//
-	// loadPluginSettings();
-	//
-	// //
-	// Common.ViewerFavoritesDO = viewer;
-	//
-	// // Linking with editor
-	// linkWithEditorAction = new Action("Link with Editor", SWT.TOGGLE) {
-	// @Override
-	// public void run() {
-	// toggleLinking();
-	// }
-	//
-	// };
-	// linkWithEditorAction.setText("Link with Editor");
-	// linkWithEditorAction.setImageDescriptor(
-	// PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ELCL_SYNCED));
-	// getViewSite().getActionBars().getToolBarManager().add(linkWithEditorAction);
-	// getSite().getPage().addPartListener(linkWithEditorPartListener);
-	// linkWithEditorAction.setChecked(linkingActive);
-	//
-	// setNewPartName();
-	// // set up comparisor to be used in tree
-	// sortTable();
-	// }
 }
