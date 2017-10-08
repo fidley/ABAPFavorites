@@ -1,7 +1,6 @@
 package com.abapblog.favoritesDO.views;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
@@ -13,18 +12,12 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
@@ -38,15 +31,19 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
-import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.ViewPart;
 
-import com.abapblog.favorites.common.AFIcons;
+import com.abapblog.favorites.common.AFPatternFilter;
+import com.abapblog.favorites.common.ColumnControlListener;
 import com.abapblog.favorites.common.Common;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
+import com.abapblog.favorites.common.ILinkedWithEditorView;
+import com.abapblog.favorites.common.LinkWithEditorPartListener;
 import com.abapblog.favorites.common.TreeObject;
 import com.abapblog.favorites.common.TreeParent;
+import com.abapblog.favorites.common.ViewContentProvider;
+import com.abapblog.favorites.common.ViewLabelProvider;
 import com.sap.adt.project.IAdtCoreProject;
 import com.sap.adt.project.ui.util.ProjectUtil;
 
@@ -93,263 +90,6 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 		}
 	}
 
-	public class ColumnControlListener implements ControlListener {
-
-		@Override
-		public void controlMoved(ControlEvent arg0) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void controlResized(ControlEvent arg0) {
-			// TODO Auto-generated method stub
-			IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ID);
-			TreeColumn column = (TreeColumn) arg0.getSource();
-			prefs.putInt("column_width" + column.getText(), column.getWidth());
-		}
-
-	}
-
-	public class ViewContentProvider implements ITreeContentProvider {
-		private TreeParent invisibleRoot;
-		public IPath stateLoc;
-
-		@Override
-		public Object[] getElements(Object parent) {
-			if (parent.equals(getViewSite())) {
-				if (invisibleRoot == null)
-					initialize();
-				return getChildren(invisibleRoot);
-			}
-			return getChildren(parent);
-		}
-
-		@Override
-		public Object getParent(Object child) {
-			if (child instanceof TreeObject) {
-				return ((TreeObject) child).getParent();
-			}
-			return null;
-		}
-
-		@Override
-		public Object[] getChildren(Object parent) {
-			if (parent instanceof TreeParent) {
-				return ((TreeParent) parent).getChildren();
-			}
-			return new Object[0];
-		}
-
-		@Override
-		public boolean hasChildren(Object parent) {
-			if (parent instanceof TreeParent)
-				return ((TreeParent) parent).hasChildren();
-			return false;
-		}
-
-		/*
-		 * We will set up a dummy model to initialize tree heararchy. In a real code,
-		 * you will connect to a real model and expose its hierarchy.
-		 */
-
-		// public void createTreeNodes() {
-		//
-		// invisibleRoot = new TreeParent("", "", true, "", getFav(), false);
-		//
-		// DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		// DocumentBuilder dBuilder;
-		// try {
-		// dBuilder = dbFactory.newDocumentBuilder();
-		// Document doc;
-		// try {
-		// doc = dBuilder.parse(Common.favFile);
-		//
-		// doc.getDocumentElement().normalize();
-		//
-		// NodeList nList = doc.getDocumentElement().getChildNodes();
-		//
-		// for (int temp = 0; temp < nList.getLength(); temp++) {
-		//
-		// Node nNode = nList.item(temp);
-		//
-		// if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-		//
-		// Element eElement = (Element) nNode;
-		//
-		// if
-		// (eElement.getNodeName().equalsIgnoreCase(TypeOfXMLNode.folderDONode.toString()))
-		// {
-		//
-		// TreeParent parent = new
-		// TreeParent(eElement.getAttribute(TypeOfXMLAttr.name.toString()),
-		// eElement.getAttribute(TypeOfXMLAttr.description.toString()),
-		// Boolean.parseBoolean(
-		// eElement.getAttribute(TypeOfXMLAttr.projectIndependent.toString())),
-		// eElement.getAttribute(TypeOfXMLAttr.project.toString()), getFav(), true);
-		// boolean projectIsIndependent = Boolean.parseBoolean(
-		// eElement.getAttribute(TypeOfXMLAttr.projectIndependent.toString()));
-		// if (projectIsIndependent == false) {
-		// String ProjectName = LinkedEditorProject;
-		// if (ProjectName.equals(""))
-		// ProjectName = Common.getProjectName();
-		//
-		// if (!parent.getProject().equals(ProjectName)) {
-		// continue;
-		// }
-		// }
-		//
-		// invisibleRoot.addChild(parent);
-		//
-		// NodeList Children = eElement.getChildNodes();
-		//
-		// for (int tempChild = 0; tempChild < Children.getLength(); tempChild++) {
-		//
-		// Node nNodeChild = Children.item(tempChild);
-		//
-		// if (nNodeChild.getNodeType() == Node.ELEMENT_NODE) {
-		//
-		// Element eElementChild = (Element) nNodeChild;
-		//
-		// String childName = eElementChild.getAttribute(TypeOfXMLAttr.name.toString());
-		// if (Common.isXMLNodeNameToUpper(eElementChild.getTagName())) {
-		// childName = childName.toUpperCase();
-		// }
-		// parent.addChild(new TreeObject(childName,
-		// Common.getEntryTypeFromXMLNode(nNodeChild.getNodeName()),
-		// eElementChild.getAttribute(TypeOfXMLAttr.description.toString()),
-		// eElementChild.getAttribute(TypeOfXMLAttr.technicalName.toString()),
-		// getFav()));
-		//
-		// }
-		// }
-		// }
-		// }
-		// }
-		//
-		// } catch (SAXException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		//
-		// } catch (ParserConfigurationException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// }
-
-		public void initialize() {
-			invisibleRoot = Utils.createTreeNodes(TypeOfXMLNode.folderDONode, getFav(), LinkedEditorProject);
-		}
-	}
-
-	class AFPatternFilter extends PatternFilter {
-		@Override
-		protected boolean isLeafMatch(final Viewer viewer, final Object element) {
-			TreeViewer treeViewer = (TreeViewer) viewer;
-			int numberOfColumns = treeViewer.getTree().getColumnCount();
-			boolean isMatch = false;
-			if (element instanceof TreeObject) {
-				TreeObject leaf = (TreeObject) element;
-				isMatch |= wordMatches(leaf.getName());
-				if (isMatch == false) {
-					isMatch |= wordMatches(leaf.getDescription());
-				}
-			}
-			return isMatch;
-		}
-
-	}
-
-	class ViewLabelProvider implements ITableLabelProvider {
-
-		@Override
-		public Image getColumnImage(Object element, int columnIndex) {
-			AFIcons AFIcons = new AFIcons();
-			switch (columnIndex) {
-			case 0:
-				String imageKey = ISharedImages.IMG_OBJ_ELEMENT;
-				if (element instanceof TreeParent)
-					if (((TreeParent) element).getDevObjProject() == true) {
-						return AFIcons.getFodlerDevObjIcon();
-					} else {
-						return AFIcons.getFolderIcon();
-					}
-
-				if (element instanceof TreeObject) {
-					TreeObject Node = (TreeObject) element;
-					switch (Node.Type) {
-					case Transaction:
-						return AFIcons.getTransactionIcon();
-					case URL:
-						return AFIcons.getURLIcon();
-					case Program:
-						return AFIcons.getProgramIcon();
-					case Class:
-						return AFIcons.getClassIcon();
-					case Interface:
-						return AFIcons.getInterfaceIcon();
-					case Include:
-						return AFIcons.getProgramIncludeIcon();
-					case FunctionGroup:
-						return AFIcons.getFunctionGroupIcon();
-					case FunctionModule:
-						return AFIcons.getFunctionModuleIcon();
-					case MessageClass:
-						return AFIcons.getMessageClassIcon();
-					case View:
-						return AFIcons.getViewIcon();
-					case Table:
-						return AFIcons.getTableIcon();
-					case SearchHelp:
-						return AFIcons.getSearchHelpIcon();
-					case ADTLink:
-						return AFIcons.getADTLinkIcon();
-					}
-
-				}
-
-				return PlatformUI.getWorkbench().getSharedImages().getImage(imageKey);
-			case 1:
-				return null;
-			}
-			return null;
-		}
-
-		@Override
-		public String getColumnText(Object element, int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-				return element.toString();
-			case 1:
-				if (element instanceof TreeObject)
-					return ((TreeObject) element).getDescription();
-
-			}
-			return null;
-		}
-
-		@Override
-		public void addListener(ILabelProviderListener listener) {
-		}
-
-		@Override
-		public void dispose() {
-		}
-
-		@Override
-		public boolean isLabelProperty(Object element, String property) {
-			return false;
-		}
-
-		@Override
-		public void removeListener(ILabelProviderListener listener) {
-		}
-	}
-
 	/**
 	 * The constructor.
 	 */
@@ -364,7 +104,7 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 		if (linkingActive) {
 			setPartName(partName);
 		} else {
-			setPartName(partName + " (" + LinkedEditorProject + ")");
+			setPartName(partName + " (" + getLinkedEditorProject() + ")");
 		}
 	}
 
@@ -387,6 +127,7 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 		AFPatternFilter filter = new AFPatternFilter();
 		FilteredTree filteredTree = new FilteredTree(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL, filter, true);
 		ColumnControlListener columnListener = new ColumnControlListener();
+		columnListener.setID(ID);
 		partName = getPartName();
 
 		viewer = filteredTree.getViewer();
@@ -401,7 +142,7 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 		columnDescr.setText("Description");
 		columnDescr.addControlListener(columnListener);
 		loadColumnSettings(columnDescr);
-		viewer.setContentProvider(new ViewContentProvider());
+		viewer.setContentProvider(new ViewContentProvider(TypeOfXMLNode.folderDONode, this, getViewSite()));
 		viewer.setInput(getViewSite());
 		viewer.setLabelProvider(new ViewLabelProvider());
 
@@ -442,7 +183,7 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 	public void editorActivated(IEditorPart activeEditor) {
 		if (linkingActive) {
 
-			if (!LinkedEditorProject.equals(getProjectName())) {
+			if (!getLinkedEditorProject().equals(getProjectName())) {
 
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				IWorkbenchWindow window = page.getWorkbenchWindow();
@@ -450,7 +191,7 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 				LinkedProject = ProjectUtil.getActiveAdtCoreProject(ADTselection, null, null,
 						IAdtCoreProject.ABAP_PROJECT_NATURE);
 				if (LinkedProject != null) {
-					LinkedEditorProject = LinkedProject.getName();
+					setLinkedEditorProject(LinkedProject.getName());
 					Common.refreshViewer(viewer);
 				}
 			}
@@ -584,7 +325,7 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
-				Utils.TempLinkedEditorProject = LinkedEditorProject;
+				Utils.TempLinkedEditorProject = getLinkedEditorProject();
 				Utils.TempLinkedProject = LinkedProject;
 				Utils.doubleClickAction.run();
 			}
@@ -617,7 +358,74 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 			e.printStackTrace();
 		}
 		linkingActive = prefs.getBoolean("linking_active", true);
-		LinkedEditorProject = prefs.get("linked_project", "");
-		LinkedProject = Common.getProjectByName(LinkedEditorProject);
+		setLinkedEditorProject(prefs.get("linked_project", ""));
+		LinkedProject = Common.getProjectByName(getLinkedEditorProject());
 	}
+
+	public String getLinkedEditorProject() {
+		return LinkedEditorProject;
+	}
+
+	public void setLinkedEditorProject(String linkedEditorProject) {
+		LinkedEditorProject = linkedEditorProject;
+	}
+
+	// @Override
+	// public void createPartControl(Composite parent) {
+	//
+	// AFPatternFilter filter = new AFPatternFilter();
+	// FilteredTree filteredTree = new FilteredTree(parent, SWT.MULTI | SWT.H_SCROLL
+	// | SWT.V_SCROLL, filter, true);
+	// ColumnControlListener columnListener = new ColumnControlListener();
+	// partName = getPartName();
+	//
+	// viewer = filteredTree.getViewer();
+	// drillDownAdapter = new DrillDownAdapter(viewer);
+	// Tree tree = viewer.getTree();
+	// tree.setHeaderVisible(true);
+	// TreeColumn columnName = new TreeColumn(tree, SWT.LEFT);
+	// columnName.setText("Name");
+	// columnName.addControlListener(columnListener);
+	// loadColumnSettings(columnName);
+	// TreeColumn columnDescr = new TreeColumn(tree, SWT.LEFT);
+	// columnDescr.setText("Description");
+	// columnDescr.addControlListener(columnListener);
+	// loadColumnSettings(columnDescr);
+	// viewer.setContentProvider(new ViewContentProvider());
+	// viewer.setInput(getViewSite());
+	// viewer.setLabelProvider(new ViewLabelProvider());
+	//
+	// // Create the help context id for the viewer's control
+	// PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(),
+	// "com.abapblog.favoritesDO.viewer");
+	// getSite().setSelectionProvider(viewer);
+	// Utils.makeActions(viewer);
+	// hookContextMenu();
+	// hookDoubleClickAction();
+	// contributeToActionBars();
+	//
+	// loadPluginSettings();
+	//
+	// //
+	// Common.ViewerFavoritesDO = viewer;
+	//
+	// // Linking with editor
+	// linkWithEditorAction = new Action("Link with Editor", SWT.TOGGLE) {
+	// @Override
+	// public void run() {
+	// toggleLinking();
+	// }
+	//
+	// };
+	// linkWithEditorAction.setText("Link with Editor");
+	// linkWithEditorAction.setImageDescriptor(
+	// PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ELCL_SYNCED));
+	// getViewSite().getActionBars().getToolBarManager().add(linkWithEditorAction);
+	// getSite().getPage().addPartListener(linkWithEditorPartListener);
+	// linkWithEditorAction.setChecked(linkingActive);
+	//
+	// setNewPartName();
+	// // set up comparisor to be used in tree
+	// sortTable();
+	// }
 }

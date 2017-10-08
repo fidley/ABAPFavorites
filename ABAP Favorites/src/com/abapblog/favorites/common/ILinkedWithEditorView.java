@@ -1,4 +1,4 @@
-package com.abapblog.favorites.views;
+package com.abapblog.favorites.common;
 
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewSite;

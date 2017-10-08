@@ -52,6 +52,8 @@ import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.common.CommonTypes.TypeOfObject;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLAttr;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
+import com.abapblog.favorites.views.Favorites;
+import com.abapblog.favoritesDO.views.FavoritesDO;
 import com.sap.adt.logging.AdtLogging;
 import com.sap.adt.project.IAdtCoreProject;
 import com.sap.adt.project.ui.util.ProjectUtil;
@@ -1556,8 +1558,15 @@ public class Common {
 		}
 	}
 
-	public TreeParent createTreeNodes(TypeOfXMLNode FolderXMLNode, Object Favorite, String LinkedEditorProject) {
+	public TreeParent createTreeNodes(TypeOfXMLNode FolderXMLNode, Object Favorite) {
 
+		String LinkedEditorProject;
+
+		try {
+			LinkedEditorProject = ((Favorites) Favorite).getLinkedEditorProject();
+		} catch (Exception e) {
+			LinkedEditorProject = ((FavoritesDO) Favorite).getLinkedEditorProject();
+		}
 		TreeParent invisibleRoot = new TreeParent("", "", true, "", Favorite, false, "root");
 
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
