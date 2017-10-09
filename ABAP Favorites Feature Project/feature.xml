@@ -2,11 +2,13 @@
 <feature
       id="ABAP_Favorites_Feature_Project"
       label="ABAP Favorites"
-      version="1.0.17"
+      version="1.0.18"
       provider-name="ABAPBlog.com">
 
    <description>
       ABAP Favorites
+
+ready for ADT 2.83
    </description>
 
    <license url="https://www.apache.org/licenses/LICENSE-2.0">

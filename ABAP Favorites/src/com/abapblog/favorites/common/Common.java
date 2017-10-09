@@ -64,7 +64,6 @@ import com.sap.adt.sapgui.ui.editors.AdtSapGuiEditorUtilityFactory;
 import com.sap.adt.tools.core.model.adtcore.IAdtObjectReference;
 import com.sap.adt.tools.core.ui.navigation.AdtNavigationServiceFactory;
 import com.sap.adt.tools.core.wbtyperegistry.WorkbenchAction;
-import com.sap.adt.util.AdapterUtil;
 
 public class Common {
 
@@ -164,27 +163,6 @@ public class Common {
 		return nodeType.isNameToUpper();
 
 	}
-
-	// public static String getObjectInternalName(TypeOfEntry ObjectType) {
-	//
-	// switch (ObjectType) {
-	// case Class:
-	// return TypeOfObject.classType.toString();
-	// case Include:
-	// return TypeOfObject.includeType.toString();
-	// case FunctionGroup:
-	// return TypeOfObject.FunctionGroupType.toString();
-	// case FunctionModule:
-	// return TypeOfObject.FunctionModuleType.toString();
-	// case Interface:
-	// return TypeOfObject.interfaceType.toString();
-	// case Program:
-	// return TypeOfObject.programType.toString();
-	// default:
-	// return "object";
-	// }
-	//
-	// }
 
 	public static TypeOfXMLNode getObjectXMLNode(TypeOfEntry ObjectType) {
 
@@ -1546,8 +1524,7 @@ public class Common {
 						programName = regexMatch.group(0);
 					}
 					if (programName.equalsIgnoreCase(reportName)) {
-						SapGuiPlugin.getDefault().openEditorForObject(project,
-								AdapterUtil.getAdapter(ref, com.sap.adt.tools.core.IAdtObjectReference.class), true,
+						SapGuiPlugin.getDefault().openEditorForObject(project, ref, true,
 								WorkbenchAction.EXECUTE.toString(), null, Collections.<String, String>emptyMap());
 						return;
 					}
