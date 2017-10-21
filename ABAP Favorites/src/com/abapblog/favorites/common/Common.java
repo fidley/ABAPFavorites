@@ -388,58 +388,6 @@ public class Common {
 
 	}
 
-	// public static void addFolderDOToXML(String Name, String Description, Boolean
-	// ProjectIndependent, String ProjectName,
-	// Boolean DevObjFolder) {
-	// DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-	// DocumentBuilder dBuilder;
-	// try {
-	// dBuilder = dbFactory.newDocumentBuilder();
-	// Document doc;
-	// try {
-	// doc = dBuilder.parse(favFile);
-	//
-	// doc.getDocumentElement().normalize();
-	// Element root = doc.getDocumentElement();
-	//
-	// Element FolderEl = doc.createElement(TypeOfXMLNode.folderDONode.toString());
-	// FolderEl.setAttribute(TypeOfXMLAttr.name.toString(), Name);
-	// FolderEl.setAttribute(TypeOfXMLAttr.description.toString(), Description);
-	// FolderEl.setAttribute(TypeOfXMLAttr.projectIndependent.toString(),
-	// ProjectIndependent.toString());
-	// FolderEl.setAttribute(TypeOfXMLAttr.project.toString(), ProjectName);
-	// FolderEl.setAttribute(TypeOfXMLAttr.devObjFolder.toString(), "true");
-	//
-	// root.appendChild(FolderEl);
-	//
-	// DOMSource source = new DOMSource(doc);
-	//
-	// TransformerFactory transformerFactory = TransformerFactory.newInstance();
-	// Transformer transformer = transformerFactory.newTransformer();
-	// StreamResult result = new StreamResult(favFile.getPath());
-	// transformer.transform(source, result);
-	//
-	// } catch (SAXException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// } catch (IOException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// } catch (TransformerConfigurationException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// } catch (TransformerException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	//
-	// } catch (ParserConfigurationException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	//
-	// }
-
 	public static void delFolderFromXML(String FolderId, TypeOfXMLNode ParentNodeType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
@@ -448,7 +396,6 @@ public class Common {
 			Document doc;
 			try {
 				doc = dBuilder.parse(favFile);
-				Element root = doc.getDocumentElement();
 				doc.getDocumentElement().normalize();
 				NodeList folders = doc.getElementsByTagName(ParentNodeType.toString());
 
@@ -1478,6 +1425,7 @@ public class Common {
 		}
 	}
 
+	@SuppressWarnings("restriction")
 	public static String getObjectDescription(IProject project, String objectName, TypeOfEntry type) {
 		String Name = "";
 
