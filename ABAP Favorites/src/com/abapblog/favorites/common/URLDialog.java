@@ -18,11 +18,13 @@ public class URLDialog extends TitleAreaDialog {
 	private Text txtName;
 	private Text txtDescription;
 	private Text txtTechnicalName;
+	private Text txtLongDescr;
 
 	private String ObjectName;
 	private String Name;
 	private String Description;
 	private String TechnicalName;
+	private String LongDescription;
 	private TypeOfEntry typeOfObject;
 
 	public URLDialog(Shell parentShell) {
@@ -59,6 +61,7 @@ public class URLDialog extends TitleAreaDialog {
 		createName(container);
 		createDescription(container);
 		createURL(container);
+		createLongDescr(container);
 
 		return area;
 	}
@@ -87,6 +90,20 @@ public class URLDialog extends TitleAreaDialog {
 		txtTechnicalName.setLayoutData(dataTechnicalName);
 	}
 
+	private void createLongDescr(Composite container) {
+		Label lbtLongDescr = new Label(container, SWT.TOP);
+		lbtLongDescr.setText("Long Description");
+
+		GridData dataLongDescr = new GridData(GridData.FILL_BOTH);
+		dataLongDescr.grabExcessHorizontalSpace = true;
+		dataLongDescr.horizontalAlignment = GridData.FILL;
+		dataLongDescr.verticalAlignment = GridData.FILL;
+		dataLongDescr.minimumHeight = 100;
+
+		txtLongDescr = new Text(container, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.RESIZE);
+		txtLongDescr.setLayoutData(dataLongDescr);
+	}
+
 	private void createDescription(Composite container) {
 		Label lbtLastName = new Label(container, SWT.NONE);
 		lbtLastName.setText("Description");
@@ -109,6 +126,7 @@ public class URLDialog extends TitleAreaDialog {
 		Name = txtName.getText();
 		Description = txtDescription.getText();
 		TechnicalName = txtTechnicalName.getText();
+		setLongDescription(txtLongDescr.getText());
 
 	}
 
@@ -144,4 +162,14 @@ public class URLDialog extends TitleAreaDialog {
 		this.Description = Description;
 		txtDescription.setText(Description);
 	}
+
+	public String getLongDescription() {
+		return LongDescription;
+	}
+
+	public void setLongDescription(String longDescription) {
+		LongDescription = longDescription;
+		txtLongDescr.setText(LongDescription);
+	}
+
 }

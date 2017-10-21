@@ -22,6 +22,8 @@ public class FolderDialog extends TitleAreaDialog {
 	private Button butDevObj;
 	private String Name;
 	private String Description;
+	private String LongDescription;
+	private Text txtLongDescr;
 	private boolean ProjectIndependent;
 	private boolean DevObjectFolder;
 
@@ -65,6 +67,7 @@ public class FolderDialog extends TitleAreaDialog {
 		if (!getDevObjectFolder()) {
 			createDevObjFolder(container);
 		}
+		createLongDescr(container);
 		return area;
 	}
 
@@ -78,6 +81,20 @@ public class FolderDialog extends TitleAreaDialog {
 
 		txtName = new Text(container, SWT.BORDER);
 		txtName.setLayoutData(dataFirstName);
+	}
+
+	private void createLongDescr(Composite container) {
+		Label lbtLongDescr = new Label(container, SWT.TOP);
+		lbtLongDescr.setText("Long Description");
+
+		GridData dataLongDescr = new GridData(GridData.FILL_BOTH);
+		dataLongDescr.grabExcessHorizontalSpace = true;
+		dataLongDescr.horizontalAlignment = GridData.FILL;
+		dataLongDescr.verticalAlignment = GridData.FILL;
+		dataLongDescr.minimumHeight = 100;
+
+		txtLongDescr = new Text(container, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.RESIZE);
+		txtLongDescr.setLayoutData(dataLongDescr);
 	}
 
 	private void createProjectIndependent(Composite container) {
@@ -141,8 +158,7 @@ public class FolderDialog extends TitleAreaDialog {
 	private void saveInput() {
 		Name = txtName.getText();
 		Description = txtDescription.getText();
-		// ProjectIndependent = butPrjInd.get
-
+		LongDescription = txtLongDescr.getText();
 	}
 
 	@Override
@@ -186,5 +202,14 @@ public class FolderDialog extends TitleAreaDialog {
 		DevObjectFolder = devObjectProject;
 		if (butDevObj != null)
 			butDevObj.setSelection(DevObjectFolder);
+	}
+
+	public String getLongDescription() {
+		return LongDescription;
+	}
+
+	public void setLongDescription(String longDescription) {
+		LongDescription = longDescription;
+		txtLongDescr.setText(LongDescription);
 	}
 }

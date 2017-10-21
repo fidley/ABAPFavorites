@@ -203,8 +203,8 @@ public class Common {
 
 	}
 
-	public static void addObjectToXML(TypeOfEntry Type, String Name, String Description, String Parent,
-			TypeOfXMLNode ParentType) {
+	public static void addObjectToXML(TypeOfEntry Type, String Name, String Description, String LongDescription,
+			String Parent, TypeOfXMLNode ParentType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {
@@ -228,6 +228,7 @@ public class Common {
 						Element ObjectElement = doc.createElement(getObjectXMLNode(Type).toString());
 						ObjectElement.setAttribute(TypeOfXMLAttr.name.toString(), Name);
 						ObjectElement.setAttribute(TypeOfXMLAttr.description.toString(), Description);
+						ObjectElement.setAttribute(TypeOfXMLAttr.longDescription.toString(), LongDescription);
 
 						nNode.appendChild(ObjectElement);
 
@@ -321,8 +322,9 @@ public class Common {
 
 	}
 
-	public static void addFolderToXML(String Name, String Description, Boolean ProjectIndependent, String ProjectName,
-			Boolean DevObjFolder, String ParentID, TypeOfXMLNode ParentType) {
+	public static void addFolderToXML(String Name, String Description, String LongDescription,
+			Boolean ProjectIndependent, String ProjectName, Boolean DevObjFolder, String ParentID,
+			TypeOfXMLNode ParentType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {
@@ -335,6 +337,7 @@ public class Common {
 				Element FolderEl = doc.createElement(ParentType.toString());
 				FolderEl.setAttribute(TypeOfXMLAttr.name.toString(), Name);
 				FolderEl.setAttribute(TypeOfXMLAttr.description.toString(), Description);
+				FolderEl.setAttribute(TypeOfXMLAttr.longDescription.toString(), LongDescription);
 				FolderEl.setAttribute(TypeOfXMLAttr.projectIndependent.toString(), ProjectIndependent.toString());
 				FolderEl.setAttribute(TypeOfXMLAttr.project.toString(), ProjectName);
 				FolderEl.setAttribute(TypeOfXMLAttr.devObjFolder.toString(), DevObjFolder.toString());
@@ -388,58 +391,6 @@ public class Common {
 
 	}
 
-	// public static void addFolderDOToXML(String Name, String Description, Boolean
-	// ProjectIndependent, String ProjectName,
-	// Boolean DevObjFolder) {
-	// DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-	// DocumentBuilder dBuilder;
-	// try {
-	// dBuilder = dbFactory.newDocumentBuilder();
-	// Document doc;
-	// try {
-	// doc = dBuilder.parse(favFile);
-	//
-	// doc.getDocumentElement().normalize();
-	// Element root = doc.getDocumentElement();
-	//
-	// Element FolderEl = doc.createElement(TypeOfXMLNode.folderDONode.toString());
-	// FolderEl.setAttribute(TypeOfXMLAttr.name.toString(), Name);
-	// FolderEl.setAttribute(TypeOfXMLAttr.description.toString(), Description);
-	// FolderEl.setAttribute(TypeOfXMLAttr.projectIndependent.toString(),
-	// ProjectIndependent.toString());
-	// FolderEl.setAttribute(TypeOfXMLAttr.project.toString(), ProjectName);
-	// FolderEl.setAttribute(TypeOfXMLAttr.devObjFolder.toString(), "true");
-	//
-	// root.appendChild(FolderEl);
-	//
-	// DOMSource source = new DOMSource(doc);
-	//
-	// TransformerFactory transformerFactory = TransformerFactory.newInstance();
-	// Transformer transformer = transformerFactory.newTransformer();
-	// StreamResult result = new StreamResult(favFile.getPath());
-	// transformer.transform(source, result);
-	//
-	// } catch (SAXException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// } catch (IOException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// } catch (TransformerConfigurationException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// } catch (TransformerException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	//
-	// } catch (ParserConfigurationException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	//
-	// }
-
 	public static void delFolderFromXML(String FolderId, TypeOfXMLNode ParentNodeType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
@@ -448,7 +399,6 @@ public class Common {
 			Document doc;
 			try {
 				doc = dBuilder.parse(favFile);
-				Element root = doc.getDocumentElement();
 				doc.getDocumentElement().normalize();
 				NodeList folders = doc.getElementsByTagName(ParentNodeType.toString());
 
@@ -492,8 +442,8 @@ public class Common {
 
 	}
 
-	public static void editFolderInXML(String FolderID, String Name, String Description, Boolean ProjectIndependent,
-			String ProjectName, Boolean DevObjFolder, TypeOfXMLNode ParentNodeType) {
+	public static void editFolderInXML(String FolderID, String Name, String Description, String LongDescription,
+			Boolean ProjectIndependent, String ProjectName, Boolean DevObjFolder, TypeOfXMLNode ParentNodeType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {
@@ -516,6 +466,7 @@ public class Common {
 						Element FolderEl = (Element) nNode;
 						FolderEl.setAttribute(TypeOfXMLAttr.name.toString(), Name);
 						FolderEl.setAttribute(TypeOfXMLAttr.description.toString(), Description);
+						FolderEl.setAttribute(TypeOfXMLAttr.longDescription.toString(), LongDescription);
 						FolderEl.setAttribute(TypeOfXMLAttr.projectIndependent.toString(),
 								ProjectIndependent.toString());
 						FolderEl.setAttribute(TypeOfXMLAttr.project.toString(), ProjectName);
@@ -553,8 +504,8 @@ public class Common {
 
 	}
 
-	public static void addURLToXML(String Name, String Description, String URL, String Parent, TypeOfXMLNode NodeType,
-			TypeOfXMLNode ParentNodeType) {
+	public static void addURLToXML(String Name, String Description, String LongDescription, String URL, String Parent,
+			TypeOfXMLNode NodeType, TypeOfXMLNode ParentNodeType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {
@@ -578,6 +529,7 @@ public class Common {
 						URLEl.setAttribute(TypeOfXMLAttr.name.toString(), Name);
 						URLEl.setAttribute(TypeOfXMLAttr.description.toString(), Description);
 						URLEl.setAttribute(TypeOfXMLAttr.technicalName.toString(), URL);
+						URLEl.setAttribute(TypeOfXMLAttr.longDescription.toString(), LongDescription);
 
 						nNode.appendChild(URLEl);
 
@@ -625,7 +577,8 @@ public class Common {
 					if (NameToUpper) {
 						Name = Name.toUpperCase();
 					}
-					Common.addObjectToXML(Type, Name, NaDialog.getDescription(), ((TreeParent) Folder).getFolderID(),
+					Common.addObjectToXML(Type, Name, NaDialog.getDescription(),
+							((TreeParent) Folder).getLongDescription(), ((TreeParent) Folder).getFolderID(),
 							((TreeParent) Folder).getTypeOfFolder());
 					refreshViewer(viewer);
 				}
@@ -655,6 +608,7 @@ public class Common {
 				FoDialog.setDescription(Folder.getDescription());
 				FoDialog.setPrjInd(Folder.getProjectIndependent());
 				FoDialog.setDevObjectFolder(Folder.getDevObjProject());
+				FoDialog.setLongDescription(Folder.getLongDescription());
 				if (FoDialog.open() == Window.OK) {
 
 					Name = FoDialog.getName();
@@ -662,18 +616,10 @@ public class Common {
 						Name = Name.toUpperCase();
 					}
 
-					editFolderInXML(Folder.getFolderID(), Name, FoDialog.getDescription(), FoDialog.getPrjInd(),
-							getProjectName(), FoDialog.getDevObjectFolder(), Folder.getTypeOfFolder());
-					/*
-					 * Common.delFolderFromXML(Folder.getName(), Folder.getTypeOfFolder());
-					 *
-					 * if (Folder.getTypeOfFolder() == TypeOfXMLNode.folderNode) {
-					 * Common.addFolderToXML(Name, FoDialog.getDescription(), FoDialog.getPrjInd(),
-					 * getProjectName(), FoDialog.getDevObjectFolder());
-					 *
-					 * } else { Common.addFolderDOToXML(Name, FoDialog.getDescription(),
-					 * FoDialog.getPrjInd(), getProjectName(), FoDialog.getDevObjectFolder()); }
-					 */
+					editFolderInXML(Folder.getFolderID(), Name, FoDialog.getDescription(),
+							FoDialog.getLongDescription(), FoDialog.getPrjInd(), getProjectName(),
+							FoDialog.getDevObjectFolder(), Folder.getTypeOfFolder());
+
 					refreshViewer(viewer);
 				}
 
@@ -692,7 +638,7 @@ public class Common {
 					UrlDialog.setName(Name);
 					UrlDialog.SetDescription(Object.getDescription());
 					UrlDialog.setURL(Object.getTechnicalName());
-
+					UrlDialog.setLongDescription(Object.getLongDescription());
 					if (UrlDialog.open() == Window.OK) {
 						Name = UrlDialog.getName();
 						if (NameToUpper) {
@@ -701,8 +647,8 @@ public class Common {
 
 						Common.delObjectFromXML(Type, Object.getName(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
-						Common.addURLToXML(Name, UrlDialog.getDescription(), UrlDialog.getURL(),
-								Object.getParent().getFolderID(), TypeOfXMLNode.urlNode,
+						Common.addURLToXML(Name, UrlDialog.getDescription(), UrlDialog.getLongDescription(),
+								UrlDialog.getURL(), Object.getParent().getFolderID(), TypeOfXMLNode.urlNode,
 								Object.getParent().getTypeOfFolder());
 
 						refreshViewer(viewer);
@@ -720,6 +666,7 @@ public class Common {
 					UrlDialog.setName(Name);
 					UrlDialog.SetDescription(Object.getDescription());
 					UrlDialog.setURL(Object.getTechnicalName());
+					UrlDialog.setLongDescription(Object.getLongDescription());
 
 					if (UrlDialog.open() == Window.OK) {
 						Name = UrlDialog.getName();
@@ -729,8 +676,8 @@ public class Common {
 
 						Common.delObjectFromXML(Type, Object.getName(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
-						Common.addURLToXML(Name, UrlDialog.getDescription(), UrlDialog.getURL(),
-								Object.getParent().getFolderID(), TypeOfXMLNode.ADTLinkNode,
+						Common.addURLToXML(Name, UrlDialog.getDescription(), UrlDialog.getLongDescription(),
+								UrlDialog.getURL(), Object.getParent().getFolderID(), TypeOfXMLNode.ADTLinkNode,
 								Object.getParent().getTypeOfFolder());
 
 						refreshViewer(viewer);
@@ -745,7 +692,7 @@ public class Common {
 					}
 					NaDialog.setName(Name);
 					NaDialog.setDescription(Object.getDescription());
-
+					NaDialog.setLongDescription(Object.getLongDescription());
 					if (NaDialog.open() == Window.OK) {
 						Name = NaDialog.getName();
 						if (NameToUpper) {
@@ -753,8 +700,8 @@ public class Common {
 						}
 						Common.delObjectFromXML(Type, Object.getName(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
-						Common.addObjectToXML(Type, Name, NaDialog.getDescription(), Object.getParent().getFolderID(),
-								Object.getParent().getTypeOfFolder());
+						Common.addObjectToXML(Type, Name, NaDialog.getDescription(), NaDialog.getLongDescription(),
+								Object.getParent().getFolderID(), Object.getParent().getTypeOfFolder());
 						refreshViewer(viewer);
 					}
 					break;
@@ -1055,9 +1002,9 @@ public class Common {
 
 						if (Folder instanceof TreeParent) {
 							Common.addFolderToXML(FolderDialog.getName(), FolderDialog.getDescription(),
-									FolderDialog.getPrjInd(), Common.getProjectName(),
-									FolderDialog.getDevObjectFolder(), ((TreeParent) Folder).getFolderID(),
-									((TreeParent) Folder).getTypeOfFolder());
+									FolderDialog.getLongDescription(), FolderDialog.getPrjInd(),
+									Common.getProjectName(), FolderDialog.getDevObjectFolder(),
+									((TreeParent) Folder).getFolderID(), ((TreeParent) Folder).getTypeOfFolder());
 							Common.refreshViewer(viewer);
 						}
 
@@ -1090,8 +1037,8 @@ public class Common {
 				if (FolderDialog.open() == Window.OK) {
 
 					Common.addFolderToXML(FolderDialog.getName(), FolderDialog.getDescription(),
-							FolderDialog.getPrjInd(), Common.getProjectName(), FolderDialog.getDevObjectFolder(), "",
-							FolderNode);
+							FolderDialog.getLongDescription(), FolderDialog.getPrjInd(), Common.getProjectName(),
+							FolderDialog.getDevObjectFolder(), "", FolderNode);
 					Common.refreshViewer(viewer);
 				}
 
@@ -1184,7 +1131,8 @@ public class Common {
 
 						if (object instanceof TreeParent) {
 
-							Common.addURLToXML(URLDialog.getName(), URLDialog.getDescription(), URLDialog.getURL(),
+							Common.addURLToXML(URLDialog.getName(), URLDialog.getDescription(),
+									URLDialog.getLongDescription(), URLDialog.getURL(),
 									((TreeParent) object).getFolderID(), TypeOfXMLNode.urlNode,
 									object.getParent().getTypeOfFolder());
 							System.out.println(URLDialog.getName());
@@ -1214,9 +1162,9 @@ public class Common {
 						if (object instanceof TreeParent) {
 							String ADTLink = URLDialog.getURL();
 							ADTLink = ADTLink.replace("(?<=\'/\'/)(.*?)(?=\'/)", "$system");
-							Common.addURLToXML(URLDialog.getName(), URLDialog.getDescription(), ADTLink,
-									((TreeParent) object).getFolderID(), TypeOfXMLNode.ADTLinkNode,
-									object.getParent().getTypeOfFolder());
+							Common.addURLToXML(URLDialog.getName(), URLDialog.getDescription(),
+									URLDialog.getLongDescription(), ADTLink, ((TreeParent) object).getFolderID(),
+									TypeOfXMLNode.ADTLinkNode, object.getParent().getTypeOfFolder());
 							System.out.println(URLDialog.getName());
 							System.out.println(URLDialog.getDescription());
 							Common.refreshViewer(viewer);
@@ -1337,6 +1285,11 @@ public class Common {
 					ISelection ADTselection = window.getSelectionService().getSelection();
 					TempLinkedProject = ProjectUtil.getActiveAdtCoreProject(ADTselection, null, null,
 							IAdtCoreProject.ABAP_PROJECT_NATURE);
+					try {
+						TempLinkedProject.refreshLocal(IProject.DEPTH_INFINITE, new NullProgressMonitor());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 
 				if (TempLinkedProject != null) {
@@ -1478,6 +1431,7 @@ public class Common {
 		}
 	}
 
+	@SuppressWarnings("restriction")
 	public static String getObjectDescription(IProject project, String objectName, TypeOfEntry type) {
 		String Name = "";
 
@@ -1544,7 +1498,7 @@ public class Common {
 		} catch (Exception e) {
 			LinkedEditorProject = ((FavoritesDO) Favorite).getLinkedEditorProject();
 		}
-		TreeParent invisibleRoot = new TreeParent("", "", true, "", Favorite, false, "root");
+		TreeParent invisibleRoot = new TreeParent("", "", true, "", "", Favorite, false, "root");
 
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
@@ -1606,7 +1560,8 @@ public class Common {
 			TreeParent parent = new TreeParent(subNode.getAttribute(TypeOfXMLAttr.name.toString()),
 					subNode.getAttribute(TypeOfXMLAttr.description.toString()),
 					Boolean.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.projectIndependent.toString())),
-					subNode.getAttribute(TypeOfXMLAttr.project.toString()), favorite,
+					subNode.getAttribute(TypeOfXMLAttr.project.toString()),
+					subNode.getAttribute(TypeOfXMLAttr.longDescription.toString()), favorite,
 					Boolean.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.devObjFolder.toString())),
 					subNode.getAttribute(TypeOfXMLAttr.folderID.toString()));
 			String FolderID = "";
@@ -1649,10 +1604,11 @@ public class Common {
 						if (Common.isXMLNodeNameToUpper(eElementChild.getTagName())) {
 							childName = childName.toUpperCase();
 						}
-						parent.addChild(
-								new TreeObject(childName, Common.getEntryTypeFromXMLNode(nNodeChild.getNodeName()),
-										eElementChild.getAttribute(TypeOfXMLAttr.description.toString()),
-										eElementChild.getAttribute(TypeOfXMLAttr.technicalName.toString()), favorite));
+						parent.addChild(new TreeObject(childName,
+								Common.getEntryTypeFromXMLNode(nNodeChild.getNodeName()),
+								eElementChild.getAttribute(TypeOfXMLAttr.description.toString()),
+								eElementChild.getAttribute(TypeOfXMLAttr.technicalName.toString()),
+								eElementChild.getAttribute(TypeOfXMLAttr.longDescription.toString()), favorite));
 					}
 				}
 			}

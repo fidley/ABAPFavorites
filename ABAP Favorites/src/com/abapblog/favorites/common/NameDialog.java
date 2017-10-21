@@ -17,10 +17,12 @@ public class NameDialog extends TitleAreaDialog {
 
 	private Text txtName;
 	private Text txtDescription;
+	private Text txtLongDescr;
 
 	private String ObjectName;
 	private String Name;
 	private String Description;
+	private String LongDescription;
 	private TypeOfEntry typeOfObject;
 
 	public NameDialog(Shell parentShell) {
@@ -62,6 +64,8 @@ public class NameDialog extends TitleAreaDialog {
 
 		createName(container);
 		createDescription(container);
+		createLongDescr(container);
+
 		return area;
 	}
 
@@ -77,6 +81,20 @@ public class NameDialog extends TitleAreaDialog {
 		txtName.setLayoutData(dataFirstName);
 	}
 
+	private void createLongDescr(Composite container) {
+		Label lbtLongDescr = new Label(container, SWT.TOP);
+		lbtLongDescr.setText("Long Description");
+
+		GridData dataLongDescr = new GridData(GridData.FILL_BOTH);
+		dataLongDescr.grabExcessHorizontalSpace = true;
+		dataLongDescr.horizontalAlignment = GridData.FILL;
+		dataLongDescr.verticalAlignment = GridData.FILL;
+		dataLongDescr.minimumHeight = 100;
+
+		txtLongDescr = new Text(container, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.RESIZE);
+		txtLongDescr.setLayoutData(dataLongDescr);
+	}
+
 	private void createDescription(Composite container) {
 		Label lbtLastName = new Label(container, SWT.NONE);
 		lbtLastName.setText("Description");
@@ -87,18 +105,6 @@ public class NameDialog extends TitleAreaDialog {
 		txtDescription = new Text(container, SWT.BORDER);
 		txtDescription.setLayoutData(dataLastName);
 
-		// Button button = new Button(container, SWT.PUSH);
-		// button.setLayoutData(new GridData(SWT.RIGHT, SWT.RIGHT, false, false));
-		// button.setText("Get Description from SAP");
-		// button.addSelectionListener(new SelectionAdapter() {
-		// @Override
-		// public void widgetSelected(SelectionEvent e) {
-		// String SAPDescr =
-		// Common.getObjectDescription(Common.getProjectByName(Common.getProjectName()),
-		// txtName.getText(), typeOfObject);
-		// txtDescription.setText(SAPDescr);
-		// }
-		// });
 	}
 
 	@Override
@@ -111,8 +117,7 @@ public class NameDialog extends TitleAreaDialog {
 	private void saveInput() {
 		Name = txtName.getText();
 		Description = txtDescription.getText();
-		// ProjectIndependent = butPrjInd.get
-
+		LongDescription = txtLongDescr.getText();
 	}
 
 	@Override
@@ -138,4 +143,14 @@ public class NameDialog extends TitleAreaDialog {
 		this.Description = Description;
 		txtDescription.setText(Description);
 	}
+
+	public String getLongDescription() {
+		return LongDescription;
+	}
+
+	public void setLongDescription(String longDescription) {
+		LongDescription = longDescription;
+		txtLongDescr.setText(LongDescription);
+	}
+
 }

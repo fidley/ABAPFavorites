@@ -60,13 +60,16 @@ public class TreeObject implements IAdaptable {
 	public TypeOfEntry Type;
 	private String TechnicalName;
 	private String Description;
+	private String LongDescription;
 
-	public TreeObject(String Name, TypeOfEntry Type, String Description, String TechnicalName, Object Favorite) {
+	public TreeObject(String Name, TypeOfEntry Type, String Description, String TechnicalName, String LongDescription,
+			Object Favorite) {
 		this.favorite = Favorite;
 		this.Name = Name;
 		this.setType(Type);
 		this.setDescription(Description);
 		this.setTechnicalName(TechnicalName);
+		this.setLongDescription(LongDescription);
 	}
 
 	public String getName() {
@@ -115,5 +118,13 @@ public class TreeObject implements IAdaptable {
 
 	private Object getOuterType() {
 		return favorite;
+	}
+
+	public String getLongDescription() {
+		return LongDescription;
+	}
+
+	public void setLongDescription(String longDescription) {
+		LongDescription = longDescription;
 	}
 }

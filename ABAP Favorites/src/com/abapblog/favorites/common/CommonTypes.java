@@ -229,6 +229,11 @@ public class CommonTypes {
 				return "description";
 			}
 		},
+		longDescription {
+			public String toString() {
+				return "longDescription";
+			}
+		},
 		projectIndependent {
 			public String toString() {
 				return "projectIndependent";

@@ -15,9 +15,9 @@ public class TreeParent extends TreeObject {
 	private TypeOfXMLNode TypeOfFolder;
 	private String FolderID;
 
-	public TreeParent(String name, String description, boolean ProjectIndependent, String Project, Object Favorite,
-			boolean DevObjProj, String FolderID) {
-		super(name, TypeOfEntry.Folder, description, "", Favorite);
+	public TreeParent(String name, String description, boolean ProjectIndependent, String Project,
+			String LongDescription, Object Favorite, boolean DevObjProj, String FolderID) {
+		super(name, TypeOfEntry.Folder, description, "", LongDescription, Favorite);
 		children = new ArrayList();
 		this.ProjectIndependent = ProjectIndependent;
 		this.setProject(Project);
