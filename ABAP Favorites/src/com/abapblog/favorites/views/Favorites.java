@@ -37,9 +37,9 @@ import org.eclipse.ui.part.ViewPart;
 import com.abapblog.favorites.common.AFPatternFilter;
 import com.abapblog.favorites.common.ColumnControlListener;
 import com.abapblog.favorites.common.Common;
+import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.common.ILinkedWithEditorView;
 import com.abapblog.favorites.common.LinkWithEditorPartListener;
-import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.common.TreeObject;
 import com.abapblog.favorites.common.TreeParent;
 import com.abapblog.favorites.common.ViewContentProvider;
@@ -259,6 +259,7 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 						manager.add(Utils.actAddMessageClass);
 						manager.add(Utils.actAddSearchHelp);
 						manager.add(Utils.actAddADTLink);
+						manager.add(Utils.actAddCDS);
 						manager.add(new Separator());
 					} else {
 						manager.add(Utils.actAddFolder);

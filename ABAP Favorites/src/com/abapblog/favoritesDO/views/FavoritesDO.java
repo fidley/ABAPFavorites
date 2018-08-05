@@ -257,6 +257,7 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 						manager.add(Utils.actAddMessageClass);
 						manager.add(Utils.actAddSearchHelp);
 						manager.add(Utils.actAddADTLink);
+						manager.add(Utils.actAddCDS);
 						manager.add(new Separator());
 					} else {
 						manager.add(Utils.actAddFolder);

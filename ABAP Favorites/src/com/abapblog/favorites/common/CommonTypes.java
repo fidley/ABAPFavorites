@@ -4,7 +4,7 @@ package com.abapblog.favorites.common;
 public class CommonTypes {
 
 	public static enum TypeOfEntry {
-		Folder, Transaction, URL, Program, Class, Interface, FunctionGroup, FunctionModule, Include, FolderDO, View, Table, MessageClass, SearchHelp, ADTLink
+		Folder, Transaction, URL, Program, Class, Interface, FunctionGroup, FunctionModule, Include, FolderDO, View, Table, MessageClass, SearchHelp, ADTLink, CDSView, AMDP
 	};
 
 	public static enum TypeOfXMLNode {
@@ -145,6 +145,24 @@ public class CommonTypes {
 				return false;
 			}
 
+		},
+			public String toString() {
+				return "cdsView";
+			}
+
+			public Boolean isNameToUpper() {
+				return false;
+			}
+
+		},
+			public String toString() {
+				return "amdp";
+			}
+
+			public Boolean isNameToUpper() {
+				return false;
+			}
+
 		};
 
 		public Boolean isNameToUpper() {
@@ -212,6 +230,15 @@ public class CommonTypes {
 			}
 		},
 		SearchHelpType {
+			public String toString() {
+				return "SHLP/DH";
+			}
+		},
+		CDSViewType {
+			public String toString() {
+			}
+		},
+		AMDPType {
 			public String toString() {
 				return "SHLP/DH";
 			}

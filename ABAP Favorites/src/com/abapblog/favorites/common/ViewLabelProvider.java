@@ -54,6 +54,10 @@ public class ViewLabelProvider implements ITableLabelProvider {
 					return AFIcons.getSearchHelpIcon();
 				case ADTLink:
 					return AFIcons.getADTLinkIcon();
+				case CDSView:
+					return AFIcons.getCDSViewIcon();
+				case AMDP:
+					return AFIcons.getAMDPIcon();
 				default:
 					break;
 				}

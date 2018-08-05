@@ -86,6 +86,8 @@ public class Common {
 	public Action actDelFolder;
 	public Action actAddView;
 	public Action actAddTable;
+	public Action actAddCDS;
+	public Action actAddAMDP;
 	public Action actAddMessageClass;
 	public Action actAddSearchHelp;
 	public Action doubleClickAction;
@@ -197,6 +199,10 @@ public class Common {
 			return TypeOfXMLNode.searchHelpNode;
 		case ADTLink:
 			return TypeOfXMLNode.ADTLinkNode;
+		case CDSView:
+			return TypeOfXMLNode.CDSViewNode;
+		case AMDP:
+			return TypeOfXMLNode.AMDPNode;
 		default:
 			return TypeOfXMLNode.programNode;
 		}
@@ -773,6 +779,12 @@ public class Common {
 		if (nodeName.equals(TypeOfXMLNode.ADTLinkNode.toString())) {
 			return TypeOfEntry.ADTLink;
 		}
+		if (nodeName.equals(TypeOfXMLNode.CDSViewNode.toString())) {
+			return TypeOfEntry.CDSView;
+		}
+		if (nodeName.equals(TypeOfXMLNode.AMDPNode.toString())) {
+			return TypeOfEntry.AMDP;
+		}
 		return null;
 	}
 
@@ -836,6 +848,14 @@ public class Common {
 		}
 
 		if (sapType.equals(TypeOfObject.SearchHelpType.toString()) && type == TypeOfEntry.SearchHelp) {
+			return true;
+		}
+
+		if (sapType.equals(TypeOfObject.CDSViewType.toString()) && type == TypeOfEntry.CDSView) {
+			return true;
+		}
+
+		if (sapType.equals(TypeOfObject.AMDPType.toString()) && type == TypeOfEntry.AMDP) {
 			return true;
 		}
 
@@ -1116,7 +1136,6 @@ public class Common {
 		actAddSearchHelp.setText("Add Search Help");
 		actAddSearchHelp.setToolTipText("Search Help");
 		actAddSearchHelp.setImageDescriptor(AFIcon.getSearchHelpIconImgDescr());
-		;
 
 		actAddURL = new Action() {
 			@Override
@@ -1174,9 +1193,32 @@ public class Common {
 				}
 			}
 		};
+
 		actAddADTLink.setText("Add ADT Link");
 		actAddADTLink.setToolTipText("ADT Link");
 		actAddADTLink.setImageDescriptor(AFIcon.getADTLinkImgDescr());
+
+		actAddCDS = new Action() {
+			@Override
+			public void run() {
+				Common.addObjectFromAction(TypeOfEntry.CDSView, true, viewer);
+			}
+
+		};
+		actAddCDS.setText("Add CDS View");
+		actAddCDS.setToolTipText("CDS");
+		actAddCDS.setImageDescriptor(AFIcon.getCDSViewImgDescr());
+
+		actAddAMDP = new Action() {
+			@Override
+			public void run() {
+				Common.addObjectFromAction(TypeOfEntry.AMDP, true, viewer);
+			}
+
+		};
+		actAddAMDP.setText("Add AMDP");
+		actAddAMDP.setToolTipText("AMDP");
+		actAddAMDP.setImageDescriptor(AFIcon.getAMDPImgDescr());
 
 		actAddClass = new Action() {
 			@Override
