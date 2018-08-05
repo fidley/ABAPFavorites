@@ -146,6 +146,7 @@ public class CommonTypes {
 			}
 
 		},
+		CDSViewNode {
 			public String toString() {
 				return "cdsView";
 			}
@@ -155,6 +156,7 @@ public class CommonTypes {
 			}
 
 		},
+		AMDPNode {
 			public String toString() {
 				return "amdp";
 			}
@@ -236,6 +238,7 @@ public class CommonTypes {
 		},
 		CDSViewType {
 			public String toString() {
+				return "DDLS/DF";
 			}
 		},
 		AMDPType {

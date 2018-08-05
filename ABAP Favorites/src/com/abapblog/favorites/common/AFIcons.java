@@ -94,6 +94,7 @@ public class AFIcons {
 	}
 
 	public Image getCDSViewIcon() {
+		return getIcon("cds.png");
 	}
 
 	public Image getAMDPIcon() {
@@ -105,6 +106,7 @@ public class AFIcons {
 	}
 
 	public ImageDescriptor getCDSViewImgDescr() {
+		return getImageDescriptor("cds.png");
 	}
 
 	public ImageDescriptor getAMDPImgDescr() {
