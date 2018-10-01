@@ -280,6 +280,7 @@ public class FavoritesDO extends ViewPart implements ILinkedWithEditorView {
 					manager.add(new Separator());
 					manager.add(Utils.actEdit);
 					manager.add(new Separator());
+					Common.addOpenInProjectMenu(manager,viewer);
 					drillDownAdapter.addNavigationActions(manager);
 					// Other plug-ins can contribute there actions here
 					manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
