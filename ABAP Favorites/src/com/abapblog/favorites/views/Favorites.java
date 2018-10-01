@@ -37,9 +37,9 @@ import org.eclipse.ui.part.ViewPart;
 import com.abapblog.favorites.common.AFPatternFilter;
 import com.abapblog.favorites.common.ColumnControlListener;
 import com.abapblog.favorites.common.Common;
-import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.common.ILinkedWithEditorView;
 import com.abapblog.favorites.common.LinkWithEditorPartListener;
+import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.common.TreeObject;
 import com.abapblog.favorites.common.TreeParent;
 import com.abapblog.favorites.common.ViewContentProvider;
@@ -282,6 +282,8 @@ public class Favorites extends ViewPart implements ILinkedWithEditorView {
 					manager.add(new Separator());
 					manager.add(Utils.actEdit);
 					manager.add(new Separator());
+
+					Common.addOpenInProjectMenu(manager,viewer);
 					drillDownAdapter.addNavigationActions(manager);
 					// Other plug-ins can contribute there actions here
 					manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
