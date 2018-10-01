@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -21,12 +22,16 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -123,6 +128,23 @@ public class Common {
 			return null;
 		}
 
+	}
+
+	public static List<IProject> getABAPProjects() {
+		List<IProject> projectList = new LinkedList<IProject>();
+		try {
+			IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+			IProject[] projects = workspaceRoot.getProjects();
+			for (int i = 0; i < projects.length; i++) {
+				IProject project = projects[i];
+				if (project.hasNature(IAdtCoreProject.ABAP_PROJECT_NATURE)) {
+					projectList.add(project);
+				}
+			}
+		} catch (CoreException ce) {
+			ce.printStackTrace();
+		}
+		return projectList;
 	}
 
 	public static String getObjectName(TypeOfEntry ObjectType) {
@@ -1448,6 +1470,90 @@ public class Common {
 		if (!ImportFileName.equals(""))
 			Common.replaceFavFile(ImportFileName);
 	};
+
+	public static void addOpenInProjectMenu(IMenuManager manager, TreeViewer viewer) {
+		// sub-menu for projects
+		MenuManager subMenu = new MenuManager("Open in project", null);
+
+		for (IProject ABAPProject : Common.getABAPProjects()) {
+			Action projectAction = new Action() {
+				@Override
+				public void run() {
+
+					ISelection selection = viewer.getSelection();
+					Object obj = ((IStructuredSelection) selection).getFirstElement();
+
+					if (ABAPProject != null) {
+						if (obj instanceof TreeObject) {
+
+							TreeObject nodeObject = ((TreeObject) obj);
+							TypeOfEntry NodeType = nodeObject.getType();
+							TreeParent nodeParent = nodeObject.parent;
+							switch (NodeType) {
+							case Transaction:
+								AdtSapGuiEditorUtilityFactory.createSapGuiEditorUtility()
+										.openEditorAndStartTransaction(ABAPProject, obj.toString(), true);
+								break;
+							case Folder:
+								break;
+							case URL:
+								try {
+									PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser()
+											.openURL(new URL(((TreeObject) obj).getTechnicalName()));
+								} catch (PartInitException | MalformedURLException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+
+								}
+								break;
+							case ADTLink:
+								Common.openAdtLink(ABAPProject, new String(((TreeObject) obj).getTechnicalName()));
+								break;
+							case Program:
+								if (nodeParent.getDevObjProject() == false) {
+									Common.runObject(ABAPProject, nodeObject.getName(), nodeObject.Type);
+									break;
+								} else {
+									Common.openObject(ABAPProject, nodeObject.getName(), nodeObject.Type);
+									break;
+								}
+							case Table:
+
+							default:
+								if (nodeParent.getDevObjProject() == false) {
+									Common.runObject(ABAPProject, nodeObject.getName(), nodeObject.Type);
+									break;
+								} else {
+									Common.openObject(ABAPProject, nodeObject.getName(), nodeObject.Type);
+									break;
+								}
+							}
+						}
+
+					} else {
+						if (obj instanceof TreeObject) {
+							TypeOfEntry NodeType = ((TreeObject) obj).getType();
+							if (NodeType == TypeOfEntry.URL) {
+								try {
+									PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser()
+											.openURL(new URL(((TreeObject) obj).getTechnicalName()));
+								} catch (PartInitException | MalformedURLException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+						}
+					}
+				}
+			};
+			projectAction.setText(ABAPProject.getName());
+			projectAction.setToolTipText(ABAPProject.getName());
+			projectAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_PROJECT));
+
+			subMenu.add(projectAction);
+		}
+		manager.add(subMenu);
+	}
 
 	public static void openObject(IProject project, String reportName, TypeOfEntry type) {
 		String programName = "";
