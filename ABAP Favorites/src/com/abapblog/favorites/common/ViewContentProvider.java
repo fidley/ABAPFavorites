@@ -5,16 +5,17 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.ui.IViewSite;
 
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
+import com.abapblog.favorites.superview.IFavorites;
 
 public class ViewContentProvider implements ITreeContentProvider {
 	private TreeParent invisibleRoot;
 	public IPath stateLoc;
 	private Common Utils;
 	private TypeOfXMLNode folderNode;
-	public Object favorite;
+	public IFavorites favorite;
 	private IViewSite viewSite;
 
-	public ViewContentProvider(TypeOfXMLNode folderNode, Object favorite, IViewSite viewSite) {
+	public ViewContentProvider(TypeOfXMLNode folderNode, IFavorites favorite, IViewSite viewSite) {
 		super();
 		this.folderNode = folderNode;
 		this.favorite = favorite;

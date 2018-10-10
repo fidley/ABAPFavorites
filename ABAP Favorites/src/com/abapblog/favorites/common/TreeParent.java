@@ -5,7 +5,9 @@ import java.util.UUID;
 
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
+import com.abapblog.favorites.superview.IFavorites;
 import com.abapblog.favorites.views.Favorites;
+import com.abapblog.favoritesDO.views.FavoritesDO;
 
 public class TreeParent extends TreeObject {
 	private ArrayList children;
@@ -14,9 +16,10 @@ public class TreeParent extends TreeObject {
 	private String Project;
 	private TypeOfXMLNode TypeOfFolder;
 	private String FolderID;
+	private IFavorites favorite;
 
 	public TreeParent(String name, String description, boolean ProjectIndependent, String Project,
-			String LongDescription, Object Favorite, boolean DevObjProj, String FolderID) {
+			String LongDescription, IFavorites Favorite, boolean DevObjProj, String FolderID) {
 		super(name, TypeOfEntry.Folder, description, "", LongDescription, Favorite);
 		children = new ArrayList();
 		this.ProjectIndependent = ProjectIndependent;
@@ -27,6 +30,7 @@ public class TreeParent extends TreeObject {
 		} else {
 			setTypeOfFolder(TypeOfXMLNode.folderDONode);
 		}
+		favorite = Favorite;
 		this.setFolderID(FolderID);
 		if (this.getFolderID() == "") {
 			this.setFolderID(UUID.randomUUID().toString());
@@ -36,6 +40,34 @@ public class TreeParent extends TreeObject {
 	public void addChild(TreeObject child) {
 		children.add(child);
 		child.setParent(this);
+		if (favorite instanceof Favorites) {
+			Favorites fav = (Favorites) favorite;
+		} else {
+			FavoritesDO fav = (FavoritesDO) favorite;
+		}
+
+		// fav.dndSource.addDragListener(new DragSourceListener() {
+		// public void dragStart(DragSourceEvent event) {
+		// TreeItem[] selection = tree.getSelection();
+		// if (selection.length > 0 && selection[0].getItemCount() == 0) {
+		// event.doit = true;
+		// dragSourceItem[0] = selection[0];
+		// } else {
+		// event.doit = false;
+		// }
+		// };
+		//
+		// public void dragSetData(DragSourceEvent event) {
+		// event.data = dragSourceItem[0].getText();
+		// }
+		//
+		// public void dragFinished(DragSourceEvent event) {
+		// if (event.detail == DND.DROP_MOVE)
+		// dragSourceItem[0].dispose();
+		// dragSourceItem[0] = null;
+		// }
+		// });
+
 	}
 
 	public void removeChild(TreeObject child) {

@@ -54,6 +54,10 @@ public class ViewLabelProvider implements ITableLabelProvider {
 					return AFIcons.getSearchHelpIcon();
 				case ADTLink:
 					return AFIcons.getADTLinkIcon();
+				case CDSView:
+					return AFIcons.getCDSViewIcon();
+				case AMDP:
+					return AFIcons.getAMDPIcon();
 				default:
 					break;
 				}
@@ -75,7 +79,16 @@ public class ViewLabelProvider implements ITableLabelProvider {
 		case 1:
 			if (element instanceof TreeObject)
 				return ((TreeObject) element).getDescription();
-
+		case 2:
+			if (element instanceof TreeParent)
+				return ((TreeParent) element).getFolderID();
+		case 3:
+			if (element instanceof TreeParent)
+				return ((TreeParent) element).getTypeOfFolder().toString();
+		case 4:
+			if (element instanceof TreeParent)
+				if (((TreeParent) element).getDevObjProject() == true)
+					return "true";
 		}
 		return null;
 	}

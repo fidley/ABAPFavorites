@@ -3,6 +3,7 @@ package com.abapblog.favorites.common;
 import org.eclipse.core.runtime.IAdaptable;
 
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
+import com.abapblog.favorites.superview.IFavorites;
 
 public class TreeObject implements IAdaptable {
 	@Override
@@ -55,7 +56,7 @@ public class TreeObject implements IAdaptable {
 	}
 
 	public TreeParent parent;
-	private Object favorite;
+	private IFavorites favorite;
 	public String Name;
 	public TypeOfEntry Type;
 	private String TechnicalName;
@@ -63,13 +64,35 @@ public class TreeObject implements IAdaptable {
 	private String LongDescription;
 
 	public TreeObject(String Name, TypeOfEntry Type, String Description, String TechnicalName, String LongDescription,
-			Object Favorite) {
+			IFavorites Favorite) {
 		this.favorite = Favorite;
 		this.Name = Name;
 		this.setType(Type);
 		this.setDescription(Description);
 		this.setTechnicalName(TechnicalName);
 		this.setLongDescription(LongDescription);
+		// Favorite.dndSource.addDragListener(new DragSourceListener() {
+		// public void dragStart(DragSourceEvent event) {
+		// TreeItem[] selection = tree.getSelection();
+		// if (selection.length > 0 && selection[0].getItemCount() == 0) {
+		// event.doit = true;
+		// dragSourceItem[0] = selection[0];
+		// } else {
+		// event.doit = false;
+		// }
+		// };
+		//
+		// public void dragSetData(DragSourceEvent event) {
+		// event.data = dragSourceItem[0].getText();
+		// }
+		//
+		// public void dragFinished(DragSourceEvent event) {
+		// if (event.detail == DND.DROP_MOVE)
+		// dragSourceItem[0].dispose();
+		// dragSourceItem[0] = null;
+		// }
+		// });
+
 	}
 
 	public String getName() {

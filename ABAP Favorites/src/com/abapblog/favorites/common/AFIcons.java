@@ -93,7 +93,23 @@ public class AFIcons {
 		return getIcon("search_help.png");
 	}
 
+	public Image getCDSViewIcon() {
+		return getIcon("cds.png");
+	}
+
+	public Image getAMDPIcon() {
+		return getIcon("search_help.png");
+	}
+
 	public ImageDescriptor getTransactionImgDescr() {
+		return getImageDescriptor("transaction.png");
+	}
+
+	public ImageDescriptor getCDSViewImgDescr() {
+		return getImageDescriptor("cds.png");
+	}
+
+	public ImageDescriptor getAMDPImgDescr() {
 		return getImageDescriptor("transaction.png");
 	}
 

@@ -2,11 +2,11 @@
 <feature
       id="ABAP_Favorites_Feature_Project"
       label="ABAP Favorites"
-      version="1.0.19"
+      version="1.0.23"
       provider-name="ABAPBlog.com">
 
    <description>
-      ABAP Favorites / Long Description for objects and folder added
+      ABAP Favorites / Drag &amp; Drop added
    </description>
 
    <license url="https://www.apache.org/licenses/LICENSE-2.0">
@@ -60,7 +60,7 @@ END OF TERMS AND CONDITIONS
    </license>
 
    <url>
-      <update label="ABAPBlog.com ABAPFavorites Update Site" url="http://abapblog.com/eclipse/plugin/ABAPFavorites"/>
+      <update label="ABAPBlog.com ABAPFavorites Update Site" url="https://abapblog.com/eclipse/plugin/ABAPFavorites"/>
    </url>
 
    <plugin
