@@ -79,7 +79,16 @@ public class ViewLabelProvider implements ITableLabelProvider {
 		case 1:
 			if (element instanceof TreeObject)
 				return ((TreeObject) element).getDescription();
-
+		case 2:
+			if (element instanceof TreeParent)
+				return ((TreeParent) element).getFolderID();
+		case 3:
+			if (element instanceof TreeParent)
+				return ((TreeParent) element).getTypeOfFolder().toString();
+		case 4:
+			if (element instanceof TreeParent)
+				if (((TreeParent) element).getDevObjProject() == true)
+					return "true";
 		}
 		return null;
 	}

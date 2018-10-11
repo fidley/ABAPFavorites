@@ -3,6 +3,10 @@ ABAP Favorites Eclipse Plugin
 
 This repository contains code for Favorites plugin, Feature plugin and Update Site Plugin
 
+Version 1.0.22
+
+Open in Project functionality added
+
 Version 1.0.19
 
 

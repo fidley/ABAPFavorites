@@ -57,8 +57,7 @@ import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.common.CommonTypes.TypeOfObject;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLAttr;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
-import com.abapblog.favorites.views.Favorites;
-import com.abapblog.favoritesDO.views.FavoritesDO;
+import com.abapblog.favorites.superview.IFavorites;
 import com.sap.adt.logging.AdtLogging;
 import com.sap.adt.project.IAdtCoreProject;
 import com.sap.adt.project.ui.util.ProjectUtil;
@@ -174,6 +173,8 @@ public class Common {
 			return "Search Help";
 		case ADTLink:
 			return "ADT Link";
+		case CDSView:
+			return "CDS View";
 		default:
 			return "object";
 		}
@@ -397,6 +398,72 @@ public class Common {
 				Transformer transformer = transformerFactory.newTransformer();
 				StreamResult result = new StreamResult(favFile.getPath());
 				transformer.transform(source, result);
+
+			} catch (SAXException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TransformerConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TransformerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void moveFolderInXML(String SourceFolderId, String TargetFolderId, TypeOfXMLNode SourceParentNodeType,
+			TypeOfXMLNode TargetParentNodeType) {
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder;
+		try {
+			dBuilder = dbFactory.newDocumentBuilder();
+			Document doc;
+			try {
+				doc = dBuilder.parse(favFile);
+				doc.getDocumentElement().normalize();
+				NodeList sourceFolders = doc.getElementsByTagName(SourceParentNodeType.toString());
+
+				for (int temp = 0; temp < sourceFolders.getLength(); temp++) {
+
+					Node nNode = sourceFolders.item(temp);
+
+					NamedNodeMap attributes = nNode.getAttributes();
+					Node FolderName = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
+					if (FolderName.getNodeValue().equals(SourceFolderId)) {
+
+						NodeList targetFolders = doc.getElementsByTagName(TargetParentNodeType.toString());
+						for (int tempTarget = 0; tempTarget < targetFolders.getLength(); tempTarget++) {
+
+							Node nNodeTarget = targetFolders.item(tempTarget);
+
+							NamedNodeMap attributesTarget = nNodeTarget.getAttributes();
+							Node FolderNameTarget = attributesTarget.getNamedItem(TypeOfXMLAttr.folderID.toString());
+							if (FolderNameTarget.getNodeValue().equals(TargetFolderId)) {
+
+								Node parent = nNode.getParentNode();
+								nNodeTarget.appendChild(nNode);
+								// parent.removeChild(nNode);
+								DOMSource source = new DOMSource(doc);
+
+								TransformerFactory transformerFactory = TransformerFactory.newInstance();
+								Transformer transformer = transformerFactory.newTransformer();
+								StreamResult result = new StreamResult(favFile.getPath());
+								transformer.transform(source, result);
+							}
+						}
+
+					}
+
+				}
 
 			} catch (SAXException e) {
 				// TODO Auto-generated catch block
@@ -1548,7 +1615,8 @@ public class Common {
 			};
 			projectAction.setText(ABAPProject.getName());
 			projectAction.setToolTipText(ABAPProject.getName());
-			projectAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_PROJECT));
+			projectAction.setImageDescriptor(
+					PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_PROJECT));
 
 			subMenu.add(projectAction);
 		}
@@ -1637,15 +1705,11 @@ public class Common {
 		}
 	}
 
-	public TreeParent createTreeNodes(TypeOfXMLNode FolderXMLNode, Object Favorite) {
+	public TreeParent createTreeNodes(TypeOfXMLNode FolderXMLNode, IFavorites Favorite) {
 
 		String LinkedEditorProject;
 
-		try {
-			LinkedEditorProject = ((Favorites) Favorite).getLinkedEditorProject();
-		} catch (Exception e) {
-			LinkedEditorProject = ((FavoritesDO) Favorite).getLinkedEditorProject();
-		}
+		LinkedEditorProject = Favorite.getLinkedEditorProject();
 		TreeParent invisibleRoot = new TreeParent("", "", true, "", "", Favorite, false, "root");
 
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -1701,7 +1765,7 @@ public class Common {
 	}
 
 	private static void createSubNodes(TypeOfXMLNode folderXMLNode, Element subNode, TreeParent subNodeParent,
-			String linkedEditorProject, Object favorite) {
+			String linkedEditorProject, IFavorites favorite) {
 
 		if (subNode.getNodeName().equalsIgnoreCase(folderXMLNode.toString())) {
 
