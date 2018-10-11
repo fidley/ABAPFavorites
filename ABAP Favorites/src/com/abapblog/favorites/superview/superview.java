@@ -61,11 +61,11 @@ import com.sap.adt.project.ui.util.ProjectUtil;
 public abstract class superview extends ViewPart implements ILinkedWithEditorView, IFavorites {
 	public static String ID;
 
-	protected static String LinkedEditorProject = "";
+	protected String LinkedEditorProject = "";
 	protected IProject LinkedProject;
 	protected IPartListener2 linkWithEditorPartListener = new LinkWithEditorPartListener(this);
 	protected Action linkWithEditorAction;
-	protected static boolean linkingActive = true;
+	protected boolean linkingActive = true;
 	public TreeViewer viewer;
 	protected Common Utils;
 	protected DrillDownAdapter drillDownAdapter;
@@ -74,11 +74,11 @@ public abstract class superview extends ViewPart implements ILinkedWithEditorVie
 
 	public static String partName;
 
-	public static void savePluginSettings() {
+	public static void savePluginSettings(IFavorites Favorite) {
 		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ID);
 
-		prefs.putBoolean("linking_active", linkingActive);
-		prefs.put("linked_project", LinkedEditorProject);
+		prefs.putBoolean("linking_active", Favorite.getLinkingActive());
+		prefs.put("linked_project", Favorite.getLinkedEditorProject());
 
 		try {
 			// prefs are automatically flushed during a plugin's "super.stop()".
@@ -481,6 +481,10 @@ public abstract class superview extends ViewPart implements ILinkedWithEditorVie
 
 	public String getLinkedEditorProject() {
 		return LinkedEditorProject;
+	}
+
+	public boolean getLinkingActive() {
+		return linkingActive;
 	}
 
 	public void setLinkedEditorProject(String linkedEditorProject) {

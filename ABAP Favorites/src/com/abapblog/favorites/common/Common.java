@@ -101,6 +101,8 @@ public class Common {
 	public String TempLinkedEditorProject;
 	public IProject TempLinkedProject;
 	private TypeOfXMLNode FolderNode;
+	public static IFavorites Favorite;
+	public static IFavorites FavoriteDO;
 
 	public Common(TypeOfXMLNode FolderNode) {
 		this.FolderNode = FolderNode;

@@ -46,7 +46,7 @@ public class Activator extends AbstractUIPlugin {
 	 * BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		Favorites.savePluginSettings();
+		Favorites.savePluginSettings(Common.Favorite);
 		plugin = null;
 		super.stop(context);
 	}
@@ -61,8 +61,8 @@ public class Activator extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path
+	 * Returns an image descriptor for the image file at the given plug-in relative
+	 * path
 	 *
 	 * @param path
 	 *            the path

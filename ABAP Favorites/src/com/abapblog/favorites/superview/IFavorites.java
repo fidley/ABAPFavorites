@@ -8,6 +8,10 @@ public interface IFavorites {
 
 	public String getLinkedEditorProject();
 
+	public boolean getLinkingActive();
+
 	public TypeOfXMLNode getFolderType();
+
+	public void putFavToCommon();
 
 }

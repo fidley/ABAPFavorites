@@ -32,4 +32,10 @@ public class FavoritesDO extends superview {
 		return TypeOfXMLNode.folderDONode;
 	}
 
+	@Override
+	public void putFavToCommon() {
+		Common.FavoriteDO = this;
+
+	}
+
 }

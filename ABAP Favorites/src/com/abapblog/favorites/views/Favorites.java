@@ -36,6 +36,12 @@ public class Favorites extends superview {
 		return TypeOfXMLNode.folderNode;
 	}
 
+	@Override
+	public void putFavToCommon() {
+		Common.Favorite = this;
+
+	}
+
 	/**
 	 * This is a callback that will allow us to create the viewer and initialize it.
 	 */
