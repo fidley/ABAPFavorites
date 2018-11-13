@@ -1,6 +1,7 @@
 package com.abapblog.favorites.common;
 
 import java.io.File;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,11 +21,12 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -32,6 +34,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -44,6 +48,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.util.BundleUtility;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.w3c.dom.Document;
@@ -58,14 +63,28 @@ import com.abapblog.favorites.common.CommonTypes.TypeOfObject;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLAttr;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.superview.IFavorites;
+import com.sap.adt.destinations.logon.AdtLogonServiceFactory;
+import com.sap.adt.destinations.logon.IAdtLogonService;
+import com.sap.adt.destinations.model.AdtDestinationDataFactory;
+import com.sap.adt.destinations.model.IAuthenticationToken;
+import com.sap.adt.destinations.model.IDestinationData;
+import com.sap.adt.destinations.model.IDestinationDataWritable;
+import com.sap.adt.destinations.ui.logon.AdtLogonServiceUIFactory;
+import com.sap.adt.destinations.ui.logon.IAdtLogonServiceUI;
 import com.sap.adt.logging.AdtLogging;
 import com.sap.adt.project.IAdtCoreProject;
+import com.sap.adt.project.IAdtCoreProjectService;
 import com.sap.adt.project.ui.util.ProjectUtil;
 import com.sap.adt.ris.search.AdtRisQuickSearchFactory;
 import com.sap.adt.ris.search.RisQuickSearchNotSupportedException;
+import com.sap.adt.sapgui.ui.ISapGuiPlugin;
 import com.sap.adt.sapgui.ui.SapGuiPlugin;
 import com.sap.adt.sapgui.ui.editors.AdtSapGuiEditorUtilityFactory;
+import com.sap.adt.tools.core.internal.AbapProjectService;
 import com.sap.adt.tools.core.model.adtcore.IAdtObjectReference;
+import com.sap.adt.tools.core.project.IAbapProject;
+import com.sap.adt.tools.core.project.IAbapProjectService;
+import com.sap.adt.tools.core.ui.dialogs.AbapProjectSelectionDialog;
 import com.sap.adt.tools.core.ui.navigation.AdtNavigationServiceFactory;
 import com.sap.adt.tools.core.wbtyperegistry.WorkbenchAction;
 
@@ -98,6 +117,7 @@ public class Common {
 	public Action actEdit;
 	public Action actExportFavorites;
 	public Action actImportFavorites;
+	public Action actLogToAllSAPSystems;
 	public String TempLinkedEditorProject;
 	public IProject TempLinkedProject;
 	private TypeOfXMLNode FolderNode;
@@ -1490,6 +1510,25 @@ public class Common {
 				}
 			}
 		};
+
+
+
+
+		actLogToAllSAPSystems = new Action() {
+			@Override
+			public void run() {
+				logonToAllSAPs();
+			}
+
+		};
+
+		Bundle bundle = Platform.getBundle("com.sap.adt.tools.core.ui");
+		URL fullPathString = BundleUtility.find(bundle, "icons/obj/abap_application.png");
+
+		actLogToAllSAPSystems.setText("Logon To All SAP Systems");
+		actLogToAllSAPSystems.setImageDescriptor(
+				ImageDescriptor.createFromURL(fullPathString) );
+
 		actExportFavorites = new Action() {
 			@Override
 			public void run() {
@@ -1510,6 +1549,22 @@ public class Common {
 		actImportFavorites.setText("Import Favorites");
 		actImportFavorites.setImageDescriptor(
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
+	}
+
+	protected void logonToAllSAPs() {
+		IAdtLogonService logonService = AdtLogonServiceFactory.createLogonService();
+		IAdtLogonServiceUI logonServiceUI = AdtLogonServiceUIFactory.createLogonServiceUI();
+		for (IProject ABAPProject : Common.getABAPProjects()) {
+			try {
+				if (logonService.isLoggedOn(ABAPProject.getName()) == false)
+				{
+					logonServiceUI.ensureLoggedOn((IAdaptable) ABAPProject);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
 	}
 
 	private static void exportFavorites(TreeViewer viewer) {

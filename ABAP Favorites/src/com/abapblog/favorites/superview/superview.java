@@ -347,6 +347,7 @@ public abstract class superview extends ViewPart implements ILinkedWithEditorVie
 	protected void fillLocalPullDown(IMenuManager manager) {
 		manager.add(Utils.actExportFavorites);
 		manager.add(Utils.actImportFavorites);
+		manager.add(Utils.actLogToAllSAPSystems);
 
 	}
 
