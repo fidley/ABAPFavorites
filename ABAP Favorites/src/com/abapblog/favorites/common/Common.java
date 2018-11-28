@@ -1,7 +1,6 @@
 package com.abapblog.favorites.common;
 
 import java.io.File;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,8 +20,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -34,7 +33,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -65,26 +63,16 @@ import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.superview.IFavorites;
 import com.sap.adt.destinations.logon.AdtLogonServiceFactory;
 import com.sap.adt.destinations.logon.IAdtLogonService;
-import com.sap.adt.destinations.model.AdtDestinationDataFactory;
-import com.sap.adt.destinations.model.IAuthenticationToken;
-import com.sap.adt.destinations.model.IDestinationData;
-import com.sap.adt.destinations.model.IDestinationDataWritable;
 import com.sap.adt.destinations.ui.logon.AdtLogonServiceUIFactory;
 import com.sap.adt.destinations.ui.logon.IAdtLogonServiceUI;
 import com.sap.adt.logging.AdtLogging;
 import com.sap.adt.project.IAdtCoreProject;
-import com.sap.adt.project.IAdtCoreProjectService;
 import com.sap.adt.project.ui.util.ProjectUtil;
 import com.sap.adt.ris.search.AdtRisQuickSearchFactory;
 import com.sap.adt.ris.search.RisQuickSearchNotSupportedException;
-import com.sap.adt.sapgui.ui.ISapGuiPlugin;
 import com.sap.adt.sapgui.ui.SapGuiPlugin;
 import com.sap.adt.sapgui.ui.editors.AdtSapGuiEditorUtilityFactory;
-import com.sap.adt.tools.core.internal.AbapProjectService;
 import com.sap.adt.tools.core.model.adtcore.IAdtObjectReference;
-import com.sap.adt.tools.core.project.IAbapProject;
-import com.sap.adt.tools.core.project.IAbapProjectService;
-import com.sap.adt.tools.core.ui.dialogs.AbapProjectSelectionDialog;
 import com.sap.adt.tools.core.ui.navigation.AdtNavigationServiceFactory;
 import com.sap.adt.tools.core.wbtyperegistry.WorkbenchAction;
 
@@ -1523,7 +1511,7 @@ public class Common {
 		};
 
 		Bundle bundle = Platform.getBundle("com.sap.adt.tools.core.ui");
-		URL fullPathString = BundleUtility.find(bundle, "icons/obj/abap_application.png");
+		URL fullPathString = BundleUtility.find(bundle, "icons/obj/abap_application.png"); 
 
 		actLogToAllSAPSystems.setText("Logon To All SAP Systems");
 		actLogToAllSAPSystems.setImageDescriptor(
@@ -1551,7 +1539,7 @@ public class Common {
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
 	}
 
-	protected void logonToAllSAPs() {
+	public static void logonToAllSAPs() {
 		IAdtLogonService logonService = AdtLogonServiceFactory.createLogonService();
 		IAdtLogonServiceUI logonServiceUI = AdtLogonServiceUIFactory.createLogonServiceUI();
 		for (IProject ABAPProject : Common.getABAPProjects()) {
@@ -1737,7 +1725,7 @@ public class Common {
 		return;
 	}
 
-	@SuppressWarnings("restriction")
+	@SuppressWarnings({ "restriction", "restriction" })
 	public static void runObject(IProject project, String reportName, TypeOfEntry type) {
 		String programName = "";
 		try {
@@ -1751,7 +1739,8 @@ public class Common {
 						programName = regexMatch.group(0);
 					}
 					if (programName.equalsIgnoreCase(reportName)) {
-						SapGuiPlugin.getDefault().openEditorForObject(project, ref, true,
+						AdtSapGuiEditorUtilityFactory.createSapGuiEditorUtility()
+						.openEditorForObject(project, ref, true,
 								WorkbenchAction.EXECUTE.toString(), null, Collections.<String, String>emptyMap());
 						return;
 					}

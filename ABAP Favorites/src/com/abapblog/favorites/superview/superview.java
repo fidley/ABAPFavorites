@@ -1,6 +1,7 @@
 package com.abapblog.favorites.superview;
 
 import org.eclipse.core.resources.IProject;
+
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
