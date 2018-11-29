@@ -149,7 +149,24 @@ public class Common {
 			IProject[] projects = workspaceRoot.getProjects();
 			for (int i = 0; i < projects.length; i++) {
 				IProject project = projects[i];
-				if (project.hasNature(IAdtCoreProject.ABAP_PROJECT_NATURE) || project.hasNature(ADT_PROJECT_SAP_BW_NATURE)  ) {
+				if (project.hasNature(IAdtCoreProject.ABAP_PROJECT_NATURE)) {
+					projectList.add(project);
+				}
+			}
+		} catch (CoreException ce) {
+			ce.printStackTrace();
+		}
+		return projectList;
+	}
+
+	public static List<IProject> getBWModelProjects() {
+		List<IProject> projectList = new LinkedList<IProject>();
+		try {
+			IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+			IProject[] projects = workspaceRoot.getProjects();
+			for (int i = 0; i < projects.length; i++) {
+				IProject project = projects[i];
+				if (project.hasNature(ADT_PROJECT_SAP_BW_NATURE) ) {
 					projectList.add(project);
 				}
 			}
@@ -1550,6 +1567,18 @@ public class Common {
 				if (logonService.isLoggedOn(ABAPProject.getName()) == false)
 				{
 					logonServiceUI.ensureLoggedOn((IAdaptable) ABAPProject);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+
+		for (IProject BWProject : Common.getBWModelProjects()) {
+			try {
+				if (logonService.isLoggedOn(BWProject.getName()) == false)
+				{
+					logonServiceUI.ensureLoggedOn((IAdaptable) BWProject);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
