@@ -22,6 +22,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -78,6 +80,7 @@ import com.sap.adt.tools.core.wbtyperegistry.WorkbenchAction;
 
 public class Common {
 
+	private static final String ADT_PROJECT_SAP_BW_NATURE = "com.sap.bw.nature";
 	public static final String favFileName = "favorites.xml";
 	public static File favFile;
 	public static TreeViewer ViewerFavorites;
@@ -146,7 +149,7 @@ public class Common {
 			IProject[] projects = workspaceRoot.getProjects();
 			for (int i = 0; i < projects.length; i++) {
 				IProject project = projects[i];
-				if (project.hasNature(IAdtCoreProject.ABAP_PROJECT_NATURE)) {
+				if (project.hasNature(IAdtCoreProject.ABAP_PROJECT_NATURE) || project.hasNature(ADT_PROJECT_SAP_BW_NATURE)  ) {
 					projectList.add(project);
 				}
 			}
@@ -1511,7 +1514,7 @@ public class Common {
 		};
 
 		Bundle bundle = Platform.getBundle("com.sap.adt.tools.core.ui");
-		URL fullPathString = BundleUtility.find(bundle, "icons/obj/abap_application.png"); 
+		URL fullPathString = BundleUtility.find(bundle, "icons/obj/abap_application.png");
 
 		actLogToAllSAPSystems.setText("Logon To All SAP Systems");
 		actLogToAllSAPSystems.setImageDescriptor(

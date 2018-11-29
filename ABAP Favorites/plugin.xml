@@ -60,7 +60,6 @@
          </view>
       </perspectiveExtension>
    </extension>
-<!--
   <extension
          point="org.eclipse.ui.menus">
    <menuContribution
@@ -68,7 +67,7 @@
             locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
          <command
                commandId="com.abapblog.favorites.commands.LogToAllSAPSystems"
-               icon="icons/myAction.gif"
+               icon="platform:/plugin/com.sap.adt.tools.core.ui/icons/obj/abap_application.png"
                style="push">
                 <visibleWhen
                    checkEnabled="false">
@@ -117,6 +116,5 @@
                      >
                      </command>
       </extension>
-      -->
 </plugin>
 
