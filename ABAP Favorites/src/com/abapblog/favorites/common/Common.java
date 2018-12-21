@@ -65,16 +65,24 @@ import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.superview.IFavorites;
 import com.sap.adt.destinations.logon.AdtLogonServiceFactory;
 import com.sap.adt.destinations.logon.IAdtLogonService;
+import com.sap.adt.destinations.model.IDestinationData;
+import com.sap.adt.destinations.model.IDestinationDataWritable;
 import com.sap.adt.destinations.ui.logon.AdtLogonServiceUIFactory;
 import com.sap.adt.destinations.ui.logon.IAdtLogonServiceUI;
 import com.sap.adt.logging.AdtLogging;
+import com.sap.adt.project.AdtCoreProjectServiceFactory;
 import com.sap.adt.project.IAdtCoreProject;
+import com.sap.adt.project.IAdtCoreProjectService;
 import com.sap.adt.project.ui.util.ProjectUtil;
 import com.sap.adt.ris.search.AdtRisQuickSearchFactory;
 import com.sap.adt.ris.search.RisQuickSearchNotSupportedException;
 import com.sap.adt.sapgui.ui.SapGuiPlugin;
 import com.sap.adt.sapgui.ui.editors.AdtSapGuiEditorUtilityFactory;
+import com.sap.adt.sapgui.ui.editors.IAdtSapGuiEditorUtility;
 import com.sap.adt.tools.core.model.adtcore.IAdtObjectReference;
+import com.sap.adt.tools.core.project.AdtProjectServiceFactory;
+import com.sap.adt.tools.core.project.IAbapProject;
+import com.sap.adt.tools.core.project.IAbapProjectService;
 import com.sap.adt.tools.core.ui.navigation.AdtNavigationServiceFactory;
 import com.sap.adt.tools.core.wbtyperegistry.WorkbenchAction;
 
@@ -144,34 +152,37 @@ public class Common {
 
 	public static List<IProject> getABAPProjects() {
 		List<IProject> projectList = new LinkedList<IProject>();
-		try {
-			IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-			IProject[] projects = workspaceRoot.getProjects();
-			for (int i = 0; i < projects.length; i++) {
-				IProject project = projects[i];
+
+		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		IProject[] projects = workspaceRoot.getProjects();
+		for (int i = 0; i < projects.length; i++) {
+			IProject project = projects[i];
+			try {
 				if (project.hasNature(IAdtCoreProject.ABAP_PROJECT_NATURE)) {
 					projectList.add(project);
 				}
+			} catch (CoreException ce) {
+				ce.printStackTrace();
 			}
-		} catch (CoreException ce) {
-			ce.printStackTrace();
 		}
+
 		return projectList;
 	}
 
 	public static List<IProject> getBWModelProjects() {
 		List<IProject> projectList = new LinkedList<IProject>();
-		try {
-			IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-			IProject[] projects = workspaceRoot.getProjects();
-			for (int i = 0; i < projects.length; i++) {
-				IProject project = projects[i];
-				if (project.hasNature(ADT_PROJECT_SAP_BW_NATURE) ) {
+
+		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		IProject[] projects = workspaceRoot.getProjects();
+		for (int i = 0; i < projects.length; i++) {
+			IProject project = projects[i];
+			try {
+				if (project.hasNature(ADT_PROJECT_SAP_BW_NATURE)) {
 					projectList.add(project);
 				}
+			} catch (CoreException ce) {
+				ce.printStackTrace();
 			}
-		} catch (CoreException ce) {
-			ce.printStackTrace();
 		}
 		return projectList;
 	}
@@ -1519,9 +1530,6 @@ public class Common {
 			}
 		};
 
-
-
-
 		actLogToAllSAPSystems = new Action() {
 			@Override
 			public void run() {
@@ -1534,8 +1542,7 @@ public class Common {
 		URL fullPathString = BundleUtility.find(bundle, "icons/obj/abap_application.png");
 
 		actLogToAllSAPSystems.setText("Logon To All SAP Systems");
-		actLogToAllSAPSystems.setImageDescriptor(
-				ImageDescriptor.createFromURL(fullPathString) );
+		actLogToAllSAPSystems.setImageDescriptor(ImageDescriptor.createFromURL(fullPathString));
 
 		actExportFavorites = new Action() {
 			@Override
@@ -1564,9 +1571,13 @@ public class Common {
 		IAdtLogonServiceUI logonServiceUI = AdtLogonServiceUIFactory.createLogonServiceUI();
 		for (IProject ABAPProject : Common.getABAPProjects()) {
 			try {
-				if (logonService.isLoggedOn(ABAPProject.getName()) == false)
-				{
+				if (logonService.isLoggedOn(ABAPProject.getName()) == false) {
+
 					logonServiceUI.ensureLoggedOn((IAdaptable) ABAPProject);
+				} else {
+
+					logonServiceUI.ensureLoggedOn((IAdaptable) ABAPProject);
+
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1576,8 +1587,7 @@ public class Common {
 
 		for (IProject BWProject : Common.getBWModelProjects()) {
 			try {
-				if (logonService.isLoggedOn(BWProject.getName()) == false)
-				{
+				if (logonService.isLoggedOn(BWProject.getName()) == false) {
 					logonServiceUI.ensureLoggedOn((IAdaptable) BWProject);
 				}
 			} catch (Exception e) {
@@ -1620,84 +1630,93 @@ public class Common {
 		MenuManager subMenu = new MenuManager("Open in project", null);
 
 		for (IProject ABAPProject : Common.getABAPProjects()) {
-			Action projectAction = new Action() {
-				@Override
-				public void run() {
 
-					ISelection selection = viewer.getSelection();
-					Object obj = ((IStructuredSelection) selection).getFirstElement();
+			try {
+				Action projectAction = new Action() {
+					@Override
+					public void run() {
 
-					if (ABAPProject != null) {
-						if (obj instanceof TreeObject) {
+						ISelection selection = viewer.getSelection();
+						Object obj = ((IStructuredSelection) selection).getFirstElement();
 
-							TreeObject nodeObject = ((TreeObject) obj);
-							TypeOfEntry NodeType = nodeObject.getType();
-							TreeParent nodeParent = nodeObject.parent;
-							switch (NodeType) {
-							case Transaction:
-								AdtSapGuiEditorUtilityFactory.createSapGuiEditorUtility()
-										.openEditorAndStartTransaction(ABAPProject, obj.toString(), true);
-								break;
-							case Folder:
-								break;
-							case URL:
-								try {
-									PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser()
-											.openURL(new URL(((TreeObject) obj).getTechnicalName()));
-								} catch (PartInitException | MalformedURLException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
+						if (ABAPProject != null) {
+							if (obj instanceof TreeObject) {
 
-								}
-								break;
-							case ADTLink:
-								Common.openAdtLink(ABAPProject, new String(((TreeObject) obj).getTechnicalName()));
-								break;
-							case Program:
-								if (nodeParent.getDevObjProject() == false) {
-									Common.runObject(ABAPProject, nodeObject.getName(), nodeObject.Type);
+								TreeObject nodeObject = ((TreeObject) obj);
+								TypeOfEntry NodeType = nodeObject.getType();
+								TreeParent nodeParent = nodeObject.parent;
+								switch (NodeType) {
+								case Transaction:
+									IAdtSapGuiEditorUtility SGEU = AdtSapGuiEditorUtilityFactory
+											.createSapGuiEditorUtility();
+									SGEU.openEditorAndStartTransaction(ABAPProject, obj.toString(), true);
 									break;
-								} else {
-									Common.openObject(ABAPProject, nodeObject.getName(), nodeObject.Type);
+								case Folder:
 									break;
-								}
-							case Table:
+								case URL:
+									try {
+										PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser()
+												.openURL(new URL(((TreeObject) obj).getTechnicalName()));
+									} catch (PartInitException | MalformedURLException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
 
-							default:
-								if (nodeParent.getDevObjProject() == false) {
-									Common.runObject(ABAPProject, nodeObject.getName(), nodeObject.Type);
+									}
 									break;
-								} else {
-									Common.openObject(ABAPProject, nodeObject.getName(), nodeObject.Type);
+								case ADTLink:
+									Common.openAdtLink(ABAPProject, new String(((TreeObject) obj).getTechnicalName()));
 									break;
+								case Program:
+									if (nodeParent.getDevObjProject() == false) {
+										Common.runObject(ABAPProject, nodeObject.getName(), nodeObject.Type);
+										break;
+									} else {
+										Common.openObject(ABAPProject, nodeObject.getName(), nodeObject.Type);
+										break;
+									}
+								case Table:
+
+								default:
+									if (nodeParent.getDevObjProject() == false) {
+										Common.runObject(ABAPProject, nodeObject.getName(), nodeObject.Type);
+										break;
+									} else {
+										Common.openObject(ABAPProject, nodeObject.getName(), nodeObject.Type);
+										break;
+									}
 								}
 							}
-						}
 
-					} else {
-						if (obj instanceof TreeObject) {
-							TypeOfEntry NodeType = ((TreeObject) obj).getType();
-							if (NodeType == TypeOfEntry.URL) {
-								try {
-									PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser()
-											.openURL(new URL(((TreeObject) obj).getTechnicalName()));
-								} catch (PartInitException | MalformedURLException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
+						} else {
+							if (obj instanceof TreeObject) {
+								TypeOfEntry NodeType = ((TreeObject) obj).getType();
+								if (NodeType == TypeOfEntry.URL) {
+									try {
+										PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser()
+												.openURL(new URL(((TreeObject) obj).getTechnicalName()));
+									} catch (PartInitException | MalformedURLException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
 								}
 							}
 						}
 					}
-				}
-			};
-			projectAction.setText(ABAPProject.getName());
-			projectAction.setToolTipText(ABAPProject.getName());
-			projectAction.setImageDescriptor(
-					PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_PROJECT));
+				};
+				projectAction.setText(ABAPProject.getName());
+				projectAction.setToolTipText(ABAPProject.getName());
+				projectAction.setImageDescriptor(
+						PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_PROJECT));
 
-			subMenu.add(projectAction);
+				subMenu.add(projectAction);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+
+			}
+			manager.add(subMenu);
+
 		}
-		manager.add(subMenu);
 	}
 
 	public static void openObject(IProject project, String reportName, TypeOfEntry type) {
@@ -1771,9 +1790,14 @@ public class Common {
 						programName = regexMatch.group(0);
 					}
 					if (programName.equalsIgnoreCase(reportName)) {
-						AdtSapGuiEditorUtilityFactory.createSapGuiEditorUtility()
-						.openEditorForObject(project, ref, true,
-								WorkbenchAction.EXECUTE.toString(), null, Collections.<String, String>emptyMap());
+						IAbapProject AP = project.getAdapter(IAbapProject.class);
+						IDestinationData DD = AP.getDestinationData();
+						IDestinationDataWritable DDW = DD.getWritable();
+						DDW.setLanguage("DE");
+						IDestinationData DDN = DDW.getReadOnlyClone();
+						AP.setDestinationData(DDN);
+						AdtSapGuiEditorUtilityFactory.createSapGuiEditorUtility().openEditorForObject(project, ref,
+								true, WorkbenchAction.EXECUTE.toString(), null, Collections.<String, String>emptyMap());
 						return;
 					}
 				}
