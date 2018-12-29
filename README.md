@@ -2,6 +2,9 @@
 ABAP Favorites Eclipse Plugin
 
 This repository contains code for Favorites plugin, Feature plugin and Update Site Plugin
+# Version 1.0.29
+  
+  ABAP Favorites and additional ADT Commands are now separate plugins. Some bugs were solved and preferences page was added.
 
 # Version 1.0.28
 
