@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="com.abapblog.adt.extension.feature"
-      label="ABAP Project Extensions Feature"
-      version="1.0.0.1"
+      label="ADT Extensions - Commands"
+      version="1.0.0.2"
       provider-name="ABAPBlog.com">
 
    <description url="http://abapblog.com">
