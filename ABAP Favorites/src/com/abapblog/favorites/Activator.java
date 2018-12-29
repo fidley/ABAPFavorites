@@ -6,6 +6,7 @@ import org.osgi.framework.BundleContext;
 
 import com.abapblog.favorites.common.Common;
 import com.abapblog.favorites.views.Favorites;
+import com.abapblog.favorites.xml.XMLhandler;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -25,7 +26,7 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public Activator() {
 
-		Common.createFavFile();
+		XMLhandler.createFavFile();
 	}
 
 	/*
