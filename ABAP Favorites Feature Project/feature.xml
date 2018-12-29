@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="ABAP_Favorites_Feature_Project"
+      id="com.abapblog.favorites.feature"
       label="ABAP Favorites"
-      version="1.0.28"
+      version="1.0.29"
       provider-name="ABAPBlog.com">
 
    <description>

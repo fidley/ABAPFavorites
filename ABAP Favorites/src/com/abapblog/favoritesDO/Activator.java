@@ -5,6 +5,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import com.abapblog.favorites.common.Common;
+import com.abapblog.favorites.xml.XMLhandler;
 import com.abapblog.favoritesDO.views.FavoritesDO;
 
 /**
@@ -23,7 +24,7 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public Activator() {
 
-		Common.createFavFile();
+		XMLhandler.createFavFile();
 
 	}
 

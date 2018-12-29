@@ -3,7 +3,7 @@ package com.abapblog.favoritesDO.views;
 import com.abapblog.favorites.common.Common;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.superview.IFavorites;
-import com.abapblog.favorites.superview.superview;
+import com.abapblog.favorites.superview.Superview;
 
 /**
  * Simple ABAP Favorites plug-in that was created on a base of sample TreeViewer
@@ -12,14 +12,16 @@ import com.abapblog.favorites.superview.superview;
  * For more go to ABAPBlog.com
  */
 
-public class FavoritesDO extends superview {
+public class FavoritesDO extends Superview {
 
 	/**
 	 * The constructor.
 	 */
 	public FavoritesDO() {
-		Utils = new Common(getFolderType());
+		FolderNode = getFolderType();
 		ID = "com.abapblog.favoritesDO.views.FavoritesDO";
+		putFavToCommon();
+		Superview.addFavoritesToActive(this);
 	}
 
 	@Override
