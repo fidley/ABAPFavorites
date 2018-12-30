@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.abapblog.favorites;singleton:=true
-Bundle-Version: 1.0.30
+Bundle-Version: 1.0.31
 Bundle-Activator: com.abapblog.favorites.Activator
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
