@@ -4,6 +4,7 @@ import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 
 public interface IFavorites {
 
+	public String getID();
 	public IFavorites getFavorites();
 
 	public String getLinkedEditorProject();

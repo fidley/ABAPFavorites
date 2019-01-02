@@ -14,16 +14,12 @@ import com.abapblog.favorites.superview.Superview;
 
 public class Favorites extends Superview {
 
-	/**
-	 * The ID of the view as specified by the extension.
-	 */
-
+	private String ID = "com.abapblog.favorites.views.Favorites";
 	/**
 	 * The constructor.
 	 */
 	public Favorites() {
 		FolderNode = getFolderType();
-		ID = "com.abapblog.favorites.views.Favorites";
 		putFavToCommon();
 		Superview.addFavoritesToActive(this);
 	}
@@ -42,6 +38,11 @@ public class Favorites extends Superview {
 	public void putFavToCommon() {
 		Common.Favorite = this;
 
+	}
+
+	@Override
+	public String getID() {
+		return ID;
 	}
 
 	/**

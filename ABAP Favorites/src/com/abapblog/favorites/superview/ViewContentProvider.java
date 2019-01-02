@@ -2,6 +2,7 @@ package com.abapblog.favorites.superview;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 
 import com.abapblog.favorites.common.Common;
@@ -17,6 +18,8 @@ public class ViewContentProvider implements ITreeContentProvider {
 	private TypeOfXMLNode folderNode;
 	public Superview favorite;
 	private IViewSite viewSite;
+	private Composite container;
+	private Boolean selectFolderDialog = false;
 
 	public ViewContentProvider(TypeOfXMLNode folderNode, Superview favorite, IViewSite viewSite) {
 		super();
@@ -25,9 +28,17 @@ public class ViewContentProvider implements ITreeContentProvider {
 		this.viewSite = viewSite;
 	}
 
+	public ViewContentProvider(TypeOfXMLNode folderNode, IFavorites favorite, Composite container) {
+		super();
+		this.folderNode = folderNode;
+		this.container = container;
+		this.favorite = (Superview) favorite;
+		this.selectFolderDialog = true;
+	}
+
 	@Override
 	public Object[] getElements(Object parent) {
-		if (parent.equals(viewSite)) {
+		if ( (viewSite != null && parent.equals(viewSite))|| (viewSite == null && parent.equals(container))) {
 			if (invisibleRoot == null)
 				initialize();
 			return getChildren(invisibleRoot);
@@ -60,7 +71,8 @@ public class ViewContentProvider implements ITreeContentProvider {
 
 	public void initialize() {
 		try {
-			invisibleRoot = favorite.createTreeNodes(folderNode, favorite);
+
+			invisibleRoot = Superview.createTreeNodes(folderNode, favorite,selectFolderDialog);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

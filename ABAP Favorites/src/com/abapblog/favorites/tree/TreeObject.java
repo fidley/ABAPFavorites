@@ -72,27 +72,6 @@ public class TreeObject implements IAdaptable {
 		this.setDescription(Description);
 		this.setTechnicalName(TechnicalName);
 		this.setLongDescription(LongDescription);
-		// Favorite.dndSource.addDragListener(new DragSourceListener() {
-		// public void dragStart(DragSourceEvent event) {
-		// TreeItem[] selection = tree.getSelection();
-		// if (selection.length > 0 && selection[0].getItemCount() == 0) {
-		// event.doit = true;
-		// dragSourceItem[0] = selection[0];
-		// } else {
-		// event.doit = false;
-		// }
-		// };
-		//
-		// public void dragSetData(DragSourceEvent event) {
-		// event.data = dragSourceItem[0].getText();
-		// }
-		//
-		// public void dragFinished(DragSourceEvent event) {
-		// if (event.detail == DND.DROP_MOVE)
-		// dragSourceItem[0].dispose();
-		// dragSourceItem[0] = null;
-		// }
-		// });
 
 	}
 

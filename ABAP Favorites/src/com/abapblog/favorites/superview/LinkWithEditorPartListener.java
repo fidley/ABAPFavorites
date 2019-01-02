@@ -1,7 +1,9 @@
 package com.abapblog.favorites.superview;
 
 import org.eclipse.ui.IEditorPart;
+
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPartReference;
 
 public class LinkWithEditorPartListener implements IPartListener2 {
@@ -38,8 +40,14 @@ public class LinkWithEditorPartListener implements IPartListener2 {
 	    }
 	  }
 
-	  public void partClosed(IWorkbenchPartReference ref) {}
+	  public void partClosed(IWorkbenchPartReference ref) {
+		  if (ref instanceof IViewReference) {
+			    view.getViewSite().getPage().removePartListener(this);
+			      }
+
+	  }
 	  public void partDeactivated(IWorkbenchPartReference ref) {}
-	  public void partHidden(IWorkbenchPartReference ref) {}
+	  public void partHidden(IWorkbenchPartReference ref) {
+	  }
 	  public void partInputChanged(IWorkbenchPartReference ref) {}
 	}

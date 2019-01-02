@@ -7,6 +7,7 @@ import org.osgi.framework.BundleContext;
 import com.abapblog.favorites.common.Common;
 import com.abapblog.favorites.views.Favorites;
 import com.abapblog.favorites.xml.XMLhandler;
+import com.abapblog.favoritesDO.views.FavoritesDO;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -48,6 +49,7 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		Favorites.savePluginSettings(Common.Favorite);
+		FavoritesDO.savePluginSettings(Common.FavoriteDO);
 		plugin = null;
 		super.stop(context);
 	}

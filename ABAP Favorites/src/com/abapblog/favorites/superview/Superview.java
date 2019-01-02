@@ -78,8 +78,11 @@ import com.sap.adt.project.IAdtCoreProject;
 import com.sap.adt.project.ui.util.ProjectUtil;
 
 public abstract class Superview extends ViewPart implements ILinkedWithEditorView, IFavorites {
-	public static String ID;
-
+ @Override
+public void dispose() {
+	 getSite().getPage().removePartListener(linkWithEditorPartListener);
+	 super.dispose();
+}
 	private static IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 	protected String LinkedEditorProject = "";
 	protected IProject LinkedProject;
@@ -123,10 +126,10 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 		((Superview) favorite).setNewViewName();
 	}
 
-	public static String partName;
+	public String partName;
 
 	public static void savePluginSettings(IFavorites Favorite) {
-		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(Favorite.getID());
 
 		prefs.putBoolean("linking_active", Favorite.isLinkingActive());
 		prefs.put("linked_project", Favorite.getLinkedEditorProject());
@@ -154,7 +157,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 		AFPatternFilter filter = new AFPatternFilter();
 		FilteredTree filteredTree = new FilteredTree(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL, filter, true);
 		ColumnControlListener columnListener = new ColumnControlListener();
-		columnListener.setID(ID);
+		columnListener.setID(getID());
 
 		partName = getPartName();
 		viewer = filteredTree.getViewer();
@@ -172,7 +175,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 
 		loadPluginSettings();
 		// Create the help context id for the viewer's control
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), ID);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), getID());
 		getSite().setSelectionProvider(viewer);
 		actions.makeActions(this);
 		hookContextMenu();
@@ -346,14 +349,17 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 		ColumnID.setText("ID");
 		ColumnID.addControlListener(columnListener);
 		ColumnID.setWidth(0);
+		ColumnID.setResizable(false);
 		TreeColumn ColumnFolderType = new TreeColumn(tree, SWT.LEFT);
 		ColumnFolderType.setText("FolderType");
 		ColumnFolderType.addControlListener(columnListener);
 		ColumnFolderType.setWidth(0);
+		ColumnFolderType.setResizable(false);
 		TreeColumn ColumnDevObj = new TreeColumn(tree, SWT.LEFT);
 		ColumnDevObj.setText("DevObjects");
 		ColumnDevObj.addControlListener(columnListener);
 		ColumnDevObj.setWidth(0);
+		ColumnDevObj.setResizable(false);
 		TreeColumn ColumnLinkedTo = new TreeColumn(tree, SWT.LEFT);
 		ColumnLinkedTo.setText("Linked To");
 		ColumnLinkedTo.addControlListener(columnListener);
@@ -524,12 +530,12 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 	}
 
 	protected void loadColumnSettings(TreeColumn Column) {
-		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(getID());
 		Column.setWidth(prefs.getInt("column_width" + Column.getText(), 300));
 	}
 
 	protected void loadPluginSettings() {
-		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(getID());
 		try {
 			prefs.sync();
 		} catch (org.osgi.service.prefs.BackingStoreException e) {
@@ -576,11 +582,11 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 		LinkedEditorProject = linkedEditorProject;
 	}
 
-	public TreeParent createTreeNodes(TypeOfXMLNode FolderXMLNode, IFavorites Favorite) {
+	public static TreeParent createTreeNodes(TypeOfXMLNode FolderXMLNode, IFavorites Favorite, Boolean selectFolderDialog) {
 
 		String LinkedEditorProject = "";
 
-		if (isHideOfDepProject() == true) {
+		if (isHideOfDepProject() == true && Favorite != null) {
 			LinkedEditorProject = Favorite.getLinkedEditorProject();
 		}
 
@@ -605,7 +611,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
 						Element eElement = (Element) nNode;
-						createSubNodes(FolderXMLNode, eElement, invisibleRoot, LinkedEditorProject, Favorite);
+						createSubNodes(FolderXMLNode, eElement, invisibleRoot, LinkedEditorProject, Favorite, selectFolderDialog);
 					}
 				}
 
@@ -638,8 +644,8 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 		return null;
 	}
 
-	private void createSubNodes(TypeOfXMLNode folderXMLNode, Element subNode, TreeParent subNodeParent,
-			String linkedEditorProject, IFavorites favorite) {
+	private static void createSubNodes(TypeOfXMLNode folderXMLNode, Element subNode, TreeParent subNodeParent,
+			String linkedEditorProject, IFavorites favorite, Boolean selectFolderDialog) {
 
 		if (subNode.getNodeName().equalsIgnoreCase(folderXMLNode.toString())) {
 
@@ -682,11 +688,11 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 					Element eElementChild = (Element) nNodeChild;
 
 					if (eElementChild.getNodeName().equalsIgnoreCase(folderXMLNode.toString())) {
-						createSubNodes(folderXMLNode, eElementChild, parent, linkedEditorProject, favorite);
+						createSubNodes(folderXMLNode, eElementChild, parent, linkedEditorProject, favorite, selectFolderDialog);
 					}
 
 					else {
-
+						if (selectFolderDialog) {
 						String childName = eElementChild.getAttribute(TypeOfXMLAttr.name.toString());
 						if (XMLhandler.isXMLNodeNameToUpper(eElementChild.getTagName())) {
 							childName = childName.toUpperCase();
@@ -696,6 +702,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 								eElementChild.getAttribute(TypeOfXMLAttr.description.toString()),
 								eElementChild.getAttribute(TypeOfXMLAttr.technicalName.toString()),
 								eElementChild.getAttribute(TypeOfXMLAttr.longDescription.toString()), favorite));
+						}
 					}
 				}
 			}

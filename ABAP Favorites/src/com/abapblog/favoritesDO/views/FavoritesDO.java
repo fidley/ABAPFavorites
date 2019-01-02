@@ -14,12 +14,13 @@ import com.abapblog.favorites.superview.Superview;
 
 public class FavoritesDO extends Superview {
 
+	private String ID = "com.abapblog.favoritesDO.views.FavoritesDO";
 	/**
 	 * The constructor.
 	 */
 	public FavoritesDO() {
 		FolderNode = getFolderType();
-		ID = "com.abapblog.favoritesDO.views.FavoritesDO";
+
 		putFavToCommon();
 		Superview.addFavoritesToActive(this);
 	}
@@ -38,6 +39,11 @@ public class FavoritesDO extends Superview {
 	public void putFavToCommon() {
 		Common.FavoriteDO = this;
 
+	}
+
+	@Override
+	public String getID() {
+		return ID;
 	}
 
 }

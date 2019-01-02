@@ -41,34 +41,6 @@ public class TreeParent extends TreeObject {
 	public void addChild(TreeObject child) {
 		children.add(child);
 		child.setParent(this);
-		if (favorite instanceof Favorites) {
-			Favorites fav = (Favorites) favorite;
-		} else {
-			FavoritesDO fav = (FavoritesDO) favorite;
-		}
-
-		// fav.dndSource.addDragListener(new DragSourceListener() {
-		// public void dragStart(DragSourceEvent event) {
-		// TreeItem[] selection = tree.getSelection();
-		// if (selection.length > 0 && selection[0].getItemCount() == 0) {
-		// event.doit = true;
-		// dragSourceItem[0] = selection[0];
-		// } else {
-		// event.doit = false;
-		// }
-		// };
-		//
-		// public void dragSetData(DragSourceEvent event) {
-		// event.data = dragSourceItem[0].getText();
-		// }
-		//
-		// public void dragFinished(DragSourceEvent event) {
-		// if (event.detail == DND.DROP_MOVE)
-		// dragSourceItem[0].dispose();
-		// dragSourceItem[0] = null;
-		// }
-		// });
-
 	}
 
 	public void removeChild(TreeObject child) {
