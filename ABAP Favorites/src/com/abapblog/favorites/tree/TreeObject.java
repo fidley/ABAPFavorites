@@ -2,7 +2,7 @@ package com.abapblog.favorites.tree;
 
 import org.eclipse.core.runtime.IAdaptable;
 
-import com.abapblog.favorites.common.CommonTypes;
+
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.superview.IFavorites;
 

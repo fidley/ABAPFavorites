@@ -1,11 +1,11 @@
 package com.abapblog.favorites.ui;
 
 import java.util.regex.Matcher;
+
 import java.util.regex.Pattern;
 
 import com.abapblog.favorites.common.*;
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
-import com.abapblog.favorites.common.CommonTypes.TypeOfObject;
 
 public class AbapEditorPathParser {
 

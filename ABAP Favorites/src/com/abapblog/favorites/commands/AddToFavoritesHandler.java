@@ -2,6 +2,7 @@ package com.abapblog.favorites.commands;
 
 import org.eclipse.core.commands.AbstractHandler;
 
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -19,7 +20,6 @@ public class AddToFavoritesHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent executionEvent) throws ExecutionException {
-		Object context = executionEvent.getApplicationContext();
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		if (window != null) {
 

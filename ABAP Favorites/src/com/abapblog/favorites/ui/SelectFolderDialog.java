@@ -4,22 +4,28 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.window.Window;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.dialogs.FilteredTree;
-import org.eclipse.ui.part.DrillDownAdapter;
 
 import com.abapblog.favorites.common.Common;
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
-import com.abapblog.favorites.common.CommonTypes.TypeOfObject;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.dialog.NameDialog;
 import com.abapblog.favorites.superview.AFPatternFilter;
-import com.abapblog.favorites.superview.IFavorites;
 import com.abapblog.favorites.superview.Superview;
 import com.abapblog.favorites.superview.ViewContentProvider;
 import com.abapblog.favorites.superview.ViewLabelProvider;
@@ -29,20 +35,6 @@ import com.abapblog.favorites.tree.TreeParent;
 import com.abapblog.favorites.views.Favorites;
 import com.abapblog.favorites.xml.XMLhandler;
 import com.abapblog.favoritesDO.views.FavoritesDO;
-import com.sap.adt.tools.core.ui.wizards.NewAdtObjectWizard;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.window.Window;
-import org.eclipse.swt.widgets.TabItem;
 
 public class SelectFolderDialog extends Dialog {
 
@@ -75,7 +67,7 @@ public class SelectFolderDialog extends Dialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite container = (Composite) super.createDialogArea(parent);
-		GridLayout gridLayout = (GridLayout) container.getLayout();
+		//GridLayout gridLayout = (GridLayout) container.getLayout();
 
 		tabFolder = new TabFolder(container, SWT.NONE);
 		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));

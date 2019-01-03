@@ -6,8 +6,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -15,16 +13,13 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.common.CommonTypes.TypeOfObject;
-import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.superview.IFavorites;
-import com.abapblog.favorites.xml.XMLhandler;
 import com.sap.adt.destinations.logon.AdtLogonServiceFactory;
 import com.sap.adt.destinations.logon.IAdtLogonService;
 import com.sap.adt.destinations.ui.logon.AdtLogonServiceUIFactory;
@@ -37,6 +32,7 @@ import com.sap.adt.ris.search.RisQuickSearchNotSupportedException;
 import com.sap.adt.tools.core.model.adtcore.IAdtObjectReference;
 
 
+@SuppressWarnings("restriction")
 public class Common {
 
 	private static final String ADT_PROJECT_SAP_BW_NATURE = "com.sap.bw.nature";

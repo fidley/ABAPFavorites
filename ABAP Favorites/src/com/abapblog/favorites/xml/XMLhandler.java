@@ -1,6 +1,7 @@
 package com.abapblog.favorites.xml;
 
 import java.io.File;
+
 import java.io.IOException;
 import java.util.UUID;
 
@@ -25,7 +26,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.abapblog.favorites.common.Common;
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLAttr;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
@@ -476,7 +476,7 @@ public class XMLhandler {
 							Node FolderNameTarget = attributesTarget.getNamedItem(TypeOfXMLAttr.folderID.toString());
 							if (FolderNameTarget.getNodeValue().equals(TargetFolderId)) {
 
-								Node parent = nNode.getParentNode();
+								//Node parent = nNode.getParentNode();
 								nNodeTarget.appendChild(nNode);
 								// parent.removeChild(nNode);
 								DOMSource source = new DOMSource(doc);

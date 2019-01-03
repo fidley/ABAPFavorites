@@ -13,6 +13,7 @@ import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.ui.SelectFolderDialog;
 import com.sap.adt.tools.core.AdtObjectReference;
 
+@SuppressWarnings("restriction")
 public class AddToFavoritesProjectExplorerHandler extends AbstractHandler {
 
 	@Override

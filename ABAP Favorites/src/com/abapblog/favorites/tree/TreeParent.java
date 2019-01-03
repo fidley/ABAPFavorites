@@ -3,12 +3,10 @@ package com.abapblog.favorites.tree;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import com.abapblog.favorites.common.CommonTypes;
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.superview.IFavorites;
 import com.abapblog.favorites.views.Favorites;
-import com.abapblog.favoritesDO.views.FavoritesDO;
 
 public class TreeParent extends TreeObject {
 	private ArrayList children;
