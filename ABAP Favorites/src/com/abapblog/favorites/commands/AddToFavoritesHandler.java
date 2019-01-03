@@ -2,21 +2,22 @@ package com.abapblog.favorites.commands;
 
 import org.eclipse.core.commands.AbstractHandler;
 
-
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.window.*;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorInput;
 import com.abapblog.favorites.common.CommonTypes;
+import com.abapblog.favorites.dialog.NameDialog;
+import com.abapblog.favorites.superview.Superview;
 import com.abapblog.favorites.ui.AbapEditorPathParser;
 import com.abapblog.favorites.ui.SelectFolderDialog;
-
+import com.abapblog.favorites.xml.XMLhandler;
 
 public class AddToFavoritesHandler extends AbstractHandler {
-
 
 	@Override
 	public Object execute(ExecutionEvent executionEvent) throws ExecutionException {
@@ -29,16 +30,25 @@ public class AddToFavoritesHandler extends AbstractHandler {
 
 			CommonTypes.TypeOfEntry objectType = AbapEditorPathParser.getType(input.toString());
 			String objectName = AbapEditorPathParser.getObjectName(input.toString());
-			//System.out.println(objectType.toString());
-			//System.out.println(objectName);
+			// System.out.println(objectType.toString());
+			// System.out.println(objectName);
 
-			SelectFolderDialog selectFolderDialog = new SelectFolderDialog(null,objectType,objectName);
-			selectFolderDialog.open();
+			SelectFolderDialog selectFolderDialog = new SelectFolderDialog(null, objectType, objectName);
+			if (selectFolderDialog.open() == Window.OK) {
+				NameDialog newObjectDialog = new NameDialog(null, selectFolderDialog.getTypeOfEntry(),
+						selectFolderDialog.getObjectName().toUpperCase());
+				if (newObjectDialog.open() == Window.OK) {
+					XMLhandler.addObjectToXML(selectFolderDialog.getTypeOfEntry(), newObjectDialog.getName(),
+							newObjectDialog.getDescription(), newObjectDialog.getLongDescription(),
+							selectFolderDialog.getFolderID(), selectFolderDialog.getFolderType());
+					Superview.refreshActiveViews();
+				}
 
 			}
 
+		}
+
 		return null;
+
 	}
-
-
 }

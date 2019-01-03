@@ -43,6 +43,8 @@ public class SelectFolderDialog extends Dialog {
 	private TabFolder tabFolder;
 	private TypeOfEntry typeOfEntry;
 	private String objectName;
+	private String folderID;
+	private TypeOfXMLNode folderType;
 	/**
 	 * Create the dialog.
 	 *
@@ -50,8 +52,8 @@ public class SelectFolderDialog extends Dialog {
 	 */
 	public SelectFolderDialog(Shell parentShell, TypeOfEntry typeOfEntry, String objectName) {
 		super(parentShell);
-		this.typeOfEntry = typeOfEntry;
-		this.objectName = objectName;
+		this.setTypeOfEntry(typeOfEntry);
+		this.setObjectName(objectName);
 	}
 
 	protected void configureShell(Shell shell) {
@@ -229,15 +231,11 @@ public class SelectFolderDialog extends Dialog {
 
 		TreeObject Folder = (TreeObject) selection.getFirstElement();
 		if (Folder instanceof TreeParent) {
-			String folderID = ((TreeParent) Folder).getFolderID();
-			TypeOfXMLNode folderType = ((TreeParent) Folder).getTypeOfFolder();
-			NameDialog newObjectDialog = new NameDialog(getShell(), typeOfEntry, objectName.toUpperCase() );
-			if (newObjectDialog.open() == Window.OK)
-			{
-				XMLhandler.addObjectToXML(typeOfEntry, newObjectDialog.getName(), newObjectDialog.getDescription(), newObjectDialog.getLongDescription(), folderID, folderType);
-				Superview.refreshActiveViews();
+			setFolderID(((TreeParent) Folder).getFolderID());
+			setFolderType(((TreeParent) Folder).getTypeOfFolder());
+
 				super.okPressed();
-			}
+
 
 		}
 
@@ -249,6 +247,38 @@ public class SelectFolderDialog extends Dialog {
 		saveDialogSettings(ID_FOLDER_FAVORITES);
 		saveDialogSettings(ID_FOLDER_FAVORITES_DO);
 		super.cancelPressed();
+	}
+
+	public  String getObjectName() {
+		return objectName;
+	}
+
+	public  void setObjectName(String objectName) {
+		this.objectName = objectName;
+	}
+
+	public  String getFolderID() {
+		return folderID;
+	}
+
+	public  void setFolderID(String folderID) {
+		this.folderID = folderID;
+	}
+
+	public  TypeOfXMLNode getFolderType() {
+		return folderType;
+	}
+
+	public  void setFolderType(TypeOfXMLNode folderType) {
+		this.folderType = folderType;
+	}
+
+	public  TypeOfEntry getTypeOfEntry() {
+		return typeOfEntry;
+	}
+
+	public  void setTypeOfEntry(TypeOfEntry typeOfEntry) {
+		this.typeOfEntry = typeOfEntry;
 	}
 
 }
