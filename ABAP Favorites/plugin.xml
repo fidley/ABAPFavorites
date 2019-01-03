@@ -93,9 +93,9 @@
                     <menuContribution allPopups="false"
           					locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu??after=com.sap.adt.activation.ui.command.selectionActivation">
        <command
-             commandId="com.abapblog.favorites.AddToFavorites"
+             commandId="com.abapblog.favorites.AddToFavoritesProjectExplorer"
              icon="icons/favorite16.png"
-             id="com.abapblog.favorites.commands.AddToFavorites"
+             id="com.abapblog.favorites.commands.AddToFavoritesProjectExplorer"
              label="Add To Favorites"
              style="push">
           <visibleWhen
@@ -108,6 +108,11 @@
          point="org.eclipse.ui.handlers">
     <handler
       class="com.abapblog.favorites.commands.AddToFavoritesProjectExplorerHandler"
+      commandId="com.abapblog.favorites.AddToFavoritesProjectExplorer">
+
+</handler>
+    <handler
+      class="com.abapblog.favorites.commands.AddToFavoritesHandler"
       commandId="com.abapblog.favorites.AddToFavorites">
 
 </handler>

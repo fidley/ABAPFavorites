@@ -1,16 +1,21 @@
 package com.abapblog.favorites.commands;
 
 import org.eclipse.core.commands.AbstractHandler;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.window.*;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 import com.abapblog.favorites.common.Common;
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
+import com.abapblog.favorites.dialog.NameDialog;
+import com.abapblog.favorites.superview.Superview;
 import com.abapblog.favorites.ui.SelectFolderDialog;
+import com.abapblog.favorites.xml.XMLhandler;
 import com.sap.adt.tools.core.AdtObjectReference;
 
 @SuppressWarnings("restriction")
@@ -30,7 +35,17 @@ public class AddToFavoritesProjectExplorerHandler extends AbstractHandler {
 					String objectName = AdtRef.getName();
 					TypeOfEntry typeOfEntry = Common.getTypeOfEntryFromSAPType(objectType);
 					SelectFolderDialog selectFolderDialog = new SelectFolderDialog(null, typeOfEntry, objectName);
-					selectFolderDialog.open();
+					if (selectFolderDialog.open() == Window.OK) {
+						NameDialog newObjectDialog = new NameDialog(null, selectFolderDialog.getTypeOfEntry(),
+								selectFolderDialog.getObjectName().toUpperCase());
+						if (newObjectDialog.open() == Window.OK) {
+							XMLhandler.addObjectToXML(selectFolderDialog.getTypeOfEntry(), newObjectDialog.getName(),
+									newObjectDialog.getDescription(), newObjectDialog.getLongDescription(),
+									selectFolderDialog.getFolderID(), selectFolderDialog.getFolderType());
+							Superview.refreshActiveViews();
+						}
+
+					}
 
 				} catch (SecurityException e) {
 					// TODO Auto-generated catch block
