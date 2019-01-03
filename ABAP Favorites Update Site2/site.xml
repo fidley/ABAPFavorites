@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/ABAP_Favorites_Feature_Project_1.0.31.jar" id="ABAP_Favorites_Feature_Project" version="1.0.31">
-      <category name="ABAP Favorites"/>
-   </feature>
    <feature url="features/com.abapblog.adt.extension.feature_1.0.0.4.jar" id="com.abapblog.adt.extension.feature" version="1.0.0.4">
       <category name="ADT Extensions"/>
+   </feature>
+   <feature url="features/ABAP_Favorites_Feature_Project_1.0.32.jar" id="ABAP_Favorites_Feature_Project" version="1.0.32">
+      <category name="ABAP Favorites"/>
    </feature>
    <category-def name="ABAP Favorites" label="ABAP Favorites"/>
    <category-def name="ADT Extensions" label="ADT Extensions"/>

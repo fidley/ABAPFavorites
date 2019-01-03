@@ -1,6 +1,7 @@
 package com.abapblog.favorites.superview;
 
 import java.net.MalformedURLException;
+
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;

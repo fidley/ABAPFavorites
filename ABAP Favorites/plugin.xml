@@ -75,5 +75,42 @@
                      class="com.abapblog.favorites.preferences.PreferenceInitializer">
                </initializer>
             </extension>
+
+            <extension  point="org.eclipse.ui.menus">
+                <menuContribution allPopups="true"
+          					locationURI="popup:#EditorContext?after=com.sap.adt.tools.abapsource.ui.navigateInto.menu">
+       <command
+             commandId="com.abapblog.favorites.AddToFavorites"
+             icon="icons/favorite16.png"
+             id="com.abapblog.favorites.commands.AddToFavorites"
+             label="Add To Favorites"
+             style="push">
+  			<visibleWhen
+                  checkEnabled="false">
+            </visibleWhen>
+       </command>
+    </menuContribution>
+                    <menuContribution allPopups="false"
+          					locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu??after=com.sap.adt.activation.ui.command.selectionActivation">
+       <command
+             commandId="com.abapblog.favorites.AddToFavorites"
+             icon="icons/favorite16.png"
+             id="com.abapblog.favorites.commands.AddToFavorites"
+             label="Add To Favorites"
+             style="push">
+          <visibleWhen
+                checkEnabled="true">
+          </visibleWhen>
+       </command>
+       </menuContribution>
+    </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+    <handler
+      class="com.abapblog.favorites.commands.AddToFavoritesProjectExplorerHandler"
+      commandId="com.abapblog.favorites.AddToFavorites">
+
+</handler>
+    </extension>
 </plugin>
 
