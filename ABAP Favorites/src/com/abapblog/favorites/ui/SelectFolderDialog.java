@@ -14,16 +14,22 @@ import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.part.DrillDownAdapter;
 
 import com.abapblog.favorites.common.Common;
+import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
+import com.abapblog.favorites.common.CommonTypes.TypeOfObject;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
+import com.abapblog.favorites.dialog.NameDialog;
 import com.abapblog.favorites.superview.AFPatternFilter;
 import com.abapblog.favorites.superview.IFavorites;
+import com.abapblog.favorites.superview.Superview;
 import com.abapblog.favorites.superview.ViewContentProvider;
 import com.abapblog.favorites.superview.ViewLabelProvider;
 import com.abapblog.favorites.tree.ColumnControlListener;
 import com.abapblog.favorites.tree.TreeObject;
 import com.abapblog.favorites.tree.TreeParent;
 import com.abapblog.favorites.views.Favorites;
+import com.abapblog.favorites.xml.XMLhandler;
 import com.abapblog.favoritesDO.views.FavoritesDO;
+import com.sap.adt.tools.core.ui.wizards.NewAdtObjectWizard;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Label;
@@ -31,23 +37,29 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.TabItem;
 
 public class SelectFolderDialog extends Dialog {
 
 	private static final String ID_FOLDER_FAVORITES_DO = "com.abapblog.favorites.ui.selectFolderDialog.FavoritesDO";
 	private static final String ID_FOLDER_FAVORITES = "com.abapblog.favorites.ui.selectFolderDialog.Favorites";
-
+	private TabFolder tabFolder;
+	private TypeOfEntry typeOfEntry;
+	private String objectName;
 	/**
 	 * Create the dialog.
 	 *
 	 * @param parentShell
 	 */
-	public SelectFolderDialog(Shell parentShell) {
+	public SelectFolderDialog(Shell parentShell, TypeOfEntry typeOfEntry, String objectName) {
 		super(parentShell);
+		this.typeOfEntry = typeOfEntry;
+		this.objectName = objectName;
 	}
 
 	protected void configureShell(Shell shell) {
@@ -65,7 +77,7 @@ public class SelectFolderDialog extends Dialog {
 		Composite container = (Composite) super.createDialogArea(parent);
 		GridLayout gridLayout = (GridLayout) container.getLayout();
 
-		TabFolder tabFolder = new TabFolder(container, SWT.NONE);
+		tabFolder = new TabFolder(container, SWT.NONE);
 		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
 		if (Common.Favorite == null) {
@@ -141,7 +153,7 @@ public class SelectFolderDialog extends Dialog {
 	 */
 	@Override
 	protected Point getInitialSize() {
-		return new Point(450, 300);
+		return new Point(600, 450);
 	}
 
 	private void setTreeColumns(ColumnControlListener columnListener, Tree tree, String ID) {
@@ -219,7 +231,24 @@ public class SelectFolderDialog extends Dialog {
 		// TODO Auto-generated method stub
 		saveDialogSettings(ID_FOLDER_FAVORITES);
 		saveDialogSettings(ID_FOLDER_FAVORITES_DO);
-		super.okPressed();
+
+		TreeViewer viewer = ((FilteredTree) tabFolder.getItem(tabFolder.getSelectionIndex()).getControl()).getViewer();
+		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+
+		TreeObject Folder = (TreeObject) selection.getFirstElement();
+		if (Folder instanceof TreeParent) {
+			String folderID = ((TreeParent) Folder).getFolderID();
+			TypeOfXMLNode folderType = ((TreeParent) Folder).getTypeOfFolder();
+			NameDialog newObjectDialog = new NameDialog(getShell(), typeOfEntry, objectName.toUpperCase() );
+			if (newObjectDialog.open() == Window.OK)
+			{
+				XMLhandler.addObjectToXML(typeOfEntry, newObjectDialog.getName(), newObjectDialog.getDescription(), newObjectDialog.getLongDescription(), folderID, folderType);
+				Superview.refreshActiveViews();
+				super.okPressed();
+			}
+
+		}
+
 	}
 
 	@Override

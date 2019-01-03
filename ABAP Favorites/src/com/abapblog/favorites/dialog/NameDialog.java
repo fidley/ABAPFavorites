@@ -37,6 +37,13 @@ public class NameDialog extends TitleAreaDialog {
 		typeOfObject = type;
 	}
 
+	public NameDialog(Shell shell, TypeOfEntry type, String name) {
+		super(shell);
+		ObjectName = Common.getObjectName(type);
+		typeOfObject = type;
+		this.Name = name;
+	}
+
 	@Override
 	public void create() {
 		super.create();
@@ -81,6 +88,7 @@ public class NameDialog extends TitleAreaDialog {
 
 		txtName = new Text(container, SWT.BORDER);
 		txtName.setLayoutData(dataFirstName);
+		txtName.setText(Name);
 	}
 
 	private void createLongDescr(Composite container) {

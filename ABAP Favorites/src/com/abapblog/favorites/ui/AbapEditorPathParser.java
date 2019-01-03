@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.abapblog.favorites.common.*;
+import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.common.CommonTypes.TypeOfObject;
 
 public class AbapEditorPathParser {
@@ -27,37 +28,36 @@ public class AbapEditorPathParser {
 	private static final Pattern patternIncludes = Pattern.compile(ADT_PROGRAMS_INCLUDES);
 
 
-	public static String getObjectName(CommonTypes.TypeOfObject typeOfObject, String path)
+	public static String getObjectName(CommonTypes.TypeOfEntry typeOfEntry, String path)
 	{
-		switch(typeOfObject) {
-		case AMDPType:
+		switch(typeOfEntry) {
+		case AMDP:
 			break;
-		case CDSViewType:
+		case CDSView:
 			break;
-		case FunctionGroupIncludeType:
-			return getName(path, patternFGInclude);
-		case FunctionGroupType:
+		case Program:
+			String ProgName = getName(path, patternFGInclude);
+			if (ProgName == "")
+				ProgName = getName(path, patternPrograms);
+			return ProgName;
+		case FunctionGroup:
 			return getName(path, patternFGroup);
-		case FunctionModuleRFCType:
-			break;
-		case FunctionModuleType:
+		case FunctionModule:
 			return getName(path, patternFM);
-		case MessageClassType:
+		case MessageClass:
 			return getName(path, patternMessageClasses);
-		case SearchHelpType:
+		case SearchHelp:
 			break;
-		case TableType:
+		case Table:
 			break;
-		case ViewType:
+		case View:
 			break;
-		case classType:
+		case Class:
 			return getName(path, patternClasses);
-		case includeType:
+		case Include:
 			return getName(path, patternIncludes);
-		case interfaceType:
+		case Interface:
 			return getName(path, patternInterfaces);
-		case programType:
-			return getName(path, patternPrograms);
 		default:
 			break;
 
@@ -72,30 +72,30 @@ public class AbapEditorPathParser {
 		return getObjectName(getType(path), path);
 	}
 
-	public static CommonTypes.TypeOfObject getType(String path) {
+	public static CommonTypes.TypeOfEntry getType(String path) {
 		if (checkClass(path)) {
-			return TypeOfObject.classType;
+			return TypeOfEntry.Class;
 		}
 		else if (checkInterface(path)){
-			return TypeOfObject.interfaceType;
+			return TypeOfEntry.Interface;
 		}
 		else if (checkFModule(path)){
-			return TypeOfObject.FunctionModuleType;
+			return TypeOfEntry.FunctionModule;
 		}
 		else if (checkFGInclude(path)){
-			return TypeOfObject.FunctionGroupIncludeType;
+			return TypeOfEntry.Program;
 		}
 		else if (checkFGroup(path)){
-			return TypeOfObject.FunctionGroupType;
+			return TypeOfEntry.FunctionGroup;
 		}
 		else if (checkMessageClass(path)){
-			return TypeOfObject.MessageClassType;
+			return TypeOfEntry.MessageClass;
 		}
 		else if (checkProgram(path)){
-			return TypeOfObject.programType;
+			return TypeOfEntry.Program;
 		}
 		else if (checkInclude(path)){
-			return TypeOfObject.includeType;
+			return TypeOfEntry.Include;
 		}
 		else
 		{

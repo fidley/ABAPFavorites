@@ -246,6 +246,12 @@ public class CommonTypes {
 				return "SHLP/DH";
 			}
 		}
+		,
+		TransactionType {
+			public String toString() {
+				return "TRAN/T";
+			}
+		}
 	}
 
 	public static enum TypeOfXMLAttr {

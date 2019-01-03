@@ -327,6 +327,7 @@ public void dispose() {
 
 	@Override
 	public void enableLinkingOfEditor() {
+		if (linkWithEditorAction != null)
 		linkWithEditorAction.setEnabled(true);
 	}
 
@@ -692,7 +693,7 @@ public void dispose() {
 					}
 
 					else {
-						if (selectFolderDialog) {
+						if (selectFolderDialog==false) {
 						String childName = eElementChild.getAttribute(TypeOfXMLAttr.name.toString());
 						if (XMLhandler.isXMLNodeNameToUpper(eElementChild.getTagName())) {
 							childName = childName.toUpperCase();

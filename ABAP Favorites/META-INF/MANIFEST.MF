@@ -16,7 +16,10 @@ Require-Bundle: org.eclipse.core.runtime,
  com.sap.adt.tools.core.ui;bundle-version="2.73.1",
  com.sap.adt.destinations;bundle-version="2.102.0",
  com.sap.adt.destinations.ui;bundle-version="2.102.0",
- org.eclipse.ui
+ org.eclipse.ui,
+ com.sap.adt.oo;bundle-version="2.102.4",
+ com.sap.adt.oo.ui;bundle-version="2.102.4",
+ com.sap.adt.projectexplorer.ui;bundle-version="2.102.4"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: com.abapblog.favorites,
