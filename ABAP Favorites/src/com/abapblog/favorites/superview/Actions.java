@@ -616,12 +616,6 @@ public class Actions {
 						programName = regexMatch.group(0);
 					}
 					if (programName.equalsIgnoreCase(reportName)) {
-						IAbapProject AP = project.getAdapter(IAbapProject.class);
-						IDestinationData DD = AP.getDestinationData();
-						IDestinationDataWritable DDW = DD.getWritable();
-						DDW.setLanguage("DE");
-						IDestinationData DDN = DDW.getReadOnlyClone();
-						AP.setDestinationData(DDN);
 						AdtSapGuiEditorUtilityFactory.createSapGuiEditorUtility().openEditorForObject(project, ref,
 								true, WorkbenchAction.EXECUTE.toString(), null, Collections.<String, String>emptyMap());
 						return;
