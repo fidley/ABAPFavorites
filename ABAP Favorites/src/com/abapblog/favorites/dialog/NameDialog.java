@@ -22,7 +22,7 @@ public class NameDialog extends TitleAreaDialog {
 	private Text txtLongDescr;
 
 	private String ObjectName;
-	private String Name;
+	private String Name = "";
 	private String Description;
 	private String LongDescription;
 	private TypeOfEntry typeOfObject;
@@ -89,6 +89,7 @@ public class NameDialog extends TitleAreaDialog {
 		txtName = new Text(container, SWT.BORDER);
 		txtName.setLayoutData(dataFirstName);
 		txtName.setText(Name);
+
 	}
 
 	private void createLongDescr(Composite container) {
