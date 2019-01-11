@@ -1,6 +1,11 @@
 package com.abapblog.favorites.superview;
 
+import java.util.ArrayList;
+
+import org.eclipse.jface.viewers.TreeViewer;
+
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
+import com.abapblog.favorites.tree.TreeParent;
 
 public interface IFavorites {
 
@@ -18,5 +23,10 @@ public interface IFavorites {
 	public void disableLinkingOfEditor();
 
 	public void enableLinkingOfEditor();
+
+	public TreeViewer getTreeViewer();
+
+	public ArrayList<String> getExpandedNodes();
+	public ArrayList<TreeParent> getExpandedParentNodes();
 
 }
