@@ -2,6 +2,7 @@ package com.abapblog.favorites.superview;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -42,6 +43,8 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.TreeAdapter;
+import org.eclipse.swt.events.TreeEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
@@ -71,6 +74,7 @@ import com.abapblog.favorites.common.CommonTypes.TypeOfXMLAttr;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.preferences.PreferenceConstants;
 import com.abapblog.favorites.tree.ColumnControlListener;
+import com.abapblog.favorites.tree.TreeExpansionListener;
 import com.abapblog.favorites.tree.TreeObject;
 import com.abapblog.favorites.tree.TreeParent;
 import com.abapblog.favorites.xml.XMLhandler;
@@ -78,11 +82,12 @@ import com.sap.adt.project.IAdtCoreProject;
 import com.sap.adt.project.ui.util.ProjectUtil;
 
 public abstract class Superview extends ViewPart implements ILinkedWithEditorView, IFavorites {
- @Override
-public void dispose() {
-	 getSite().getPage().removePartListener(linkWithEditorPartListener);
-	 super.dispose();
-}
+	@Override
+	public void dispose() {
+		getSite().getPage().removePartListener(linkWithEditorPartListener);
+		super.dispose();
+	}
+
 	private static IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 	protected String LinkedEditorProject = "";
 	protected IProject LinkedProject;
@@ -97,6 +102,8 @@ public void dispose() {
 	private Actions actions = new Actions();
 	public String TempLinkedEditorProject;
 	public IProject TempLinkedProject;
+	private ArrayList<String> expandedNodes;
+	private ArrayList<TreeParent> expandedParentNodes;
 
 	protected TypeOfXMLNode FolderNode;
 	private static List<TreeViewer> activeViewers = new ArrayList<TreeViewer>();
@@ -110,17 +117,34 @@ public void dispose() {
 		getActiveTreeViewers().forEach((viewer) -> {
 			refreshViewer(viewer);
 		});
-		getActiveFavorites().forEach((favorite)-> {
+		getActiveFavorites().forEach((favorite) -> {
 			toggleLinkingOfEditor(favorite);
 		});
 	}
 
+	@Override
+	public ArrayList<TreeParent> getExpandedParentNodes() {
+		if (expandedParentNodes == null)
+			expandedParentNodes = new ArrayList<TreeParent>();
+		return expandedParentNodes;
+	}
+
+	@Override
+	public ArrayList<String> getExpandedNodes() {
+		if (expandedNodes == null)
+			expandedNodes = new ArrayList<String>();
+		return expandedNodes;
+	}
+
+	@Override
+	public TreeViewer getTreeViewer() {
+		return viewer;
+	}
+
 	private static void toggleLinkingOfEditor(IFavorites favorite) {
-		if(isHideOfDepProject()) {
+		if (isHideOfDepProject()) {
 			favorite.enableLinkingOfEditor();
-		}
-		else
-		{
+		} else {
 			favorite.disableLinkingOfEditor();
 		}
 		((Superview) favorite).setNewViewName();
@@ -134,6 +158,12 @@ public void dispose() {
 		prefs.putBoolean("linking_active", Favorite.isLinkingActive());
 		prefs.put("linked_project", Favorite.getLinkedEditorProject());
 
+		if (Superview.isSaveFolderExpansionState()) {
+			String[] expNodes = (String[]) Favorite.getExpandedNodes().toArray(new String[0]);
+			prefs.put("expanded_nodes", String.join(";", expNodes));
+		} else {
+			prefs.put("expanded_nodes", "");
+		}
 		try {
 			// prefs are automatically flushed during a plugin's "super.stop()".
 			prefs.flush();
@@ -144,7 +174,7 @@ public void dispose() {
 	}
 
 	protected void setNewViewName() {
-		if (isLinkingActive()||isHideOfDepProject()==false) {
+		if (isLinkingActive() || isHideOfDepProject() == false) {
 			setPartName(partName);
 		} else {
 			setPartName(partName + " (" + getLinkedEditorProject() + ")");
@@ -165,7 +195,7 @@ public void dispose() {
 		activeViewers.add(viewer);
 		drillDownAdapter = new DrillDownAdapter(viewer);
 		Tree tree = viewer.getTree();
-
+		tree.addTreeListener(new TreeExpansionListener(this));
 		addDragAndDropSupport(tree);
 
 		setTreeColumns(columnListener, tree);
@@ -185,6 +215,8 @@ public void dispose() {
 		setNewViewName();
 		sortTable();
 		refreshViewer(viewer);
+		viewer.setExpandedElements(getExpandedParentNodes().toArray());
+
 	}
 
 	private void setLinkingWithEditor() {
@@ -328,7 +360,7 @@ public void dispose() {
 	@Override
 	public void enableLinkingOfEditor() {
 		if (linkWithEditorAction != null)
-		linkWithEditorAction.setEnabled(true);
+			linkWithEditorAction.setEnabled(true);
 	}
 
 	@Override
@@ -381,6 +413,7 @@ public void dispose() {
 				if (LinkedProject != null) {
 					setLinkedEditorProject(LinkedProject.getName());
 					Superview.refreshViewer(viewer);
+					viewer.setExpandedElements(getExpandedParentNodes().toArray());
 				}
 			}
 			return;
@@ -390,6 +423,10 @@ public void dispose() {
 
 	public static boolean isHideOfDepProject() {
 		return store.getBoolean(PreferenceConstants.P_HIDE_PROJECT_DEP_FOLDERS);
+	}
+
+	public static boolean isSaveFolderExpansionState() {
+		return store.getBoolean(PreferenceConstants.P_KEEP_THE_EXPANDED_FOLDERS_AT_START);
 	}
 
 	protected void toggleLinking() {
@@ -402,7 +439,6 @@ public void dispose() {
 		}
 		setNewViewName();
 	}
-
 
 	protected void hookContextMenu() {
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
@@ -545,7 +581,21 @@ public void dispose() {
 		}
 		setLinkingActive(prefs.getBoolean("linking_active", true));
 		setLinkedEditorProject(prefs.get("linked_project", ""));
+		expandTreeNodes(prefs);
 		LinkedProject = Common.getProjectByName(getLinkedEditorProject());
+	}
+
+	private void expandTreeNodes(IEclipsePreferences prefs) {
+		String expandedNodesString = "";
+		String[] expNodes = null;
+		expandedNodesString = prefs.get("expanded_nodes", expandedNodesString);
+		if (expandedNodesString != "") {
+			expNodes = expandedNodesString.split(";");
+		}
+		;
+		if (expNodes != null) {
+			this.expandedNodes = new ArrayList<String>(Arrays.asList(expNodes));
+		}
 	};
 
 	protected void hookDoubleClickAction() {
@@ -554,10 +604,8 @@ public void dispose() {
 			public void doubleClick(DoubleClickEvent event) {
 				TempLinkedEditorProject = getLinkedEditorProject();
 				if (isHideOfDepProject()) {
-				TempLinkedProject = LinkedProject;
-				}
-				else
-				{
+					TempLinkedProject = LinkedProject;
+				} else {
 					TempLinkedProject = null;
 				}
 				actions.actDoubleClick.run();
@@ -583,9 +631,12 @@ public void dispose() {
 		LinkedEditorProject = linkedEditorProject;
 	}
 
-	public static TreeParent createTreeNodes(TypeOfXMLNode FolderXMLNode, IFavorites Favorite, Boolean selectFolderDialog) {
+	public static TreeParent createTreeNodes(TypeOfXMLNode FolderXMLNode, IFavorites Favorite,
+			Boolean selectFolderDialog) {
 
 		String LinkedEditorProject = "";
+
+		Favorite.getExpandedParentNodes().clear();
 
 		if (isHideOfDepProject() == true && Favorite != null) {
 			LinkedEditorProject = Favorite.getLinkedEditorProject();
@@ -612,7 +663,8 @@ public void dispose() {
 					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
 						Element eElement = (Element) nNode;
-						createSubNodes(FolderXMLNode, eElement, invisibleRoot, LinkedEditorProject, Favorite, selectFolderDialog);
+						createSubNodes(FolderXMLNode, eElement, invisibleRoot, LinkedEditorProject, Favorite,
+								selectFolderDialog);
 					}
 				}
 
@@ -657,16 +709,20 @@ public void dispose() {
 					subNode.getAttribute(TypeOfXMLAttr.longDescription.toString()), favorite,
 					Boolean.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.devObjFolder.toString())),
 					subNode.getAttribute(TypeOfXMLAttr.folderID.toString()));
+
 			String FolderID = "";
 			FolderID = subNode.getAttribute(TypeOfXMLAttr.folderID.toString());
 			if (FolderID == "") {
 				FolderID = parent.getFolderID();
 				subNode.setAttribute(TypeOfXMLAttr.folderID.toString(), FolderID);
 			}
+
+			if (favorite.getExpandedNodes().contains(FolderID))
+				favorite.getExpandedParentNodes().add(parent);
+
 			boolean projectIsIndependent = Boolean
 					.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.projectIndependent.toString()));
-			if (projectIsIndependent == false
-					&& isHideOfDepProject() == true) {
+			if (projectIsIndependent == false && isHideOfDepProject() == true) {
 				String ProjectName = linkedEditorProject;
 				if (ProjectName.equals(""))
 					ProjectName = Common.getProjectName();
@@ -689,20 +745,22 @@ public void dispose() {
 					Element eElementChild = (Element) nNodeChild;
 
 					if (eElementChild.getNodeName().equalsIgnoreCase(folderXMLNode.toString())) {
-						createSubNodes(folderXMLNode, eElementChild, parent, linkedEditorProject, favorite, selectFolderDialog);
+						createSubNodes(folderXMLNode, eElementChild, parent, linkedEditorProject, favorite,
+								selectFolderDialog);
 					}
 
 					else {
-						if (selectFolderDialog==false) {
-						String childName = eElementChild.getAttribute(TypeOfXMLAttr.name.toString());
-						if (XMLhandler.isXMLNodeNameToUpper(eElementChild.getTagName())) {
-							childName = childName.toUpperCase();
-						}
-						parent.addChild(new TreeObject(childName,
-								XMLhandler.getEntryTypeFromXMLNode(nNodeChild.getNodeName()),
-								eElementChild.getAttribute(TypeOfXMLAttr.description.toString()),
-								eElementChild.getAttribute(TypeOfXMLAttr.technicalName.toString()),
-								eElementChild.getAttribute(TypeOfXMLAttr.longDescription.toString()), favorite));
+						if (selectFolderDialog == false) {
+							String childName = eElementChild.getAttribute(TypeOfXMLAttr.name.toString());
+							if (XMLhandler.isXMLNodeNameToUpper(eElementChild.getTagName())) {
+								childName = childName.toUpperCase();
+							}
+							TreeObject child = new TreeObject(childName,
+									XMLhandler.getEntryTypeFromXMLNode(nNodeChild.getNodeName()),
+									eElementChild.getAttribute(TypeOfXMLAttr.description.toString()),
+									eElementChild.getAttribute(TypeOfXMLAttr.technicalName.toString()),
+									eElementChild.getAttribute(TypeOfXMLAttr.longDescription.toString()), favorite);
+							parent.addChild(child);
 						}
 					}
 				}
@@ -722,7 +780,6 @@ public void dispose() {
 			} catch (Exception e) {
 
 			}
-
 			viewer.refresh();
 		}
 	}
@@ -730,6 +787,7 @@ public void dispose() {
 	public static List<IFavorites> getActiveFavorites() {
 		return activeFavorites;
 	}
+
 	public static void addFavoritesToActive(IFavorites Favorite) {
 		activeFavorites.add(Favorite);
 	}

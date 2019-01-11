@@ -20,6 +20,9 @@ public class FavoritesPreferences extends FieldEditorPreferencePage implements I
 	public void createFieldEditors() {
 		addField(new BooleanFieldEditor(PreferenceConstants.P_HIDE_PROJECT_DEP_FOLDERS,
 				"&Hide project dependent folders", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PreferenceConstants.P_KEEP_THE_EXPANDED_FOLDERS_AT_START,
+				"&Save state of folder expansion", getFieldEditorParent()));
+
 	}
 
 	public void init(IWorkbench workbench) {

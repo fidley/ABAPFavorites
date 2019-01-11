@@ -48,7 +48,9 @@ public class Activator extends AbstractUIPlugin {
 	 * BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
+		if (Common.Favorite !=null)
 		Favorites.savePluginSettings(Common.Favorite);
+		if (Common.FavoriteDO !=null)
 		FavoritesDO.savePluginSettings(Common.FavoriteDO);
 		plugin = null;
 		super.stop(context);
