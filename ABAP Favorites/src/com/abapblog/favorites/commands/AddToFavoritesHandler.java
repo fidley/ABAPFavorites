@@ -30,8 +30,8 @@ public class AddToFavoritesHandler extends AbstractHandler {
 
 			CommonTypes.TypeOfEntry objectType = AbapEditorPathParser.getType(input.toString());
 			String objectName = AbapEditorPathParser.getObjectName(input.toString());
-			// System.out.println(objectType.toString());
-			// System.out.println(objectName);
+			//In case of objects in own namespace we have to convert %2f to / character to have correct name
+			objectName = objectName.replaceAll("%2f", "/");
 
 			SelectFolderDialog selectFolderDialog = new SelectFolderDialog(null, objectType, objectName);
 			if (selectFolderDialog.open() == Window.OK) {
