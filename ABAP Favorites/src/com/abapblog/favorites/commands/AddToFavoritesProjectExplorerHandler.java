@@ -23,40 +23,59 @@ public class AddToFavoritesProjectExplorerHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent executionEvent) throws ExecutionException {
-
+		SelectFolderDialog selectFolderDialog = null;
+		Boolean FolderSelected = false;
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		if (window != null) {
 			IStructuredSelection selection = (IStructuredSelection) window.getSelectionService().getSelection();
-			Object firstElement = selection.getFirstElement();
-			if (firstElement instanceof IAdaptable) {
-				try {
-					AdtObjectReference AdtRef = ((IAdaptable) firstElement).getAdapter(AdtObjectReference.class);
-					String objectType = AdtRef.getType();
-					String objectName = AdtRef.getName();
-					TypeOfEntry typeOfEntry = Common.getTypeOfEntryFromSAPType(objectType);
-					SelectFolderDialog selectFolderDialog = new SelectFolderDialog(null, typeOfEntry, objectName);
-					if (selectFolderDialog.open() == Window.OK) {
-						NameDialog newObjectDialog = new NameDialog(null, selectFolderDialog.getTypeOfEntry(),
-								selectFolderDialog.getObjectName().toUpperCase());
-						if (newObjectDialog.open() == Window.OK) {
-							XMLhandler.addObjectToXML(selectFolderDialog.getTypeOfEntry(), newObjectDialog.getName(),
-									newObjectDialog.getDescription(), newObjectDialog.getLongDescription(),
+			Object[] Items = ((IStructuredSelection) selection).toArray();
+			for (int i = 0; i < Items.length; i++) {
+				IAdaptable item = (IAdaptable) Items[i];
+				if (item instanceof IAdaptable) {
+					try {
+						AdtObjectReference AdtRef = ((IAdaptable) item).getAdapter(AdtObjectReference.class);
+						String objectType = AdtRef.getType();
+						String objectName = AdtRef.getName();
+						TypeOfEntry typeOfEntry = Common.getTypeOfEntryFromSAPType(objectType);
+
+						if (Items.length == 1 || FolderSelected == false) {
+							selectFolderDialog = new SelectFolderDialog(null, typeOfEntry, objectName);
+							if (selectFolderDialog.open() == Window.OK) {
+								FolderSelected = true;
+								if (Items.length == 1) {
+									NameDialog newObjectDialog = new NameDialog(null,
+											selectFolderDialog.getTypeOfEntry(),
+											selectFolderDialog.getObjectName().toUpperCase());
+									if (newObjectDialog.open() == Window.OK) {
+										XMLhandler.addObjectToXML(selectFolderDialog.getTypeOfEntry(),
+												newObjectDialog.getName(), newObjectDialog.getDescription(),
+												newObjectDialog.getLongDescription(), selectFolderDialog.getFolderID(),
+												selectFolderDialog.getFolderType());
+									}
+								} else {
+									XMLhandler.addObjectToXML(typeOfEntry, objectName.toUpperCase(), "", "",
+											selectFolderDialog.getFolderID(), selectFolderDialog.getFolderType());
+								}
+							}
+
+						} else {
+							XMLhandler.addObjectToXML(typeOfEntry, objectName.toUpperCase(), "", "",
 									selectFolderDialog.getFolderID(), selectFolderDialog.getFolderType());
-							Superview.refreshActiveViews();
 						}
 
+					} catch (SecurityException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IllegalArgumentException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 
-				} catch (SecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
-
 			}
+
 		}
+		Superview.refreshActiveViews();
 		return null;
 
 	}
