@@ -1,7 +1,6 @@
 package com.abapblog.favorites.xml;
 
 import java.io.File;
-
 import java.io.IOException;
 import java.util.UUID;
 
@@ -121,7 +120,9 @@ public class XMLhandler {
 
 					NamedNodeMap attributes = nNode.getAttributes();
 					Node FolderID = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
-
+					if (FolderID == null) {
+						continue;
+					}
 					if (FolderID.getNodeValue().contentEquals(Parent)) {
 
 						Element ObjectElement = doc.createElement(getObjectXMLNode(Type).toString());
@@ -465,6 +466,10 @@ public class XMLhandler {
 
 					NamedNodeMap attributes = nNode.getAttributes();
 					Node FolderName = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
+					if (FolderName == null)
+					{
+						continue;
+					}
 					if (FolderName.getNodeValue().equals(SourceFolderId)) {
 
 						NodeList targetFolders = doc.getElementsByTagName(TargetParentNodeType.toString());
@@ -476,7 +481,7 @@ public class XMLhandler {
 							Node FolderNameTarget = attributesTarget.getNamedItem(TypeOfXMLAttr.folderID.toString());
 							if (FolderNameTarget.getNodeValue().equals(TargetFolderId)) {
 
-								//Node parent = nNode.getParentNode();
+								// Node parent = nNode.getParentNode();
 								nNodeTarget.appendChild(nNode);
 								// parent.removeChild(nNode);
 								DOMSource source = new DOMSource(doc);
