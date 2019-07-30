@@ -39,7 +39,7 @@ public class AddToFavoritesHandler extends AbstractHandler {
 						selectFolderDialog.getObjectName().toUpperCase());
 				if (newObjectDialog.open() == Window.OK) {
 					XMLhandler.addObjectToXML(selectFolderDialog.getTypeOfEntry(), newObjectDialog.getName(),
-							newObjectDialog.getDescription(), newObjectDialog.getLongDescription(),
+							newObjectDialog.getDescription(), newObjectDialog.getLongDescription(),"",
 							selectFolderDialog.getFolderID(), selectFolderDialog.getFolderType());
 					Superview.refreshActiveViews();
 				}

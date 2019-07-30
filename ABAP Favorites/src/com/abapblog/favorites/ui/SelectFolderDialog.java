@@ -45,46 +45,40 @@ public class SelectFolderDialog extends Dialog {
 	private String objectName;
 	private String folderID;
 	private TypeOfXMLNode folderType;
-	/**
-	 * Create the dialog.
-	 *
-	 * @param parentShell
-	 */
+
 	public SelectFolderDialog(Shell parentShell, TypeOfEntry typeOfEntry, String objectName) {
 		super(parentShell);
 		this.setTypeOfEntry(typeOfEntry);
 		this.setObjectName(objectName);
 	}
-
+	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText("Select folder to add the object to");
 	}
 
-	/**
-	 * Create contents of the dialog.
-	 *
-	 * @param parent
-	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite container = (Composite) super.createDialogArea(parent);
-		//GridLayout gridLayout = (GridLayout) container.getLayout();
-
 		tabFolder = new TabFolder(container, SWT.NONE);
 		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-		if (Common.Favorite == null) {
-			Common.Favorite = new Favorites();
-		}
-
+		initializeFavorites();
 		createFavoritesTree(container, tabFolder);
 
-		if (Common.FavoriteDO == null)
-			Common.FavoriteDO = new FavoritesDO();
+		initializeFavoritesDO();
 		createFavoritesDOTree(container, tabFolder);
 
 		return container;
+	}
+	private static void initializeFavoritesDO() {
+		if (Common.FavoriteDO == null)
+			Common.FavoriteDO = new FavoritesDO();
+	}
+	private static void initializeFavorites() {
+		if (Common.Favorite == null) {
+			Common.Favorite = new Favorites();
+		}
 	}
 
 	private void createFavoritesDOTree(Composite container, TabFolder tabFolder) {
@@ -104,7 +98,6 @@ public class SelectFolderDialog extends Dialog {
 		setTreeColumns(columnListenerDO, treeFavoritesFoldersDO, ID_FOLDER_FAVORITES_DO);
 		treeViewerFavDO
 				.setContentProvider(new ViewContentProvider(TypeOfXMLNode.folderDONode, Common.FavoriteDO, container));
-		// treeViewerFav.setInput(getViewSite());
 		treeViewerFavDO.setInput(container);
 		treeViewerFavDO.setLabelProvider(new ViewLabelProvider());
 		sortTreeViewer(treeViewerFavDO);
@@ -125,75 +118,66 @@ public class SelectFolderDialog extends Dialog {
 
 		setTreeColumns(columnListener, treeFavoritesFolders, ID_FOLDER_FAVORITES);
 		treeViewerFav.setContentProvider(new ViewContentProvider(TypeOfXMLNode.folderNode, Common.Favorite, container));
-		// treeViewerFav.setInput(getViewSite());
 		treeViewerFav.setInput(container);
 		treeViewerFav.setLabelProvider(new ViewLabelProvider());
 		sortTreeViewer(treeViewerFav);
 	}
 
-	/**
-	 * Create contents of the button bar.
-	 *
-	 * @param parent
-	 */
+
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
-	/**
-	 * Return the initial size of the dialog.
-	 */
 	@Override
 	protected Point getInitialSize() {
 		return new Point(600, 450);
 	}
 
-	private void setTreeColumns(ColumnControlListener columnListener, Tree tree, String ID) {
+	private void setTreeColumns(ColumnControlListener columnListener, Tree tree, String id) {
 		tree.setHeaderVisible(true);
 		TreeColumn columnName = new TreeColumn(tree, SWT.LEFT);
 		columnName.setText("Name");
 		columnName.addControlListener(columnListener);
-		loadColumnSettings(columnName, ID);
+		loadColumnSettings(columnName, id);
 		TreeColumn columnDescr = new TreeColumn(tree, SWT.LEFT);
 		columnDescr.setText("Description");
 		columnDescr.addControlListener(columnListener);
-		loadColumnSettings(columnDescr, ID);
-		TreeColumn ColumnID = new TreeColumn(tree, SWT.LEFT);
-		ColumnID.setText("ID");
-		ColumnID.addControlListener(columnListener);
-		ColumnID.setWidth(0);
-		ColumnID.setResizable(false);
-		TreeColumn ColumnFolderType = new TreeColumn(tree, SWT.LEFT);
-		ColumnFolderType.setText("FolderType");
-		ColumnFolderType.addControlListener(columnListener);
-		ColumnFolderType.setWidth(0);
-		ColumnFolderType.setResizable(false);
-		TreeColumn ColumnDevObj = new TreeColumn(tree, SWT.LEFT);
-		ColumnDevObj.setText("DevObjects");
-		ColumnDevObj.addControlListener(columnListener);
-		ColumnDevObj.setWidth(0);
-		ColumnDevObj.setResizable(false);
-		TreeColumn ColumnLinkedTo = new TreeColumn(tree, SWT.LEFT);
-		ColumnLinkedTo.setText("Linked To");
-		ColumnLinkedTo.addControlListener(columnListener);
-		loadColumnSettings(ColumnLinkedTo, ID);
+		loadColumnSettings(columnDescr, id);
+		TreeColumn columnID = new TreeColumn(tree, SWT.LEFT);
+		columnID.setText("ID");
+		columnID.addControlListener(columnListener);
+		columnID.setWidth(0);
+		columnID.setResizable(false);
+		TreeColumn columnFolderType = new TreeColumn(tree, SWT.LEFT);
+		columnFolderType.setText("FolderType");
+		columnFolderType.addControlListener(columnListener);
+		columnFolderType.setWidth(0);
+		columnFolderType.setResizable(false);
+		TreeColumn columnDevObj = new TreeColumn(tree, SWT.LEFT);
+		columnDevObj.setText("DevObjects");
+		columnDevObj.addControlListener(columnListener);
+		columnDevObj.setWidth(0);
+		columnDevObj.setResizable(false);
+		TreeColumn columnLinkedTo = new TreeColumn(tree, SWT.LEFT);
+		columnLinkedTo.setText("Linked To");
+		columnLinkedTo.addControlListener(columnListener);
+		loadColumnSettings(columnLinkedTo, id);
 	}
 
-	protected void loadColumnSettings(TreeColumn Column, String ID) {
-		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ID);
-		Column.setWidth(prefs.getInt("column_width" + Column.getText(), 300));
+	protected void loadColumnSettings(TreeColumn column, String id) {
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(id);
+		column.setWidth(prefs.getInt("column_width" + column.getText(), 300));
 	}
 
-	public static void saveDialogSettings(String ID) {
-		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ID);
+	public static void saveDialogSettings(String id) {
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(id);
 
 		try {
 			// prefs are automatically flushed during a plugin's "super.stop()".
 			prefs.flush();
 		} catch (org.osgi.service.prefs.BackingStoreException e) {
-			// TODO write a real exception handler.
 			e.printStackTrace();
 		}
 	}
@@ -222,17 +206,16 @@ public class SelectFolderDialog extends Dialog {
 
 	@Override
 	protected void okPressed() {
-		// TODO Auto-generated method stub
 		saveDialogSettings(ID_FOLDER_FAVORITES);
 		saveDialogSettings(ID_FOLDER_FAVORITES_DO);
 
 		TreeViewer viewer = ((FilteredTree) tabFolder.getItem(tabFolder.getSelectionIndex()).getControl()).getViewer();
 		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 
-		TreeObject Folder = (TreeObject) selection.getFirstElement();
-		if (Folder instanceof TreeParent) {
-			setFolderID(((TreeParent) Folder).getFolderID());
-			setFolderType(((TreeParent) Folder).getTypeOfFolder());
+		TreeObject folder = (TreeObject) selection.getFirstElement();
+		if (folder instanceof TreeParent) {
+			setFolderID(((TreeParent) folder).getFolderID());
+			setFolderType(((TreeParent) folder).getTypeOfFolder());
 
 				super.okPressed();
 
@@ -243,7 +226,6 @@ public class SelectFolderDialog extends Dialog {
 
 	@Override
 	protected void cancelPressed() {
-		// TODO Auto-generated method stub
 		saveDialogSettings(ID_FOLDER_FAVORITES);
 		saveDialogSettings(ID_FOLDER_FAVORITES_DO);
 		super.cancelPressed();

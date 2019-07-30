@@ -27,7 +27,7 @@ public class ViewLabelProvider implements ITableLabelProvider {
 
 			if (element instanceof TreeObject) {
 				TreeObject Node = (TreeObject) element;
-				switch (Node.Type) {
+				switch (Node.getType()) {
 				case Transaction:
 					return AFIcons.getTransactionIcon();
 				case URL:
@@ -102,8 +102,8 @@ public class ViewLabelProvider implements ITableLabelProvider {
 			else if (element instanceof TreeObject)
 			{
 				TreeObject object = ((TreeObject) element);
-				if (object.parent.getProjectIndependent() == false)
-					return object.parent.getProject().toString();
+				if (object.getParent().getProjectIndependent() == false)
+					return object.getParent().getProject().toString();
 			}
 		}
 		return null;

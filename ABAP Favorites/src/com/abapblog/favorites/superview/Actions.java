@@ -226,7 +226,7 @@ public class Actions {
 					if (obj instanceof TreeObject) {
 						TreeObject nodeObject = ((TreeObject) obj);
 						TypeOfEntry NodeType = nodeObject.getType();
-						TreeParent nodeParent = nodeObject.parent;
+						TreeParent nodeParent = nodeObject.getParent();
 						if (nodeParent.getProjectIndependent()) {
 							superview.TempLinkedProject = null;
 						} else {
@@ -265,7 +265,7 @@ public class Actions {
 
 							TreeObject nodeObject = ((TreeObject) obj);
 							TypeOfEntry NodeType = nodeObject.getType();
-							TreeParent nodeParent = nodeObject.parent;
+							TreeParent nodeParent = nodeObject.getParent();
 							switch (NodeType) {
 							case Transaction:
 								AdtSapGuiEditorUtilityFactory.createSapGuiEditorUtility().openEditorAndStartTransaction(
@@ -289,20 +289,20 @@ public class Actions {
 								break;
 							case Program:
 								if (nodeParent.getDevObjProject() == false) {
-									runObject(superview.TempLinkedProject, nodeObject.getName(), nodeObject.Type);
+									runObject(superview.TempLinkedProject, nodeObject.getName(), nodeObject.getType());
 									break;
 								} else {
-									openObject(superview.TempLinkedProject, nodeObject.getName(), nodeObject.Type);
+									openObject(superview.TempLinkedProject, nodeObject.getName(), nodeObject.getType());
 									break;
 								}
 							case Table:
 
 							default:
 								if (nodeParent.getDevObjProject() == false) {
-									runObject(superview.TempLinkedProject, nodeObject.getName(), nodeObject.Type);
+									runObject(superview.TempLinkedProject, nodeObject.getName(), nodeObject.getType());
 									break;
 								} else {
-									openObject(superview.TempLinkedProject, nodeObject.getName(), nodeObject.Type);
+									openObject(superview.TempLinkedProject, nodeObject.getName(), nodeObject.getType());
 									break;
 								}
 							}
@@ -480,9 +480,9 @@ public class Actions {
 						if (object instanceof TreeParent) {
 							String ADTLink = URLDialog.getURL();
 							ADTLink = ADTLink.replace("(?<=\'/\'/)(.*?)(?=\'/)", "$system");
-							XMLhandler.addURLToXML(URLDialog.getName(), URLDialog.getDescription(),
-									URLDialog.getLongDescription(), ADTLink, ((TreeParent) object).getFolderID(),
-									TypeOfXMLNode.ADTLinkNode, object.getParent().getTypeOfFolder());
+							XMLhandler.addObjectToXML(
+									TypeOfEntry.ADTLink,URLDialog.getName(), URLDialog.getDescription(),
+									URLDialog.getLongDescription(), ADTLink, ((TreeParent) object).getFolderID(), object.getParent().getTypeOfFolder());
 							System.out.println(URLDialog.getName());
 							System.out.println(URLDialog.getDescription());
 							Superview.refreshViewer(viewer);
@@ -590,10 +590,9 @@ public class Actions {
 
 						if (object instanceof TreeParent) {
 
-							XMLhandler.addURLToXML(URLDialog.getName(), URLDialog.getDescription(),
+							XMLhandler.addObjectToXML(TypeOfEntry.URL,URLDialog.getName(), URLDialog.getDescription(),
 									URLDialog.getLongDescription(), URLDialog.getURL(),
-									((TreeParent) object).getFolderID(), TypeOfXMLNode.urlNode,
-									object.getParent().getTypeOfFolder());
+									((TreeParent) object).getFolderID(), object.getParent().getTypeOfFolder());
 							System.out.println(URLDialog.getName());
 							System.out.println(URLDialog.getDescription());
 							Superview.refreshViewer(viewer);
@@ -751,9 +750,8 @@ public class Actions {
 
 						XMLhandler.delObjectFromXML(Type, Object.getName(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
-						XMLhandler.addURLToXML(Name, UrlDialog.getDescription(), UrlDialog.getLongDescription(),
-								UrlDialog.getURL(), Object.getParent().getFolderID(), TypeOfXMLNode.urlNode,
-								Object.getParent().getTypeOfFolder());
+						XMLhandler.addObjectToXML(TypeOfEntry.URL,Name, UrlDialog.getDescription(), UrlDialog.getLongDescription(),
+								UrlDialog.getURL(), Object.getParent().getFolderID(), Object.getParent().getTypeOfFolder());
 
 						Superview.refreshViewer(viewer);
 					}
@@ -780,8 +778,8 @@ public class Actions {
 
 						XMLhandler.delObjectFromXML(Type, Object.getName(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
-						XMLhandler.addURLToXML(Name, UrlDialog.getDescription(), UrlDialog.getLongDescription(),
-								UrlDialog.getURL(), Object.getParent().getFolderID(), TypeOfXMLNode.ADTLinkNode,
+						XMLhandler.addObjectToXML(TypeOfEntry.ADTLink,Name, UrlDialog.getDescription(), UrlDialog.getLongDescription(),
+								UrlDialog.getURL(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
 
 						Superview.refreshViewer(viewer);
@@ -804,7 +802,7 @@ public class Actions {
 						}
 						XMLhandler.delObjectFromXML(Type, Object.getName(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
-						XMLhandler.addObjectToXML(Type, Name, NaDialog.getDescription(), NaDialog.getLongDescription(),
+						XMLhandler.addObjectToXML(Type, Name, NaDialog.getDescription(), NaDialog.getLongDescription(),"",
 								Object.getParent().getFolderID(), Object.getParent().getTypeOfFolder());
 						Superview.refreshViewer(viewer);
 					}
@@ -823,8 +821,8 @@ public class Actions {
 
 			if (object instanceof TreeObject) {
 				TreeObject treeObj = (TreeObject) object;
-				XMLhandler.delObjectFromXML(treeObj.Type, object.Name, object.parent.getFolderID(),
-						object.parent.getTypeOfFolder());
+				XMLhandler.delObjectFromXML(treeObj.getType(), object.getName(), object.getParent().getFolderID(),
+						object.getParent().getTypeOfFolder());
 				Superview.refreshViewer(viewer);
 			}
 		}
@@ -846,7 +844,7 @@ public class Actions {
 						Name = Name.toUpperCase();
 					}
 					XMLhandler.addObjectToXML(Type, Name, NaDialog.getDescription(),
-							((TreeParent) Folder).getLongDescription(), ((TreeParent) Folder).getFolderID(),
+							((TreeParent) Folder).getLongDescription(),((TreeParent) Folder).getTechnicalName(), ((TreeParent) Folder).getFolderID(),
 							((TreeParent) Folder).getTypeOfFolder());
 					Superview.refreshViewer(viewer);
 				}
@@ -874,7 +872,7 @@ public class Actions {
 
 								TreeObject nodeObject = ((TreeObject) obj);
 								TypeOfEntry NodeType = nodeObject.getType();
-								TreeParent nodeParent = nodeObject.parent;
+								TreeParent nodeParent = nodeObject.getParent();
 								switch (NodeType) {
 								case Transaction:
 									IAdtSapGuiEditorUtility SGEU = AdtSapGuiEditorUtilityFactory
@@ -898,20 +896,20 @@ public class Actions {
 									break;
 								case Program:
 									if (nodeParent.getDevObjProject() == false) {
-										runObject(ABAPProject, nodeObject.getName(), nodeObject.Type);
+										runObject(ABAPProject, nodeObject.getName(), nodeObject.getType());
 										break;
 									} else {
-										openObject(ABAPProject, nodeObject.getName(), nodeObject.Type);
+										openObject(ABAPProject, nodeObject.getName(), nodeObject.getType());
 										break;
 									}
 								case Table:
 
 								default:
 									if (nodeParent.getDevObjProject() == false) {
-										runObject(ABAPProject, nodeObject.getName(), nodeObject.Type);
+										runObject(ABAPProject, nodeObject.getName(), nodeObject.getType());
 										break;
 									} else {
-										openObject(ABAPProject, nodeObject.getName(), nodeObject.Type);
+										openObject(ABAPProject, nodeObject.getName(), nodeObject.getType());
 										break;
 									}
 								}
@@ -948,7 +946,7 @@ public class Actions {
 
 		}
 	}
-	
+
 
 	private void createCopyToClipboardAction(TreeViewer viewer, AFIcons AFIcon) {
 		actCopyToClipboard = new Action() {
@@ -961,7 +959,7 @@ public class Actions {
 		};
 		actCopyToClipboard.setText("Copy to Clipboard");
 		actCopyToClipboard.setToolTipText("Copy to Clipboard");
-		actCopyToClipboard.setImageDescriptor(AFIcon.getCopyToClipboardImgDescr());		
+		actCopyToClipboard.setImageDescriptor(AFIcon.getCopyToClipboardImgDescr());
 	}
 
 }

@@ -14,7 +14,7 @@ import com.abapblog.favorites.superview.Superview;
 
 public class Favorites extends Superview {
 
-	private String ID = "com.abapblog.favorites.views.Favorites";
+	private String id = "com.abapblog.favorites.views.Favorites";
 	/**
 	 * The constructor.
 	 */
@@ -42,11 +42,8 @@ public class Favorites extends Superview {
 
 	@Override
 	public String getID() {
-		return ID;
+		return id;
 	}
 
-	/**
-	 * This is a callback that will allow us to create the viewer and initialize it.
-	 */
 
 }

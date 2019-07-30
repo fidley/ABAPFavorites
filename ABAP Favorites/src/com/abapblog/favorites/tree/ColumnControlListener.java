@@ -7,28 +7,25 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.widgets.TreeColumn;
 
 public class ColumnControlListener implements ControlListener {
-	private String ID;
+	private String id;
 
 	@Override
 	public void controlMoved(ControlEvent arg0) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void controlResized(ControlEvent arg0) {
-		// TODO Auto-generated method stub
-		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(getID());
+	IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(getID());
 		TreeColumn column = (TreeColumn) arg0.getSource();
 		prefs.putInt("column_width" + column.getText(), column.getWidth());
 	}
 
 	public String getID() {
-		return ID;
+		return id;
 	}
 
-	public void setID(String iD) {
-		ID = iD;
+	public void setID(String id) {
+		this.id = id;
 	}
 
 }

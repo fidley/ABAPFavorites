@@ -9,29 +9,29 @@ import com.abapblog.favorites.superview.IFavorites;
 import com.abapblog.favorites.views.Favorites;
 
 public class TreeParent extends TreeObject {
-	private ArrayList children;
-	private boolean ProjectIndependent;
-	private boolean DevObjProject;
-	private String Project;
-	private TypeOfXMLNode TypeOfFolder;
-	private String FolderID;
+	private ArrayList<TreeObject> children;
+	private boolean projectIndependent;
+	private boolean devObjProject;
+	private String project;
+	private TypeOfXMLNode typeOfFolder;
+	private String folderID;
 	private IFavorites favorite;
 
-	public TreeParent(String name, String description, boolean ProjectIndependent, String Project,
-			String LongDescription, IFavorites Favorite, boolean DevObjProj, String FolderID) {
-		super(name, TypeOfEntry.Folder, description, "", LongDescription, Favorite);
-		children = new ArrayList();
-		this.ProjectIndependent = ProjectIndependent;
-		this.setProject(Project);
-		this.setDevObjProject(DevObjProj);
-		if (Favorite instanceof Favorites) {
+	public TreeParent(String name, String description, boolean projectIndependent, String project,
+			String longDescription, IFavorites favorite, boolean devObjProj, String folderID) {
+		super(name, TypeOfEntry.Folder, description, "", longDescription, favorite);
+		children = new ArrayList<>();
+		this.projectIndependent = projectIndependent;
+		this.setProject(project);
+		this.setDevObjProject(devObjProj);
+		if (favorite instanceof Favorites) {
 			setTypeOfFolder(TypeOfXMLNode.folderNode);
 		} else {
 			setTypeOfFolder(TypeOfXMLNode.folderDONode);
 		}
-		favorite = Favorite;
-		this.setFolderID(FolderID);
-		if (this.getFolderID() == "") {
+		this.favorite = favorite;
+		this.setFolderID(folderID);
+		if (this.getFolderID().equals("")) {
 			this.setFolderID(UUID.randomUUID().toString());
 		}
 	}
@@ -47,46 +47,46 @@ public class TreeParent extends TreeObject {
 	}
 
 	public TreeObject[] getChildren() {
-		return (TreeObject[]) children.toArray(new TreeObject[children.size()]);
+		return children.toArray(new TreeObject[children.size()]);
 	}
 
 	public boolean hasChildren() {
-		return children.size() > 0;
+		return !children.isEmpty();
 	}
 
 	public boolean getDevObjProject() {
-		return DevObjProject;
+		return devObjProject;
 	}
 
 	public void setDevObjProject(boolean devObjProject) {
-		DevObjProject = devObjProject;
+		this.devObjProject = devObjProject;
 	}
 
 	public String getProject() {
-		return Project;
+		return project;
 	}
 
 	public void setProject(String project) {
-		Project = project;
+		this.project = project;
 	}
 
 	public TypeOfXMLNode getTypeOfFolder() {
-		return TypeOfFolder;
+		return typeOfFolder;
 	}
 
 	public void setTypeOfFolder(TypeOfXMLNode typeOfFolder) {
-		TypeOfFolder = typeOfFolder;
+		this.typeOfFolder = typeOfFolder;
 	}
 
 	public Boolean getProjectIndependent() {
-		return ProjectIndependent;
+		return projectIndependent;
 	}
 
 	public String getFolderID() {
-		return FolderID;
+		return folderID;
 	}
 
 	public void setFolderID(String folderID) {
-		FolderID = folderID;
+		this.folderID = folderID;
 	}
 }

@@ -9,7 +9,6 @@ import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 
 public class AbapEditorPathParser {
 
-
 	private static final String ADT_CLASSLIB_CLASSES = "((?<=adt\\/classlib\\/classes\\/)(.*)(?=\\/))";
 	private static final String ADT_CLASSLIB_INTERFACES = "(?<=adt\\/classlib\\/interfaces\\/)(.*)(?=\\/)";
 	private static final String ADT_FUNCTIONS_GROUPS_FMODULES = "(?<=adt\\/functions\\/groups\\/)(\\w*\\/fmodules\\/)(\\w*)(?=\\/)";
@@ -27,19 +26,21 @@ public class AbapEditorPathParser {
 	private static final Pattern patternPrograms = Pattern.compile(ADT_PROGRAMS_PROGRAMS);
 	private static final Pattern patternIncludes = Pattern.compile(ADT_PROGRAMS_INCLUDES);
 
+	private AbapEditorPathParser() {
+		throw new IllegalStateException("Static class");
+	}
 
-	public static String getObjectName(CommonTypes.TypeOfEntry typeOfEntry, String path)
-	{
-		switch(typeOfEntry) {
+	public static String getObjectName(CommonTypes.TypeOfEntry typeOfEntry, String path) {
+		switch (typeOfEntry) {
 		case AMDP:
 			break;
 		case CDSView:
 			break;
 		case Program:
-			String ProgName = getName(path, patternFGInclude);
-			if (ProgName == "")
-				ProgName = getName(path, patternPrograms);
-			return ProgName;
+			String progName = getName(path, patternFGInclude);
+			if (progName == "")
+				progName = getName(path, patternPrograms);
+			return progName;
 		case FunctionGroup:
 			return getName(path, patternFGroup);
 		case FunctionModule:
@@ -66,141 +67,75 @@ public class AbapEditorPathParser {
 		return "";
 	}
 
-
-	public static String getObjectName(String path)
-	{
+	public static String getObjectName(String path) {
 		return getObjectName(getType(path), path);
 	}
 
 	public static CommonTypes.TypeOfEntry getType(String path) {
 		if (checkClass(path)) {
 			return TypeOfEntry.Class;
-		}
-		else if (checkInterface(path)){
+		} else if (checkInterface(path)) {
 			return TypeOfEntry.Interface;
-		}
-		else if (checkFModule(path)){
+		} else if (checkFModule(path)) {
 			return TypeOfEntry.FunctionModule;
-		}
-		else if (checkFGInclude(path)){
+		} else if (checkFGInclude(path)) {
 			return TypeOfEntry.Program;
-		}
-		else if (checkFGroup(path)){
+		} else if (checkFGroup(path)) {
 			return TypeOfEntry.FunctionGroup;
-		}
-		else if (checkMessageClass(path)){
+		} else if (checkMessageClass(path)) {
 			return TypeOfEntry.MessageClass;
-		}
-		else if (checkProgram(path)){
+		} else if (checkProgram(path)) {
 			return TypeOfEntry.Program;
-		}
-		else if (checkInclude(path)){
+		} else if (checkInclude(path)) {
 			return TypeOfEntry.Include;
-		}
-		else
-		{
+		} else {
 			return null;
 		}
 	}
 
 	private static Boolean checkClass(String path) {
-		if (checkRegex(path,patternClasses)) {
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return checkRegex(path, patternClasses);
+
 	}
 
 	private static Boolean checkInterface(String path) {
-		if (checkRegex(path,patternInterfaces)) {
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return checkRegex(path, patternInterfaces);
 	}
 
 	private static Boolean checkFModule(String path) {
-		if (checkRegex(path,patternFM)) {
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return checkRegex(path, patternFM);
 	}
 
 	private static Boolean checkFGInclude(String path) {
-		if (checkRegex(path,patternFGInclude)) {
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return checkRegex(path, patternFGInclude);
 	}
 
 	private static Boolean checkFGroup(String path) {
-		if (checkRegex(path,patternFGroup)) {
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return checkRegex(path, patternFGroup);
 	}
 
 	private static Boolean checkMessageClass(String path) {
-		if (checkRegex(path,patternMessageClasses)) {
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return checkRegex(path, patternMessageClasses);
 	}
 
 	private static Boolean checkProgram(String path) {
-		if (checkRegex(path,patternPrograms)) {
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return checkRegex(path, patternPrograms);
 	}
 
 	private static Boolean checkInclude(String path) {
-		if (checkRegex(path,patternIncludes)) {
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return checkRegex(path, patternIncludes);
 	}
 
 	private static Boolean checkRegex(String path, Pattern pattern) {
 		Matcher m = pattern.matcher(path);
-		if (m.find()){
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return m.find();
 	}
 
 	private static String getName(String path, Pattern pattern) {
 		Matcher m = pattern.matcher(path);
-		if (m.find()){
+		if (m.find()) {
 			return m.group(m.groupCount());
-		}
-		else
-		{
+		} else {
 			return "";
 		}
 	}
