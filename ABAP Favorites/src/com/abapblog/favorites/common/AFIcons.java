@@ -176,5 +176,9 @@ public class AFIcons {
 	public ImageDescriptor getSearchHelpIconImgDescr() {
 		return getImageDescriptor("search_help.png");
 	}
+	
+	public ImageDescriptor getCopyToClipboardImgDescr() {
+		return getImageDescriptor("clipboard.png");
+	}
 
 }

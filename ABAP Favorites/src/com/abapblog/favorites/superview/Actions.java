@@ -1,5 +1,8 @@
 package com.abapblog.favorites.superview;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.net.MalformedURLException;
 
 import java.net.URL;
@@ -78,6 +81,7 @@ public class Actions {
 	public Action actExportFavorites;
 	public Action actImportFavorites;
 	public Action actDoubleClick;
+	public Action actCopyToClipboard;
 
 	public void makeActions(Superview superview) {
 		AFIcons AFIcon = new AFIcons();
@@ -103,7 +107,9 @@ public class Actions {
 		createDoubleClickActions(superview);
 		createExportFavoritesAction(superview.viewer);
 		createImportFavoritesAction(superview.viewer);
+		createCopyToClipboardAction(superview.viewer, AFIcon);
 	}
+
 
 	private void createAddFolderAction(Superview superview) {
 		actAddFolder = new Action() {
@@ -941,6 +947,21 @@ public class Actions {
 			manager.add(subMenu);
 
 		}
+	}
+	
+
+	private void createCopyToClipboardAction(TreeViewer viewer, AFIcons AFIcon) {
+		actCopyToClipboard = new Action() {
+			@Override
+			public void run() {
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				TreeObject object = (TreeObject) viewer.getStructuredSelection().getFirstElement();
+				clipboard.setContents(new StringSelection(object.getName()), null);
+			}
+		};
+		actCopyToClipboard.setText("Copy to Clipboard");
+		actCopyToClipboard.setToolTipText("Copy to Clipboard");
+		actCopyToClipboard.setImageDescriptor(AFIcon.getCopyToClipboardImgDescr());		
 	}
 
 }

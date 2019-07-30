@@ -559,6 +559,8 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 					manager.add(new Separator());
 					manager.add(actions.actEdit);
 					manager.add(new Separator());
+					manager.add(actions.actCopyToClipboard);
+					manager.add(new Separator());
 
 					Actions.addOpenInProjectMenu(manager, viewer);
 					drillDownAdapter.addNavigationActions(manager);
