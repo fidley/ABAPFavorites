@@ -48,6 +48,9 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.TreeAdapter;
 import org.eclipse.swt.events.TreeEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -159,6 +162,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 	}
 
 	public String partName;
+	protected boolean controlPressed;
 
 	public static void savePluginSettings(IFavorites Favorite) {
 		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(Favorite.getID());
@@ -205,6 +209,24 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 		Tree tree = viewer.getTree();
 		tree.addTreeListener(new TreeExpansionListener(this));
 		addDragAndDropSupport(tree);
+
+		tree.addKeyListener((new KeyAdapter() {
+			public void keyPressed(KeyEvent event) {
+				if ( (event.keyCode & SWT.CTRL) !=0 ) {
+					controlPressed = true;
+				}
+				else { controlPressed = false;
+				}
+			}
+			@Override
+			public void keyReleased(KeyEvent event) {
+				if ( (event.keyCode & SWT.CTRL) !=0 ) {
+					controlPressed = false;
+				}
+			}
+		})
+
+		);
 
 		setTreeColumns(columnListener, tree);
 		viewer.setContentProvider(new ViewContentProvider(getFolderType(), this, getViewSite()));
@@ -658,7 +680,8 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 				} else {
 					TempLinkedProject = null;
 				}
-				actions.actDoubleClick.run();
+				if ( controlPressed == false )
+				{ actions.actDoubleClick.run(); };
 			}
 		});
 	}
