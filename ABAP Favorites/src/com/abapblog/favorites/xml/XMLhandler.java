@@ -7,10 +7,12 @@ import java.util.UUID;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -31,33 +33,36 @@ import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.superview.Superview;
 
 public class XMLhandler {
+	private XMLhandler() {
+		throw new IllegalStateException("Utility class");
+	}
 
-	public static void addFolderToXML(String Name, String Description, String LongDescription,
-			Boolean ProjectIndependent, String ProjectName, Boolean DevObjFolder, String ParentID,
-			TypeOfXMLNode ParentType) {
+	public static void addFolderToXML(String name, String description, String longDescription,
+			Boolean projectIndependent, String projectName, Boolean devObjFolder, String parentID,
+			TypeOfXMLNode parentType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {
 			dBuilder = dbFactory.newDocumentBuilder();
 			Document doc;
 			try {
-				doc = dBuilder.parse(favFile);
+				doc = dBuilder.parse(getFavFile());
 
 				doc.getDocumentElement().normalize();
-				Element FolderEl = doc.createElement(ParentType.toString());
-				FolderEl.setAttribute(TypeOfXMLAttr.name.toString(), Name);
-				FolderEl.setAttribute(TypeOfXMLAttr.description.toString(), Description);
-				FolderEl.setAttribute(TypeOfXMLAttr.longDescription.toString(), LongDescription);
-				FolderEl.setAttribute(TypeOfXMLAttr.projectIndependent.toString(), ProjectIndependent.toString());
-				FolderEl.setAttribute(TypeOfXMLAttr.project.toString(), ProjectName);
-				FolderEl.setAttribute(TypeOfXMLAttr.devObjFolder.toString(), DevObjFolder.toString());
-				FolderEl.setAttribute(TypeOfXMLAttr.folderID.toString(), UUID.randomUUID().toString());
+				Element folder = doc.createElement(parentType.toString());
+				folder.setAttribute(TypeOfXMLAttr.name.toString(), name);
+				folder.setAttribute(TypeOfXMLAttr.description.toString(), description);
+				folder.setAttribute(TypeOfXMLAttr.longDescription.toString(), longDescription);
+				folder.setAttribute(TypeOfXMLAttr.projectIndependent.toString(), projectIndependent.toString());
+				folder.setAttribute(TypeOfXMLAttr.project.toString(), projectName);
+				folder.setAttribute(TypeOfXMLAttr.devObjFolder.toString(), devObjFolder.toString());
+				folder.setAttribute(TypeOfXMLAttr.folderID.toString(), UUID.randomUUID().toString());
 
-				if (ParentID == "") {
+				if (parentID.equals("")) {
 					Element root = doc.getDocumentElement();
-					root.appendChild(FolderEl);
+					root.appendChild(folder);
 				} else {
-					NodeList folders = doc.getElementsByTagName(ParentType.toString());
+					NodeList folders = doc.getElementsByTagName(parentType.toString());
 
 					for (int temp = 0; temp < folders.getLength(); temp++) {
 
@@ -66,8 +71,8 @@ public class XMLhandler {
 						NamedNodeMap attributes = nNode.getAttributes();
 						Node FolderID = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
 
-						if (FolderID.getNodeValue().contentEquals(ParentID)) {
-							nNode.appendChild(FolderEl);
+						if (FolderID.getNodeValue().contentEquals(parentID)) {
+							nNode.appendChild(folder);
 							break;
 						}
 					}
@@ -77,148 +82,73 @@ public class XMLhandler {
 
 				TransformerFactory transformerFactory = TransformerFactory.newInstance();
 				Transformer transformer = transformerFactory.newTransformer();
-				StreamResult result = new StreamResult(favFile.getPath());
+				StreamResult result = new StreamResult(getFavFile().getPath());
 				transformer.transform(source, result);
 
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerException e) {
-				// TODO Auto-generated catch block
+			} catch (SAXException | IOException | TransformerException e) {
 				e.printStackTrace();
 			}
 
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
 
-	public static void addObjectToXML(TypeOfEntry Type, String Name, String Description, String LongDescription,
-			String Parent, TypeOfXMLNode ParentType) {
+	public static void addObjectToXML(TypeOfEntry type, String name, String description, String longDescription,String technicalName,
+			String parent, TypeOfXMLNode parentType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {
 			dBuilder = dbFactory.newDocumentBuilder();
-			Document doc;
-			try {
-				doc = dBuilder.parse(favFile);
-
-				doc.getDocumentElement().normalize();
-				NodeList folders = doc.getElementsByTagName(ParentType.toString());
-
-				for (int temp = 0; temp < folders.getLength(); temp++) {
-
-					Node nNode = folders.item(temp);
-
-					NamedNodeMap attributes = nNode.getAttributes();
-					Node FolderID = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
-					if (FolderID == null) {
-						continue;
-					}
-					if (FolderID.getNodeValue().contentEquals(Parent)) {
-
-						Element ObjectElement = doc.createElement(getObjectXMLNode(Type).toString());
-						ObjectElement.setAttribute(TypeOfXMLAttr.name.toString(), Name);
-						ObjectElement.setAttribute(TypeOfXMLAttr.description.toString(), Description);
-						ObjectElement.setAttribute(TypeOfXMLAttr.longDescription.toString(), LongDescription);
-
-						nNode.appendChild(ObjectElement);
-
-						DOMSource source = new DOMSource(doc);
-
-						TransformerFactory transformerFactory = TransformerFactory.newInstance();
-						Transformer transformer = transformerFactory.newTransformer();
-						StreamResult result = new StreamResult(favFile.getPath());
-						transformer.transform(source, result);
-					}
-				}
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			addObjectToXMLStream(type, name, description, longDescription, technicalName, parent, parentType, dBuilder);
 
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
 
-	public static void addURLToXML(String Name, String Description, String LongDescription, String URL, String Parent,
-			TypeOfXMLNode NodeType, TypeOfXMLNode ParentNodeType) {
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder;
+	private static void addObjectToXMLStream(TypeOfEntry type, String name, String description, String longDescription, String technicalName,
+			String parent, TypeOfXMLNode parentType, DocumentBuilder dBuilder)
+			throws TransformerFactoryConfigurationError {
+		Document doc;
 		try {
-			dBuilder = dbFactory.newDocumentBuilder();
-			Document doc;
-			try {
-				doc = dBuilder.parse(favFile);
+			doc = dBuilder.parse(getFavFile());
+			doc.getDocumentElement().normalize();
+			NodeList folders = doc.getElementsByTagName(parentType.toString());
 
-				doc.getDocumentElement().normalize();
-				NodeList folders = doc.getElementsByTagName(ParentNodeType.toString());
+			for (int temp = 0; temp < folders.getLength(); temp++) {
 
-				for (int temp = 0; temp < folders.getLength(); temp++) {
+				Node nNode = folders.item(temp);
 
-					Node nNode = folders.item(temp);
-
-					NamedNodeMap attributes = nNode.getAttributes();
-					Node FolderID = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
-					if (FolderID.getNodeValue().contentEquals(Parent)) {
-
-						Element URLEl = doc.createElement(NodeType.toString());
-						URLEl.setAttribute(TypeOfXMLAttr.name.toString(), Name);
-						URLEl.setAttribute(TypeOfXMLAttr.description.toString(), Description);
-						URLEl.setAttribute(TypeOfXMLAttr.technicalName.toString(), URL);
-						URLEl.setAttribute(TypeOfXMLAttr.longDescription.toString(), LongDescription);
-
-						nNode.appendChild(URLEl);
-
-						DOMSource source = new DOMSource(doc);
-
-						TransformerFactory transformerFactory = TransformerFactory.newInstance();
-						Transformer transformer = transformerFactory.newTransformer();
-						StreamResult result = new StreamResult(favFile.getPath());
-						transformer.transform(source, result);
-					}
+				NamedNodeMap attributes = nNode.getAttributes();
+				Node FolderID = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
+				if (FolderID == null) {
+					continue;
 				}
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+				if (FolderID.getNodeValue().contentEquals(parent)) {
 
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
+					Element ObjectElement = doc.createElement(getObjectXMLNode(type).toString());
+					ObjectElement.setAttribute(TypeOfXMLAttr.name.toString(), name);
+					ObjectElement.setAttribute(TypeOfXMLAttr.description.toString(), description);
+					ObjectElement.setAttribute(TypeOfXMLAttr.longDescription.toString(), longDescription);
+					ObjectElement.setAttribute(TypeOfXMLAttr.technicalName.toString(), technicalName);
+
+					nNode.appendChild(ObjectElement);
+
+					DOMSource source = new DOMSource(doc);
+
+					TransformerFactory transformerFactory = TransformerFactory.newInstance();
+					Transformer transformer = transformerFactory.newTransformer();
+					StreamResult result = new StreamResult(getFavFile().getPath());
+					transformer.transform(source, result);
+				}
+			}
+		} catch (SAXException | IOException | TransformerException e) {
 			e.printStackTrace();
 		}
-
 	}
-
 	public static void delFolderFromXML(String FolderId, TypeOfXMLNode ParentNodeType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
@@ -226,7 +156,7 @@ public class XMLhandler {
 			dBuilder = dbFactory.newDocumentBuilder();
 			Document doc;
 			try {
-				doc = dBuilder.parse(favFile);
+				doc = dBuilder.parse(getFavFile());
 				doc.getDocumentElement().normalize();
 				NodeList folders = doc.getElementsByTagName(ParentNodeType.toString());
 
@@ -243,28 +173,17 @@ public class XMLhandler {
 
 						TransformerFactory transformerFactory = TransformerFactory.newInstance();
 						Transformer transformer = transformerFactory.newTransformer();
-						StreamResult result = new StreamResult(favFile.getPath());
+						StreamResult result = new StreamResult(getFavFile().getPath());
 						transformer.transform(source, result);
 					}
 
 				}
 
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerException e) {
-				// TODO Auto-generated catch block
+			} catch (SAXException | IOException | TransformerException e) {
 				e.printStackTrace();
 			}
 
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -277,7 +196,7 @@ public class XMLhandler {
 			dBuilder = dbFactory.newDocumentBuilder();
 			Document doc;
 			try {
-				doc = dBuilder.parse(favFile);
+				doc = dBuilder.parse(getFavFile());
 
 				doc.getDocumentElement().normalize();
 				NodeList folders = doc.getElementsByTagName(ParentNodeType.toString());
@@ -306,7 +225,7 @@ public class XMLhandler {
 
 									TransformerFactory transformerFactory = TransformerFactory.newInstance();
 									Transformer transformer = transformerFactory.newTransformer();
-									StreamResult result = new StreamResult(favFile.getPath());
+									StreamResult result = new StreamResult(getFavFile().getPath());
 									transformer.transform(source, result);
 								}
 							} catch (Exception e) {
@@ -316,16 +235,11 @@ public class XMLhandler {
 
 					}
 				}
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
+			} catch (SAXException | IOException e) {
 				e.printStackTrace();
 			}
 
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -339,8 +253,7 @@ public class XMLhandler {
 			dBuilder = dbFactory.newDocumentBuilder();
 			Document doc;
 			try {
-				doc = dBuilder.parse(favFile);
-				// Element root = doc.getDocumentElement();
+				doc = dBuilder.parse(getFavFile());
 				doc.getDocumentElement().normalize();
 				NodeList folders = doc.getElementsByTagName(ParentNodeType.toString());
 
@@ -361,33 +274,21 @@ public class XMLhandler {
 						FolderEl.setAttribute(TypeOfXMLAttr.project.toString(), ProjectName);
 						FolderEl.setAttribute(TypeOfXMLAttr.devObjFolder.toString(), DevObjFolder.toString());
 
-						// root.removeChild(nNode);
 						DOMSource source = new DOMSource(doc);
 
 						TransformerFactory transformerFactory = TransformerFactory.newInstance();
 						Transformer transformer = transformerFactory.newTransformer();
-						StreamResult result = new StreamResult(favFile.getPath());
+						StreamResult result = new StreamResult(getFavFile().getPath());
 						transformer.transform(source, result);
 					}
 
 				}
 
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerException e) {
-				// TODO Auto-generated catch block
+			} catch (SAXException | IOException | TransformerException e) {
 				e.printStackTrace();
 			}
 
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -456,7 +357,7 @@ public class XMLhandler {
 			dBuilder = dbFactory.newDocumentBuilder();
 			Document doc;
 			try {
-				doc = dBuilder.parse(favFile);
+				doc = dBuilder.parse(getFavFile());
 				doc.getDocumentElement().normalize();
 				NodeList sourceFolders = doc.getElementsByTagName(SourceParentNodeType.toString());
 
@@ -466,8 +367,7 @@ public class XMLhandler {
 
 					NamedNodeMap attributes = nNode.getAttributes();
 					Node FolderName = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
-					if (FolderName == null)
-					{
+					if (FolderName == null) {
 						continue;
 					}
 					if (FolderName.getNodeValue().equals(SourceFolderId)) {
@@ -481,14 +381,12 @@ public class XMLhandler {
 							Node FolderNameTarget = attributesTarget.getNamedItem(TypeOfXMLAttr.folderID.toString());
 							if (FolderNameTarget.getNodeValue().equals(TargetFolderId)) {
 
-								// Node parent = nNode.getParentNode();
 								nNodeTarget.appendChild(nNode);
-								// parent.removeChild(nNode);
 								DOMSource source = new DOMSource(doc);
 
 								TransformerFactory transformerFactory = TransformerFactory.newInstance();
 								Transformer transformer = transformerFactory.newTransformer();
-								StreamResult result = new StreamResult(favFile.getPath());
+								StreamResult result = new StreamResult(getFavFile().getPath());
 								transformer.transform(source, result);
 							}
 						}
@@ -497,28 +395,17 @@ public class XMLhandler {
 
 				}
 
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerException e) {
-				// TODO Auto-generated catch block
+			} catch (SAXException | IOException | TransformerException e) {
 				e.printStackTrace();
 			}
 
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
 
-	public static File favFile;
+	private static File favFile;
 
 	public static TypeOfXMLNode getObjectXMLNode(TypeOfEntry ObjectType) {
 
@@ -588,23 +475,18 @@ public class XMLhandler {
 			DOMSource source = new DOMSource(doc);
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
-			StreamResult result = new StreamResult(favFile.getPath());
+			StreamResult result = new StreamResult(getFavFile().getPath());
 			transformer.transform(source, result);
 			Superview.refreshActiveViews();
 		} catch (ParserConfigurationException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -619,20 +501,19 @@ public class XMLhandler {
 			dBuilder = dbFactory.newDocumentBuilder();
 
 			Document doc = null;
-			favFile = new File(stateLoc.toFile(), favFileName);
-			if (favFile.exists() == false) {
+			favFile = new File(stateLoc.toFile(), FAV_FILE_NAME);
+			if (getFavFile().exists() == false) {
 				try {
-					favFile.createNewFile();
+					getFavFile().createNewFile();
 					doc = dBuilder.newDocument();
 					Node root = doc.createElement("root");
 					doc.appendChild(root);
 
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			} else {
-				doc = dBuilder.parse(favFile);
+				doc = dBuilder.parse(getFavFile());
 
 			}
 			;
@@ -644,19 +525,14 @@ public class XMLhandler {
 			transformer.transform(source, result);
 
 		} catch (ParserConfigurationException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -665,10 +541,10 @@ public class XMLhandler {
 		Bundle bundle = FrameworkUtil.getBundle((com.abapblog.favorites.views.Favorites.class));
 		IPath stateLoc = Platform.getStateLocation(bundle);
 
-		favFile = new File(stateLoc.toFile(), favFileName);
-		if (favFile.exists() == false) {
+		favFile = new File(stateLoc.toFile(), FAV_FILE_NAME);
+		if (getFavFile().exists() == false) {
 			try {
-				favFile.createNewFile();
+				getFavFile().createNewFile();
 
 				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 				DocumentBuilder dBuilder;
@@ -681,26 +557,26 @@ public class XMLhandler {
 
 				TransformerFactory transformerFactory = TransformerFactory.newInstance();
 				Transformer transformer = transformerFactory.newTransformer();
-				StreamResult result = new StreamResult(favFile.getPath());
+				StreamResult result = new StreamResult(getFavFile().getPath());
 				transformer.transform(source, result);
 
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (ParserConfigurationException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (TransformerConfigurationException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (TransformerException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		;
 	}
 
-	public static final String favFileName = "favorites.xml";
+	public static File getFavFile() {
+		return favFile;
+	}
+
+	public static final String FAV_FILE_NAME = "favorites.xml";
 
 }

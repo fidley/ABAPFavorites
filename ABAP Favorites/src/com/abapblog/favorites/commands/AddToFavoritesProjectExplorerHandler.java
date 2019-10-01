@@ -49,17 +49,17 @@ public class AddToFavoritesProjectExplorerHandler extends AbstractHandler {
 									if (newObjectDialog.open() == Window.OK) {
 										XMLhandler.addObjectToXML(selectFolderDialog.getTypeOfEntry(),
 												newObjectDialog.getName(), newObjectDialog.getDescription(),
-												newObjectDialog.getLongDescription(), selectFolderDialog.getFolderID(),
+												newObjectDialog.getLongDescription(),"", selectFolderDialog.getFolderID(),
 												selectFolderDialog.getFolderType());
 									}
 								} else {
 									XMLhandler.addObjectToXML(typeOfEntry, objectName.toUpperCase(), "", "",
-											selectFolderDialog.getFolderID(), selectFolderDialog.getFolderType());
+											selectFolderDialog.getFolderID(),"",selectFolderDialog.getFolderType());
 								}
 							}
 
 						} else {
-							XMLhandler.addObjectToXML(typeOfEntry, objectName.toUpperCase(), "", "",
+							XMLhandler.addObjectToXML(typeOfEntry, objectName.toUpperCase(), "", "", "",
 									selectFolderDialog.getFolderID(), selectFolderDialog.getFolderType());
 						}
 

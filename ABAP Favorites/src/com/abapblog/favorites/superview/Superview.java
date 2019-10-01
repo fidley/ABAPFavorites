@@ -372,7 +372,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 							String objectType = AdtRef.getType();
 							String objectName = AdtRef.getName();
 							TypeOfEntry typeOfEntry = Common.getTypeOfEntryFromSAPType(objectType);
-							XMLhandler.addObjectToXML(typeOfEntry, objectName.toUpperCase(), "", "", ID, ParentType);
+							XMLhandler.addObjectToXML(typeOfEntry, objectName.toUpperCase(), "", "","", ID, ParentType);
 
 						} catch (SecurityException e) {
 							// TODO Auto-generated catch block
@@ -401,19 +401,21 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 						} else {
 							if (item.getParent().getDevObjProject() == DevObjProjBool
 									&& !ID.equals(item.getParent().getFolderID())) {
-								if (item.getType() == TypeOfEntry.URL) {
-									XMLhandler.addURLToXML(item.getName(), item.getDescription(),
-											item.getLongDescription(), item.getTechnicalName(), ID,
-											TypeOfXMLNode.urlNode, ParentType);
-								} else if (item.getType() == TypeOfEntry.ADTLink) {
-									XMLhandler.addURLToXML(item.getName(), item.getDescription(),
-											item.getLongDescription(), item.getTechnicalName(), ID,
-											TypeOfXMLNode.ADTLinkNode, ParentType);
-								} else {
-									XMLhandler.addObjectToXML(item.getType(), item.getName(), item.getDescription(),
-											item.getLongDescription(), ID, ParentType);
-
-								}
+//								if (item.getType() == TypeOfEntry.URL) {
+//									XMLhandler.addURLToXML(item.getName(), item.getDescription(),
+//											item.getLongDescription(), item.getTechnicalName(), ID,
+//											TypeOfXMLNode.urlNode, ParentType);
+//								} else if (item.getType() == TypeOfEntry.ADTLink) {
+//									XMLhandler.addURLToXML(item.getName(), item.getDescription(),
+//											item.getLongDescription(), item.getTechnicalName(), ID,
+//											TypeOfXMLNode.ADTLinkNode, ParentType);
+//								} else {
+//									XMLhandler.addObjectToXML(item.getType(), item.getName(), item.getDescription(),
+//											item.getLongDescription(), ID, ParentType);
+//
+//								}
+								XMLhandler.addObjectToXML(item.getType(), item.getName(), item.getDescription(),
+										item.getLongDescription(),item.getTechnicalName(), ID, ParentType);
 								XMLhandler.delObjectFromXML(item.getType(), item.getName(),
 										item.getParent().getFolderID(), item.getParent().getTypeOfFolder());
 							}
@@ -723,7 +725,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 			dBuilder = dbFactory.newDocumentBuilder();
 			Document doc;
 			try {
-				doc = dBuilder.parse(XMLhandler.favFile);
+				doc = dBuilder.parse(XMLhandler.getFavFile());
 
 				doc.getDocumentElement().normalize();
 
@@ -745,7 +747,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 
 				TransformerFactory transformerFactory = TransformerFactory.newInstance();
 				Transformer transformer = transformerFactory.newTransformer();
-				StreamResult result = new StreamResult(XMLhandler.favFile.getPath());
+				StreamResult result = new StreamResult(XMLhandler.getFavFile().getPath());
 				transformer.transform(source, result);
 				return invisibleRoot;
 			} catch (SAXException e) {

@@ -1,10 +1,5 @@
 package com.abapblog.favorites.tree;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.events.TreeAdapter;
 import org.eclipse.swt.events.TreeEvent;
 
@@ -13,10 +8,11 @@ import com.abapblog.favorites.superview.IFavorites;
 public class TreeExpansionListener extends TreeAdapter {
 	private IFavorites favorite;
 
-	public TreeExpansionListener(IFavorites Favorite) {
-		this.favorite = Favorite;
+	public TreeExpansionListener(IFavorites favorite) {
+		this.favorite = favorite;
 	}
 
+	@Override
 	public void treeExpanded(TreeEvent event) {
 
 		TreeParent node = (TreeParent) event.item.getData();
@@ -27,6 +23,7 @@ public class TreeExpansionListener extends TreeAdapter {
 
 	}
 
+	@Override
 	public void treeCollapsed(TreeEvent event) {
 		TreeParent node = (TreeParent) event.item.getData();
 		favorite.getExpandedNodes().remove(node.getFolderID());

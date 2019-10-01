@@ -12,10 +12,10 @@ public class TreeObject implements IAdaptable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + getOuterType().hashCode();
-		result = prime * result + ((Description == null) ? 0 : Description.hashCode());
-		result = prime * result + ((Name == null) ? 0 : Name.hashCode());
-		result = prime * result + ((TechnicalName == null) ? 0 : TechnicalName.hashCode());
-		result = prime * result + ((Type == null) ? 0 : Type.hashCode());
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((technicalName == null) ? 0 : technicalName.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		result = prime * result + ((parent == null) ? 0 : parent.hashCode());
 		return result;
 	}
@@ -31,60 +31,64 @@ public class TreeObject implements IAdaptable {
 		TreeObject other = (TreeObject) obj;
 		if (!getOuterType().equals(other.getOuterType()))
 			return false;
-		if (Description == null) {
-			if (other.Description != null)
+		if (description == null) {
+			if (other.description != null)
 				return false;
-		} else if (!Description.equals(other.Description))
+		}
+		else if (!description.equals(other.description))
 			return false;
-		if (Name == null) {
-			if (other.Name != null)
+		if (name == null) {
+			if (other.name != null)
 				return false;
-		} else if (!Name.equals(other.Name))
+		}
+		else if (!name.equals(other.name))
 			return false;
-		if (TechnicalName == null) {
-			if (other.TechnicalName != null)
+		if (technicalName == null) {
+			if (other.technicalName != null)
 				return false;
-		} else if (!TechnicalName.equals(other.TechnicalName))
+		}
+		else if (!technicalName.equals(other.technicalName))
 			return false;
-		if (Type != other.Type)
+		if (type != other.type)
 			return false;
 		if (parent == null) {
 			if (other.parent != null)
 				return false;
-		} else if (!parent.equals(other.parent))
+		}
+		else if (!parent.equals(other.parent))
 			return false;
 		return true;
 	}
 
-	public TreeParent parent;
+	private TreeParent parent;
 	private IFavorites favorite;
-	public String Name;
-	public TypeOfEntry Type;
-	private String TechnicalName;
-	private String Description;
-	private String LongDescription;
+	private String name;
+	private TypeOfEntry type;
+	private String technicalName;
+	private String description;
+	private String longDescription;
 
-	public TreeObject(String Name, TypeOfEntry Type, String Description, String TechnicalName, String LongDescription,
-			IFavorites Favorite) {
-		this.favorite = Favorite;
-		this.Name = Name;
-		this.setType(Type);
-		this.setDescription(Description);
-		this.setTechnicalName(TechnicalName);
-		this.setLongDescription(LongDescription);
+	public TreeObject(String name, TypeOfEntry type, String description, String technicalName, String longDescription,
+			IFavorites favorite) {
+		this.favorite = favorite;
+		this.name = name;
+		this.setType(type);
+		this.setDescription(description);
+		this.setTechnicalName(technicalName);
+		this.setLongDescription(longDescription);
 
 	}
 
 	public String getName() {
-		return Name;
+		return name;
 	}
 
 	public TypeOfEntry getType() {
-		return Type;
+		return type;
 	}
 
 	public void setType(TypeOfEntry type) {
-		Type = type;
+		this.type = type;
 	}
 
 	public void setParent(TreeParent parent) {
@@ -104,19 +108,19 @@ public class TreeObject implements IAdaptable {
 	}
 
 	public String getTechnicalName() {
-		return TechnicalName;
+		return technicalName;
 	}
 
 	public void setTechnicalName(String technicalName) {
-		TechnicalName = technicalName;
+		this.technicalName = technicalName;
 	}
 
 	public String getDescription() {
-		return Description;
+		return description;
 	}
 
 	public void setDescription(String description) {
-		Description = description;
+		this.description = description;
 	}
 
 	private Object getOuterType() {
@@ -124,10 +128,10 @@ public class TreeObject implements IAdaptable {
 	}
 
 	public String getLongDescription() {
-		return LongDescription;
+		return longDescription;
 	}
 
 	public void setLongDescription(String longDescription) {
-		LongDescription = longDescription;
+		this.longDescription = longDescription;
 	}
 }
