@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -30,6 +31,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+
+import com.abapblog.favorites.Activator;
 import com.abapblog.favorites.common.AFIcons;
 import com.abapblog.favorites.common.Common;
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
@@ -37,6 +40,7 @@ import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.dialog.FolderDialog;
 import com.abapblog.favorites.dialog.NameDialog;
 import com.abapblog.favorites.dialog.URLDialog;
+import com.abapblog.favorites.preferences.PreferenceConstants;
 import com.abapblog.favorites.tree.TreeObject;
 import com.abapblog.favorites.tree.TreeParent;
 import com.abapblog.favorites.xml.XMLhandler;
@@ -82,7 +86,7 @@ public class Actions {
 	public Action actImportFavorites;
 	public Action actDoubleClick;
 	public Action actCopyToClipboard;
-
+	private static IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 	public void makeActions(Superview superview) {
 		AFIcons AFIcon = new AFIcons();
 		createAddFolderAction(superview);
@@ -269,7 +273,7 @@ public class Actions {
 							switch (NodeType) {
 							case Transaction:
 								AdtSapGuiEditorUtilityFactory.createSapGuiEditorUtility().openEditorAndStartTransaction(
-										superview.TempLinkedProject, obj.toString(), true);
+										superview.TempLinkedProject, obj.toString(), store.getBoolean(PreferenceConstants.P_NAVIGATE_TO_ECLIPSE_FOR_SUPPORTED_DEV_OBJECTS));
 								break;
 							case Folder:
 								break;
@@ -622,7 +626,7 @@ public class Actions {
 					}
 					if (programName.equalsIgnoreCase(reportName)) {
 						AdtSapGuiEditorUtilityFactory.createSapGuiEditorUtility().openEditorForObject(project, ref,
-								true, WorkbenchAction.EXECUTE.toString(), null, Collections.<String, String>emptyMap());
+								store.getBoolean(PreferenceConstants.P_NAVIGATE_TO_ECLIPSE_FOR_SUPPORTED_DEV_OBJECTS), WorkbenchAction.EXECUTE.toString(), null, Collections.<String, String>emptyMap());
 						return;
 					}
 				}
