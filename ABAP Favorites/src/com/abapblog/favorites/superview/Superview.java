@@ -1,7 +1,6 @@
 package com.abapblog.favorites.superview;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,14 +15,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -31,14 +27,11 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.LocalSelectionTransfer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
@@ -48,11 +41,6 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.TreeAdapter;
-import org.eclipse.swt.events.TreeEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
@@ -61,9 +49,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -95,7 +81,7 @@ import com.sap.adt.tools.core.AdtObjectReference;
 public abstract class Superview extends ViewPart implements ILinkedWithEditorView, IFavorites {
 	@Override
 	public void dispose() {
-		getSite().getPage().removePartListener(linkWithEditorPartListener);
+		getSite().getPage().removePartListener(this.linkWithEditorPartListener);
 		super.dispose();
 	}
 
@@ -110,15 +96,15 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 	protected DrillDownAdapter drillDownAdapter;
 	protected DragSource dndSource;
 	protected IStructuredSelection dndSourceSelection;
-	private Actions actions = new Actions();
+	private final Actions actions = new Actions();
 	public String TempLinkedEditorProject;
 	public IProject TempLinkedProject;
 	private ArrayList<String> expandedNodes;
 	private ArrayList<TreeParent> expandedParentNodes;
 
 	protected TypeOfXMLNode FolderNode;
-	private static List<TreeViewer> activeViewers = new ArrayList<TreeViewer>();
-	private static List<IFavorites> activeFavorites = new ArrayList<IFavorites>();
+	private static List<TreeViewer> activeViewers = new ArrayList<>();
+	private static List<IFavorites> activeFavorites = new ArrayList<>();
 
 	public static List<TreeViewer> getActiveTreeViewers() {
 		return activeViewers;
@@ -135,24 +121,26 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 
 	@Override
 	public ArrayList<TreeParent> getExpandedParentNodes() {
-		if (expandedParentNodes == null)
-			expandedParentNodes = new ArrayList<TreeParent>();
-		return expandedParentNodes;
+		if (this.expandedParentNodes == null) {
+			this.expandedParentNodes = new ArrayList<>();
+		}
+		return this.expandedParentNodes;
 	}
 
 	@Override
 	public ArrayList<String> getExpandedNodes() {
-		if (expandedNodes == null)
-			expandedNodes = new ArrayList<String>();
-		return expandedNodes;
+		if (this.expandedNodes == null) {
+			this.expandedNodes = new ArrayList<>();
+		}
+		return this.expandedNodes;
 	}
 
 	@Override
 	public TreeViewer getTreeViewer() {
-		return viewer;
+		return this.viewer;
 	}
 
-	private static void toggleLinkingOfEditor(IFavorites favorite) {
+	private static void toggleLinkingOfEditor(final IFavorites favorite) {
 		if (isHideOfDepProject()) {
 			favorite.enableLinkingOfEditor();
 		} else {
@@ -164,14 +152,14 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 	public String partName;
 	protected boolean controlPressed;
 
-	public static void savePluginSettings(IFavorites Favorite) {
-		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(Favorite.getID());
+	public static void savePluginSettings(final IFavorites Favorite) {
+		final IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(Favorite.getID());
 
 		prefs.putBoolean("linking_active", Favorite.isLinkingActive());
 		prefs.put("linked_project", Favorite.getLinkedEditorProject());
 
 		if (Superview.isSaveFolderExpansionState()) {
-			String[] expNodes = (String[]) Favorite.getExpandedNodes().toArray(new String[0]);
+			final String[] expNodes = Favorite.getExpandedNodes().toArray(new String[0]);
 			prefs.put("expanded_nodes", String.join(";", expNodes));
 		} else {
 			prefs.put("expanded_nodes", "");
@@ -179,7 +167,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 		try {
 			// prefs are automatically flushed during a plugin's "super.stop()".
 			prefs.flush();
-		} catch (org.osgi.service.prefs.BackingStoreException e) {
+		} catch (final org.osgi.service.prefs.BackingStoreException e) {
 			// TODO write a real exception handler.
 			e.printStackTrace();
 		}
@@ -187,115 +175,102 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 
 	protected void setNewViewName() {
 		if (isLinkingActive() || isHideOfDepProject() == false) {
-			setPartName(partName);
+			setPartName(this.partName);
 		} else {
-			setPartName(partName + " (" + getLinkedEditorProject() + ")");
+			setPartName(this.partName + " (" + getLinkedEditorProject() + ")");
 		}
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(final Composite parent) {
 
-		AFPatternFilter filter = new AFPatternFilter();
-		FilteredTree filteredTree = new FilteredTree(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL, filter, true);
-		ColumnControlListener columnListener = new ColumnControlListener();
+		final AFPatternFilter filter = new AFPatternFilter();
+		final FilteredTree filteredTree = new FilteredTree(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL, filter,
+				true);
+		final ColumnControlListener columnListener = new ColumnControlListener();
 		columnListener.setID(getID());
 
-		partName = getPartName();
-		viewer = filteredTree.getViewer();
+		this.partName = getPartName();
+		this.viewer = filteredTree.getViewer();
 
-		activeViewers.add(viewer);
-		drillDownAdapter = new DrillDownAdapter(viewer);
-		Tree tree = viewer.getTree();
+		activeViewers.add(this.viewer);
+		this.drillDownAdapter = new DrillDownAdapter(this.viewer);
+		final Tree tree = this.viewer.getTree();
 		tree.addTreeListener(new TreeExpansionListener(this));
 		addDragAndDropSupport(tree);
 
-		tree.addKeyListener((new KeyAdapter() {
-			public void keyPressed(KeyEvent event) {
-				if ( (event.keyCode & SWT.CTRL) !=0 ) {
-					controlPressed = true;
-				}
-				else { controlPressed = false;
-				}
-			}
-			@Override
-			public void keyReleased(KeyEvent event) {
-				if ( (event.keyCode & SWT.CTRL) !=0 ) {
-					controlPressed = false;
-				}
-			}
-		})
-
-		);
-
 		setTreeColumns(columnListener, tree);
-		viewer.setContentProvider(new ViewContentProvider(getFolderType(), this, getViewSite()));
-		viewer.setInput(getViewSite());
-		viewer.setLabelProvider(new ViewLabelProvider());
+		this.viewer.setContentProvider(new ViewContentProvider(getFolderType(), this, getViewSite()));
+		this.viewer.setInput(getViewSite());
+		this.viewer.setLabelProvider(new ViewLabelProvider());
 
 		loadPluginSettings();
 		// Create the help context id for the viewer's control
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), getID());
-		getSite().setSelectionProvider(viewer);
-		actions.makeActions(this);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(this.viewer.getControl(), getID());
+		getSite().setSelectionProvider(this.viewer);
+		this.actions.makeActions(this);
 		hookContextMenu();
 		hookDoubleClickAction();
 		contributeToActionBars();
 		setLinkingWithEditor();
 		setNewViewName();
 		sortTable();
-		refreshViewer(viewer);
-		viewer.setExpandedElements(getExpandedParentNodes().toArray());
+		refreshViewer(this.viewer);
+		this.viewer.setExpandedElements(getExpandedParentNodes().toArray());
 
 	}
 
 	private void setLinkingWithEditor() {
 		// Linking with editor
-		linkWithEditorAction = new Action("Link with Editor", SWT.TOGGLE) {
+		this.linkWithEditorAction = new Action("Link with Editor", SWT.TOGGLE) {
 			@Override
 			public void run() {
 				toggleLinking();
 			}
 
 		};
-		linkWithEditorAction.setText("Link with Editor");
-		linkWithEditorAction.setImageDescriptor(
+		this.linkWithEditorAction.setText("Link with Editor");
+		this.linkWithEditorAction.setImageDescriptor(
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ELCL_SYNCED));
-		getViewSite().getActionBars().getToolBarManager().add(linkWithEditorAction);
-		getSite().getPage().addPartListener(linkWithEditorPartListener);
-		linkWithEditorAction.setChecked(isLinkingActive());
+		getViewSite().getActionBars().getToolBarManager().add(this.linkWithEditorAction);
+		getSite().getPage().addPartListener(this.linkWithEditorPartListener);
+		this.linkWithEditorAction.setChecked(isLinkingActive());
 		toggleLinkingOfEditor(this);
 	}
 
-	private void addDragAndDropSupport(Tree tree) {
-		Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
-		int operations = DND.DROP_MOVE;
+	private void addDragAndDropSupport(final Tree tree) {
+		final Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
+		final int operations = DND.DROP_MOVE;
 
-		viewer.addDragSupport(operations, types, new DragSourceListener() {
-			public void dragStart(DragSourceEvent event) {
-				TreeItem[] selection = tree.getSelection();
+		this.viewer.addDragSupport(operations, types, new DragSourceListener() {
+			@Override
+			public void dragStart(final DragSourceEvent event) {
+				final TreeItem[] selection = tree.getSelection();
 				if (selection.length > 0) {
 					event.doit = true;
 				} else {
 					event.doit = false;
 				}
-			};
+			}
 
-			public void dragSetData(DragSourceEvent event) {
-				dndSourceSelection = (IStructuredSelection) viewer.getSelection();
+			@Override
+			public void dragSetData(final DragSourceEvent event) {
+				Superview.this.dndSourceSelection = (IStructuredSelection) Superview.this.viewer.getSelection();
 				event.data = "Data"; // To not cause org.eclipse.swt.SWTException: Data does not have correct format
 										// for type
 
 			}
 
-			public void dragFinished(DragSourceEvent event) {
+			@Override
+			public void dragFinished(final DragSourceEvent event) {
 
 			}
 
 		});
 
-		viewer.addDropSupport(operations, types, new DropTargetListener() {
-			public void dragEnter(DropTargetEvent event) {
+		this.viewer.addDropSupport(operations, types, new DropTargetListener() {
+			@Override
+			public void dragEnter(final DropTargetEvent event) {
 				if (event.detail == DND.DROP_DEFAULT) {
 					if ((event.operations & DND.DROP_COPY) != 0) {
 						event.detail = DND.DROP_COPY;
@@ -305,26 +280,30 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 				}
 			}
 
-			public void dragOver(DropTargetEvent event) {
+			@Override
+			public void dragOver(final DropTargetEvent event) {
 				event.feedback = DND.FEEDBACK_SELECT | DND.FEEDBACK_SCROLL;
 			}
 
-			public void dragOperationChanged(DropTargetEvent event) {
+			@Override
+			public void dragOperationChanged(final DropTargetEvent event) {
 
-			}
-
-			public void dragLeave(DropTargetEvent event) {
-
-			}
-
-			public void dropAccept(DropTargetEvent event) {
 			}
 
 			@Override
-			public void drop(DropTargetEvent event) {
+			public void dragLeave(final DropTargetEvent event) {
+
+			}
+
+			@Override
+			public void dropAccept(final DropTargetEvent event) {
+			}
+
+			@Override
+			public void drop(final DropTargetEvent event) {
 				if (event.detail == DND.DROP_MOVE) {
 
-					TreeItem Target = (TreeItem) event.item;
+					final TreeItem Target = (TreeItem) event.item;
 					String ID = Target.getText(2);
 					String FolderType = Target.getText(3);
 					String DevObjProj = Target.getText(4);
@@ -352,7 +331,9 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 						DevObjProjBool = false;
 					}
 
-					if (DropItemsFromProjectExplorer(ID, ParentType) == false);
+					if (DropItemsFromProjectExplorer(ID, ParentType) == false) {
+
+					}
 					{
 
 						dropItemsFromFavorites(ID, DevObjProjBool, ParentType);
@@ -360,24 +341,25 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 				}
 			}
 
-			private Boolean DropItemsFromProjectExplorer(String ID, TypeOfXMLNode ParentType) {
-				LocalSelectionTransfer LST = LocalSelectionTransfer.getTransfer();
-				ISelection selection = LST.getSelection();
+			private Boolean DropItemsFromProjectExplorer(final String ID, final TypeOfXMLNode ParentType) {
+				final LocalSelectionTransfer LST = LocalSelectionTransfer.getTransfer();
+				final ISelection selection = LST.getSelection();
 				if (selection instanceof IStructuredSelection) {
-					Object[] Items = ((IStructuredSelection) selection).toArray();
-					for (int i = 0; i < Items.length; i++) {
-						IAdaptable item = (IAdaptable) Items[i];
+					final Object[] Items = ((IStructuredSelection) selection).toArray();
+					for (final Object item2 : Items) {
+						final IAdaptable item = (IAdaptable) item2;
 						try {
-							AdtObjectReference AdtRef = item.getAdapter(AdtObjectReference.class);
-							String objectType = AdtRef.getType();
-							String objectName = AdtRef.getName();
-							TypeOfEntry typeOfEntry = Common.getTypeOfEntryFromSAPType(objectType);
-							XMLhandler.addObjectToXML(typeOfEntry, objectName.toUpperCase(), "", "","", ID, ParentType);
+							final AdtObjectReference AdtRef = item.getAdapter(AdtObjectReference.class);
+							final String objectType = AdtRef.getType();
+							final String objectName = AdtRef.getName();
+							final TypeOfEntry typeOfEntry = Common.getTypeOfEntryFromSAPType(objectType);
+							XMLhandler.addObjectToXML(typeOfEntry, objectName.toUpperCase(), "", "", "", ID,
+									ParentType);
 
-						} catch (SecurityException e) {
+						} catch (final SecurityException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-						} catch (IllegalArgumentException e) {
+						} catch (final IllegalArgumentException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
@@ -389,14 +371,15 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 				return false;
 			}
 
-			private void dropItemsFromFavorites(String ID, Boolean DevObjProjBool, TypeOfXMLNode ParentType) {
+			private void dropItemsFromFavorites(final String ID, final Boolean DevObjProjBool,
+					final TypeOfXMLNode ParentType) {
 				if (ID != "") {
-					dndSourceSelection = (IStructuredSelection) viewer.getSelection();
-					Object[] Items = dndSourceSelection.toArray();
-					for (int i = 0; i < Items.length; i++) {
-						TreeObject item = (TreeObject) Items[i];
+					Superview.this.dndSourceSelection = (IStructuredSelection) Superview.this.viewer.getSelection();
+					final Object[] Items = Superview.this.dndSourceSelection.toArray();
+					for (final Object item2 : Items) {
+						final TreeObject item = (TreeObject) item2;
 						if (item instanceof TreeParent && !ID.equals(((TreeParent) item).getFolderID())) {
-							TreeParent Folder = (TreeParent) item;
+							final TreeParent Folder = (TreeParent) item;
 							XMLhandler.moveFolderInXML(Folder.getFolderID(), ID, Folder.getTypeOfFolder(), ParentType);
 						} else {
 							if (item.getParent().getDevObjProject() == DevObjProjBool
@@ -415,14 +398,14 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 //
 //								}
 								XMLhandler.addObjectToXML(item.getType(), item.getName(), item.getDescription(),
-										item.getLongDescription(),item.getTechnicalName(), ID, ParentType);
+										item.getLongDescription(), item.getTechnicalName(), ID, ParentType);
 								XMLhandler.delObjectFromXML(item.getType(), item.getName(),
 										item.getParent().getFolderID(), item.getParent().getTypeOfFolder());
 							}
 						}
 					}
-					Superview.refreshViewer(viewer);
-					dndSourceSelection = null;
+					Superview.refreshViewer(Superview.this.viewer);
+					Superview.this.dndSourceSelection = null;
 				}
 			}
 
@@ -431,61 +414,62 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 
 	@Override
 	public void enableLinkingOfEditor() {
-		if (linkWithEditorAction != null)
-			linkWithEditorAction.setEnabled(true);
+		if (this.linkWithEditorAction != null) {
+			this.linkWithEditorAction.setEnabled(true);
+		}
 	}
 
 	@Override
 	public void disableLinkingOfEditor() {
-		linkWithEditorAction.setEnabled(false);
+		this.linkWithEditorAction.setEnabled(false);
 	}
 
-	private void setTreeColumns(ColumnControlListener columnListener, Tree tree) {
+	private void setTreeColumns(final ColumnControlListener columnListener, final Tree tree) {
 		tree.setHeaderVisible(true);
-		TreeColumn columnName = new TreeColumn(tree, SWT.LEFT);
+		final TreeColumn columnName = new TreeColumn(tree, SWT.LEFT);
 		columnName.setText("Name");
 		columnName.addControlListener(columnListener);
 		loadColumnSettings(columnName);
-		TreeColumn columnDescr = new TreeColumn(tree, SWT.LEFT);
+		final TreeColumn columnDescr = new TreeColumn(tree, SWT.LEFT);
 		columnDescr.setText("Description");
 		columnDescr.addControlListener(columnListener);
 		loadColumnSettings(columnDescr);
-		TreeColumn ColumnID = new TreeColumn(tree, SWT.LEFT);
+		final TreeColumn ColumnID = new TreeColumn(tree, SWT.LEFT);
 		ColumnID.setText("ID");
 		ColumnID.addControlListener(columnListener);
 		ColumnID.setWidth(0);
 		ColumnID.setResizable(false);
-		TreeColumn ColumnFolderType = new TreeColumn(tree, SWT.LEFT);
+		final TreeColumn ColumnFolderType = new TreeColumn(tree, SWT.LEFT);
 		ColumnFolderType.setText("FolderType");
 		ColumnFolderType.addControlListener(columnListener);
 		ColumnFolderType.setWidth(0);
 		ColumnFolderType.setResizable(false);
-		TreeColumn ColumnDevObj = new TreeColumn(tree, SWT.LEFT);
+		final TreeColumn ColumnDevObj = new TreeColumn(tree, SWT.LEFT);
 		ColumnDevObj.setText("DevObjects");
 		ColumnDevObj.addControlListener(columnListener);
 		ColumnDevObj.setWidth(0);
 		ColumnDevObj.setResizable(false);
-		TreeColumn ColumnLinkedTo = new TreeColumn(tree, SWT.LEFT);
+		final TreeColumn ColumnLinkedTo = new TreeColumn(tree, SWT.LEFT);
 		ColumnLinkedTo.setText("Linked To");
 		ColumnLinkedTo.addControlListener(columnListener);
 		loadColumnSettings(ColumnLinkedTo);
 	}
 
 	@Override
-	public void editorActivated(IEditorPart activeEditor) {
+	public void editorActivated(final IEditorPart activeEditor) {
 
 		if (isLinkingActive() && isHideOfDepProject()) {
 			if (!getLinkedEditorProject().equals(Common.getProjectName())) {
 
-				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-				IWorkbenchWindow window = page.getWorkbenchWindow();
-				ISelection ADTselection = window.getSelectionService().getSelection();
-				LinkedProject = ProjectUtil.getActiveAdtCoreProject(ADTselection, null, null,
+				final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				final IWorkbenchWindow window = page.getWorkbenchWindow();
+				final ISelection ADTselection = window.getSelectionService().getSelection();
+				this.LinkedProject = ProjectUtil.getActiveAdtCoreProject(ADTselection, null, null,
 						IAdtCoreProject.ABAP_PROJECT_NATURE);
-				if (LinkedProject != null) {
-					setLinkedEditorProject(LinkedProject.getName());
-					Superview.refreshViewer(viewer);
-					viewer.setExpandedElements(getExpandedParentNodes().toArray());
+				if (this.LinkedProject != null) {
+					setLinkedEditorProject(this.LinkedProject.getName());
+					Superview.refreshViewer(this.viewer);
+					this.viewer.setExpandedElements(getExpandedParentNodes().toArray());
 				}
 			}
 			return;
@@ -513,111 +497,106 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 	}
 
 	protected void hookContextMenu() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		final MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(IMenuManager manager) {
-				fillContextMenu(manager);
-			}
-		});
-		Menu menu = menuMgr.createContextMenu(viewer.getControl());
-		viewer.getControl().setMenu(menu);
-		getSite().registerContextMenu(menuMgr, viewer);
+		menuMgr.addMenuListener(manager -> fillContextMenu(manager));
+		final Menu menu = menuMgr.createContextMenu(this.viewer.getControl());
+		this.viewer.getControl().setMenu(menu);
+		getSite().registerContextMenu(menuMgr, this.viewer);
 	}
 
 	protected void contributeToActionBars() {
-		IActionBars bars = getViewSite().getActionBars();
+		final IActionBars bars = getViewSite().getActionBars();
 		fillLocalPullDown(bars.getMenuManager());
 		fillLocalToolBar(bars.getToolBarManager());
 	}
 
-	protected void fillLocalPullDown(IMenuManager manager) {
-		manager.add(actions.actExportFavorites);
-		manager.add(actions.actImportFavorites);
+	protected void fillLocalPullDown(final IMenuManager manager) {
+		manager.add(this.actions.actExportFavorites);
+		manager.add(this.actions.actImportFavorites);
 
 	}
 
-	protected void fillContextMenu(IMenuManager manager) {
-		if (viewer.getSelection() instanceof IStructuredSelection) {
-			IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+	protected void fillContextMenu(final IMenuManager manager) {
+		if (this.viewer.getSelection() instanceof IStructuredSelection) {
+			final IStructuredSelection selection = (IStructuredSelection) this.viewer.getSelection();
 
 			try {
 
-				TreeObject object = (TreeObject) selection.getFirstElement();
+				final TreeObject object = (TreeObject) selection.getFirstElement();
 
 				if (object instanceof TreeParent) {
-					TreeParent parent = (TreeParent) object;
+					final TreeParent parent = (TreeParent) object;
 					if (parent.getDevObjProject() == true) {
-						manager.add(actions.actAddFolder);
-						manager.add(actions.actAddProgram);
-						manager.add(actions.actAddClass);
-						manager.add(actions.actAddInterface);
-						manager.add(actions.actAddFunctionGroup);
-						manager.add(actions.actAddFunctionModule);
-						manager.add(actions.actAddView);
-						manager.add(actions.actAddTable);
-						manager.add(actions.actAddMessageClass);
-						manager.add(actions.actAddSearchHelp);
-						manager.add(actions.actAddADTLink);
-						manager.add(actions.actAddCDS);
+						manager.add(this.actions.actAddFolder);
+						manager.add(this.actions.actAddProgram);
+						manager.add(this.actions.actAddClass);
+						manager.add(this.actions.actAddInterface);
+						manager.add(this.actions.actAddFunctionGroup);
+						manager.add(this.actions.actAddFunctionModule);
+						manager.add(this.actions.actAddView);
+						manager.add(this.actions.actAddTable);
+						manager.add(this.actions.actAddMessageClass);
+						manager.add(this.actions.actAddSearchHelp);
+						manager.add(this.actions.actAddADTLink);
+						manager.add(this.actions.actAddCDS);
 						manager.add(new Separator());
 					} else {
-						manager.add(actions.actAddFolder);
-						manager.add(actions.actAddTransaction);
-						manager.add(actions.actAddProgram);
-						manager.add(actions.actAddURL);
+						manager.add(this.actions.actAddFolder);
+						manager.add(this.actions.actAddTransaction);
+						manager.add(this.actions.actAddProgram);
+						manager.add(this.actions.actAddURL);
 						manager.add(new Separator());
 					}
-					manager.add(actions.actDelFolder);
+					manager.add(this.actions.actDelFolder);
 					manager.add(new Separator());
-					manager.add(actions.actEdit);
+					manager.add(this.actions.actEdit);
 					manager.add(new Separator());
-					drillDownAdapter.addNavigationActions(manager);
+					this.drillDownAdapter.addNavigationActions(manager);
 					// Other plug-ins can contribute there actions here
 					manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 				} else if (object instanceof TreeObject) {
 
 					manager.add(new Separator());
-					manager.add(actions.actDelete);
+					manager.add(this.actions.actDelete);
 					manager.add(new Separator());
-					manager.add(actions.actEdit);
+					manager.add(this.actions.actEdit);
 					manager.add(new Separator());
-					manager.add(actions.actCopyToClipboard);
+					manager.add(this.actions.actCopyToClipboard);
 					manager.add(new Separator());
 
-					Actions.addOpenInProjectMenu(manager, viewer);
-					drillDownAdapter.addNavigationActions(manager);
+					Actions.addOpenInProjectMenu(manager, this.viewer);
+					this.drillDownAdapter.addNavigationActions(manager);
 					// Other plug-ins can contribute there actions here
 					manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 				}
 
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				// TODO: handle exception
 				showMessage(e.toString());
 			}
 		}
 	}
 
-	protected void fillLocalToolBar(IToolBarManager manager) {
+	protected void fillLocalToolBar(final IToolBarManager manager) {
 
-		manager.add(actions.actAddRootFolder);
+		manager.add(this.actions.actAddRootFolder);
 
-		drillDownAdapter.addNavigationActions(manager);
+		this.drillDownAdapter.addNavigationActions(manager);
 	}
 
 	public void sortTable() {
 
-		viewer.setComparator(new ViewerComparator() {
+		this.viewer.setComparator(new ViewerComparator() {
 			@Override
-			public int compare(Viewer viewer, Object e1, Object e2) {
+			public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
 				if (e1 instanceof TreeParent && e2 instanceof TreeParent) {
 					return ((TreeParent) e1).getName().compareToIgnoreCase(((TreeParent) e2).getName());
 				} else if (e1 instanceof TreeParent && e2 instanceof TreeObject) {
-					return (-1);
+					return -1;
 				} else if (e1 instanceof TreeObject && e2 instanceof TreeParent) {
-					return (1);
+					return 1;
 				} else if (e1 instanceof TreeObject && e2 instanceof TreeObject) {
 					return ((TreeObject) e1).getName().compareToIgnoreCase(((TreeObject) e2).getName());
 
@@ -628,8 +607,8 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 		});
 	}
 
-	protected void showMessage(String message) {
-		MessageDialog.openInformation(viewer.getControl().getShell(), "Favorites", message);
+	protected void showMessage(final String message) {
+		MessageDialog.openInformation(this.viewer.getControl().getShell(), "Favorites", message);
 	}
 
 	/**
@@ -637,77 +616,71 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 	 */
 	@Override
 	public void setFocus() {
-		viewer.getControl().setFocus();
+		this.viewer.getControl().setFocus();
 	}
 
-	protected void loadColumnSettings(TreeColumn Column) {
-		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(getID());
+	protected void loadColumnSettings(final TreeColumn Column) {
+		final IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(getID());
 		Column.setWidth(prefs.getInt("column_width" + Column.getText(), 300));
 	}
 
 	protected void loadPluginSettings() {
-		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(getID());
+		final IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(getID());
 		try {
 			prefs.sync();
-		} catch (org.osgi.service.prefs.BackingStoreException e) {
+		} catch (final org.osgi.service.prefs.BackingStoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		setLinkingActive(prefs.getBoolean("linking_active", true));
 		setLinkedEditorProject(prefs.get("linked_project", ""));
 		expandTreeNodes(prefs);
-		LinkedProject = Common.getProjectByName(getLinkedEditorProject());
+		this.LinkedProject = Common.getProjectByName(getLinkedEditorProject());
 	}
 
-	private void expandTreeNodes(IEclipsePreferences prefs) {
+	private void expandTreeNodes(final IEclipsePreferences prefs) {
 		String expandedNodesString = "";
 		String[] expNodes = null;
 		expandedNodesString = prefs.get("expanded_nodes", expandedNodesString);
 		if (expandedNodesString != "") {
 			expNodes = expandedNodesString.split(";");
 		}
-		;
 		if (expNodes != null) {
-			this.expandedNodes = new ArrayList<String>(Arrays.asList(expNodes));
+			this.expandedNodes = new ArrayList<>(Arrays.asList(expNodes));
 		}
-	};
+	}
 
 	protected void hookDoubleClickAction() {
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(DoubleClickEvent event) {
-				TempLinkedEditorProject = getLinkedEditorProject();
-				if (isHideOfDepProject()) {
-					TempLinkedProject = LinkedProject;
-				} else {
-					TempLinkedProject = null;
-				}
-				if ( controlPressed == false )
-				{ actions.actDoubleClick.run(); };
-			}
-		});
+		/**
+		 * addDoubleClickListener unfortunately does not supply the currently pressed
+		 * modifier keys in the event object so as a work around we register Mouse and
+		 * Keyboard listeners
+		 */
+		new TreeSelectionEventAdapter(this, this.actions.actDoubleClick);
 	}
 
+	@Override
 	public String getLinkedEditorProject() {
 
-		return LinkedEditorProject;
+		return this.LinkedEditorProject;
 
 	}
 
+	@Override
 	public boolean isLinkingActive() {
-		return linkingActive;
+		return this.linkingActive;
 	}
 
-	public void setLinkingActive(boolean linkingActive) {
+	public void setLinkingActive(final boolean linkingActive) {
 		this.linkingActive = linkingActive;
 	}
 
-	public void setLinkedEditorProject(String linkedEditorProject) {
-		LinkedEditorProject = linkedEditorProject;
+	public void setLinkedEditorProject(final String linkedEditorProject) {
+		this.LinkedEditorProject = linkedEditorProject;
 	}
 
-	public static TreeParent createTreeNodes(TypeOfXMLNode FolderXMLNode, IFavorites Favorite,
-			Boolean selectFolderDialog) {
+	public static TreeParent createTreeNodes(final TypeOfXMLNode FolderXMLNode, final IFavorites Favorite,
+			final Boolean selectFolderDialog) {
 
 		String LinkedEditorProject = "";
 
@@ -717,9 +690,9 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 			LinkedEditorProject = Favorite.getLinkedEditorProject();
 		}
 
-		TreeParent invisibleRoot = new TreeParent("", "", true, "", "", Favorite, false, "root");
+		final TreeParent invisibleRoot = new TreeParent("", "", true, "", "", Favorite, false, "root");
 
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {
 			dBuilder = dbFactory.newDocumentBuilder();
@@ -729,55 +702,56 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 
 				doc.getDocumentElement().normalize();
 
-				NodeList nList = doc.getDocumentElement().getChildNodes();
+				final NodeList nList = doc.getDocumentElement().getChildNodes();
 
 				for (int temp = 0; temp < nList.getLength(); temp++) {
 
-					Node nNode = nList.item(temp);
+					final Node nNode = nList.item(temp);
 
 					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-						Element eElement = (Element) nNode;
+						final Element eElement = (Element) nNode;
 						createSubNodes(FolderXMLNode, eElement, invisibleRoot, LinkedEditorProject, Favorite,
 								selectFolderDialog);
 					}
 				}
 
-				DOMSource source = new DOMSource(doc);
+				final DOMSource source = new DOMSource(doc);
 
-				TransformerFactory transformerFactory = TransformerFactory.newInstance();
-				Transformer transformer = transformerFactory.newTransformer();
-				StreamResult result = new StreamResult(XMLhandler.getFavFile().getPath());
+				final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+				final Transformer transformer = transformerFactory.newTransformer();
+				final StreamResult result = new StreamResult(XMLhandler.getFavFile().getPath());
 				transformer.transform(source, result);
 				return invisibleRoot;
-			} catch (SAXException e) {
+			} catch (final SAXException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (TransformerConfigurationException e) {
+			} catch (final TransformerConfigurationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (TransformerException e) {
+			} catch (final TransformerException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
-		} catch (ParserConfigurationException e) {
+		} catch (final ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	private static void createSubNodes(TypeOfXMLNode folderXMLNode, Element subNode, TreeParent subNodeParent,
-			String linkedEditorProject, IFavorites favorite, Boolean selectFolderDialog) {
+	private static void createSubNodes(final TypeOfXMLNode folderXMLNode, final Element subNode,
+			final TreeParent subNodeParent, final String linkedEditorProject, final IFavorites favorite,
+			final Boolean selectFolderDialog) {
 
 		if (subNode.getNodeName().equalsIgnoreCase(folderXMLNode.toString())) {
 
-			TreeParent parent = new TreeParent(subNode.getAttribute(TypeOfXMLAttr.name.toString()),
+			final TreeParent parent = new TreeParent(subNode.getAttribute(TypeOfXMLAttr.name.toString()),
 					subNode.getAttribute(TypeOfXMLAttr.description.toString()),
 					Boolean.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.projectIndependent.toString())),
 					subNode.getAttribute(TypeOfXMLAttr.project.toString()),
@@ -792,15 +766,17 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 				subNode.setAttribute(TypeOfXMLAttr.folderID.toString(), FolderID);
 			}
 
-			if (favorite.getExpandedNodes().contains(FolderID))
+			if (favorite.getExpandedNodes().contains(FolderID)) {
 				favorite.getExpandedParentNodes().add(parent);
+			}
 
-			boolean projectIsIndependent = Boolean
+			final boolean projectIsIndependent = Boolean
 					.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.projectIndependent.toString()));
 			if (projectIsIndependent == false && isHideOfDepProject() == true) {
 				String ProjectName = linkedEditorProject;
-				if (ProjectName.equals(""))
+				if (ProjectName.equals("")) {
 					ProjectName = Common.getProjectName();
+				}
 
 				if (!parent.getProject().equals(ProjectName)) {
 					return;
@@ -809,15 +785,15 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 
 			subNodeParent.addChild(parent);
 
-			NodeList Children = subNode.getChildNodes();
+			final NodeList Children = subNode.getChildNodes();
 
 			for (int tempChild = 0; tempChild < Children.getLength(); tempChild++) {
 
-				Node nNodeChild = Children.item(tempChild);
+				final Node nNodeChild = Children.item(tempChild);
 
 				if (nNodeChild.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElementChild = (Element) nNodeChild;
+					final Element eElementChild = (Element) nNodeChild;
 
 					if (eElementChild.getNodeName().equalsIgnoreCase(folderXMLNode.toString())) {
 						createSubNodes(folderXMLNode, eElementChild, parent, linkedEditorProject, favorite,
@@ -830,7 +806,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 							if (XMLhandler.isXMLNodeNameToUpper(eElementChild.getTagName())) {
 								childName = childName.toUpperCase();
 							}
-							TreeObject child = new TreeObject(childName,
+							final TreeObject child = new TreeObject(childName,
 									XMLhandler.getEntryTypeFromXMLNode(nNodeChild.getNodeName()),
 									eElementChild.getAttribute(TypeOfXMLAttr.description.toString()),
 									eElementChild.getAttribute(TypeOfXMLAttr.technicalName.toString()),
@@ -844,15 +820,15 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 
 	}
 
-	public static void refreshViewer(TreeViewer viewer) {
+	public static void refreshViewer(final TreeViewer viewer) {
 
 		if (viewer != null) {
 
-			Object ContentProvider = viewer.getContentProvider();
+			final Object ContentProvider = viewer.getContentProvider();
 			try {
-				java.lang.reflect.Method initialize = ContentProvider.getClass().getMethod("initialize");
+				final java.lang.reflect.Method initialize = ContentProvider.getClass().getMethod("initialize");
 				initialize.invoke(ContentProvider);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 
 			}
 			viewer.refresh();
@@ -863,7 +839,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 		return activeFavorites;
 	}
 
-	public static void addFavoritesToActive(IFavorites Favorite) {
+	public static void addFavoritesToActive(final IFavorites Favorite) {
 		activeFavorites.add(Favorite);
 	}
 }
