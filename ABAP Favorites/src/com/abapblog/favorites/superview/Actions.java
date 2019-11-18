@@ -3,22 +3,12 @@ package com.abapblog.favorites.superview;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.net.MalformedURLException;
-
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Iterator;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -27,16 +17,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import com.abapblog.favorites.Activator;
 import com.abapblog.favorites.common.AFIcons;
 import com.abapblog.favorites.common.Common;
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
-import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.dialog.FolderDialog;
 import com.abapblog.favorites.dialog.NameDialog;
 import com.abapblog.favorites.dialog.URLDialog;
@@ -44,22 +30,7 @@ import com.abapblog.favorites.preferences.PreferenceConstants;
 import com.abapblog.favorites.tree.TreeObject;
 import com.abapblog.favorites.tree.TreeParent;
 import com.abapblog.favorites.xml.XMLhandler;
-import com.sap.adt.destinations.logon.AdtLogonServiceFactory;
-import com.sap.adt.destinations.logon.IAdtLogonService;
-import com.sap.adt.destinations.model.IDestinationData;
-import com.sap.adt.destinations.model.IDestinationDataWritable;
 import com.sap.adt.destinations.ui.logon.AdtLogonServiceUIFactory;
-import com.sap.adt.destinations.ui.logon.IAdtLogonServiceUI;
-import com.sap.adt.project.IAdtCoreProject;
-import com.sap.adt.project.ui.util.ProjectUtil;
-import com.sap.adt.ris.search.AdtRisQuickSearchFactory;
-import com.sap.adt.ris.search.RisQuickSearchNotSupportedException;
-import com.sap.adt.sapgui.ui.editors.AdtSapGuiEditorUtilityFactory;
-import com.sap.adt.sapgui.ui.editors.IAdtSapGuiEditorUtility;
-import com.sap.adt.tools.core.model.adtcore.IAdtObjectReference;
-import com.sap.adt.tools.core.project.IAbapProject;
-import com.sap.adt.tools.core.ui.navigation.AdtNavigationServiceFactory;
-import com.sap.adt.tools.core.wbtyperegistry.WorkbenchAction;
 
 public class Actions {
 
@@ -84,11 +55,11 @@ public class Actions {
 	public Action actEdit;
 	public Action actExportFavorites;
 	public Action actImportFavorites;
-	public Action actDoubleClick;
+	public ITreeNodeAction actDoubleClick;
 	public Action actCopyToClipboard;
-	private static IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-	public void makeActions(Superview superview) {
-		AFIcons AFIcon = new AFIcons();
+
+	public void makeActions(final Superview superview) {
+		final AFIcons AFIcon = new AFIcons();
 		createAddFolderAction(superview);
 		createAddRootFolderAction(superview);
 		createAddTransactionAction(superview.viewer, AFIcon);
@@ -108,15 +79,14 @@ public class Actions {
 		createDelFolderAction(superview.viewer);
 		createEditAction(superview.viewer, AFIcon);
 		createDeleteAction(superview.viewer);
-		createDoubleClickActions(superview);
+		this.actDoubleClick = new DoubleClickAction(superview);
 		createExportFavoritesAction(superview.viewer);
 		createImportFavoritesAction(superview.viewer);
 		createCopyToClipboardAction(superview.viewer, AFIcon);
 	}
 
-
-	private void createAddFolderAction(Superview superview) {
-		actAddFolder = new Action() {
+	private void createAddFolderAction(final Superview superview) {
+		this.actAddFolder = new Action() {
 			@Override
 			public void run() {
 				Boolean FolderDO = false;
@@ -128,22 +98,22 @@ public class Actions {
 					FolderDO = true;
 					break;
 				}
-				;
-				FolderDialog FolderDialog = new FolderDialog(superview.viewer.getControl().getShell(), FolderDO);
+
+				final FolderDialog FolderDialog = new FolderDialog(superview.viewer.getControl().getShell(), FolderDO);
 				FolderDialog.create();
 				if (FolderDialog.open() == Window.OK) {
 
 					if (superview.viewer.getSelection() instanceof IStructuredSelection) {
-						IStructuredSelection selection = (IStructuredSelection) superview.viewer.getSelection();
+						final IStructuredSelection selection = (IStructuredSelection) superview.viewer.getSelection();
 
-						TreeObject Folder = (TreeObject) selection.getFirstElement();
+						final TreeObject Folder = (TreeObject) selection.getFirstElement();
 
 						if (Folder instanceof TreeParent) {
 							XMLhandler.addFolderToXML(FolderDialog.getName(), FolderDialog.getDescription(),
 									FolderDialog.getLongDescription(), FolderDialog.getPrjInd(),
 									Common.getProjectName(), FolderDialog.getDevObjectFolder(),
 									((TreeParent) Folder).getFolderID(), ((TreeParent) Folder).getTypeOfFolder());
-							superview.refreshViewer(superview.viewer);
+							Superview.refreshViewer(superview.viewer);
 						}
 
 					}
@@ -152,14 +122,14 @@ public class Actions {
 
 			}
 		};
-		actAddFolder.setText("Add New Folder");
-		actAddFolder.setToolTipText("Add New Folder");
-		actAddFolder.setImageDescriptor(
+		this.actAddFolder.setText("Add New Folder");
+		this.actAddFolder.setToolTipText("Add New Folder");
+		this.actAddFolder.setImageDescriptor(
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
 	}
 
-	private void createAddRootFolderAction(Superview superview) {
-		actAddRootFolder = new Action() {
+	private void createAddRootFolderAction(final Superview superview) {
+		this.actAddRootFolder = new Action() {
 			@Override
 			public void run() {
 				Boolean FolderDO = false;
@@ -171,209 +141,93 @@ public class Actions {
 					FolderDO = true;
 					break;
 				}
-				;
-				FolderDialog FolderDialog = new FolderDialog(superview.viewer.getControl().getShell(), FolderDO);
+
+				final FolderDialog FolderDialog = new FolderDialog(superview.viewer.getControl().getShell(), FolderDO);
 				FolderDialog.create();
 				if (FolderDialog.open() == Window.OK) {
 
 					XMLhandler.addFolderToXML(FolderDialog.getName(), FolderDialog.getDescription(),
 							FolderDialog.getLongDescription(), FolderDialog.getPrjInd(), Common.getProjectName(),
 							FolderDialog.getDevObjectFolder(), "", superview.FolderNode);
-					superview.refreshViewer(superview.viewer);
+					Superview.refreshViewer(superview.viewer);
 				}
 
 			}
 
 		};
 
-		actAddRootFolder.setText("Add New Folder");
-		actAddRootFolder.setToolTipText("Add New Folder");
-		actAddRootFolder.setImageDescriptor(
+		this.actAddRootFolder.setText("Add New Folder");
+		this.actAddRootFolder.setToolTipText("Add New Folder");
+		this.actAddRootFolder.setImageDescriptor(
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
 	}
 
-	private void createImportFavoritesAction(TreeViewer viewer) {
-		actImportFavorites = new Action() {
+	private void createImportFavoritesAction(final TreeViewer viewer) {
+		this.actImportFavorites = new Action() {
 			@Override
 			public void run() {
 				importFavorites(viewer);
 			}
 
 		};
-		actImportFavorites.setText("Import Favorites");
-		actImportFavorites.setImageDescriptor(
+		this.actImportFavorites.setText("Import Favorites");
+		this.actImportFavorites.setImageDescriptor(
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
 	}
 
-	private void createExportFavoritesAction(TreeViewer viewer) {
-		actExportFavorites = new Action() {
+	private void createExportFavoritesAction(final TreeViewer viewer) {
+		this.actExportFavorites = new Action() {
 			@Override
 			public void run() {
 				exportFavorites(viewer);
 			}
 
 		};
-		actExportFavorites.setText("Export Favorites");
-		actExportFavorites.setImageDescriptor(
+		this.actExportFavorites.setText("Export Favorites");
+		this.actExportFavorites.setImageDescriptor(
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_SAVEAS_EDIT));
 	}
 
-	private void createDoubleClickActions(Superview superview) {
-		actDoubleClick = new Action() {
-			@Override
-			public void run() {
-
-				ISelection selection = superview.viewer.getSelection();
-				Object obj = ((IStructuredSelection) selection).getFirstElement();
-
-				if (Superview.isHideOfDepProject() == false) {
-					if (obj instanceof TreeObject) {
-						TreeObject nodeObject = ((TreeObject) obj);
-						TypeOfEntry NodeType = nodeObject.getType();
-						TreeParent nodeParent = nodeObject.getParent();
-						if (nodeParent.getProjectIndependent()) {
-							superview.TempLinkedProject = null;
-						} else {
-							superview.TempLinkedProject = Common.getProjectByName(nodeParent.getProject());
-						}
-					}
-
-				}
-
-				if (superview.TempLinkedProject == null) {
-					IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-					IWorkbenchWindow window = page.getWorkbenchWindow();
-					ISelection ADTselection = window.getSelectionService().getSelection();
-					superview.TempLinkedProject = ProjectUtil.getActiveAdtCoreProject(ADTselection, null, null,
-							IAdtCoreProject.ABAP_PROJECT_NATURE);
-					try {
-						superview.TempLinkedProject.refreshLocal(IProject.DEPTH_INFINITE, new NullProgressMonitor());
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-
-				if (superview.TempLinkedProject != null) {
-					superview.TempLinkedEditorProject = superview.TempLinkedProject.getName();
-
-					try {
-						IAdtLogonService logonService = AdtLogonServiceFactory.createLogonService();
-						IAdtLogonServiceUI logonServiceUI = AdtLogonServiceUIFactory.createLogonServiceUI();
-
-						if (logonService.isLoggedOn(superview.TempLinkedEditorProject) == false) {
-
-							logonServiceUI.ensureLoggedOn((IAdaptable) superview.TempLinkedProject);
-						}
-
-						if (obj instanceof TreeObject) {
-
-							TreeObject nodeObject = ((TreeObject) obj);
-							TypeOfEntry NodeType = nodeObject.getType();
-							TreeParent nodeParent = nodeObject.getParent();
-							switch (NodeType) {
-							case Transaction:
-								AdtSapGuiEditorUtilityFactory.createSapGuiEditorUtility().openEditorAndStartTransaction(
-										superview.TempLinkedProject, obj.toString(), store.getBoolean(PreferenceConstants.P_NAVIGATE_TO_ECLIPSE_FOR_SUPPORTED_DEV_OBJECTS));
-								break;
-							case Folder:
-								break;
-							case URL:
-								try {
-									PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser()
-											.openURL(new URL(((TreeObject) obj).getTechnicalName()));
-								} catch (PartInitException | MalformedURLException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-
-								}
-								break;
-							case ADTLink:
-								openAdtLink(superview.TempLinkedProject,
-										new String(((TreeObject) obj).getTechnicalName()));
-								break;
-							case Program:
-								if (nodeParent.getDevObjProject() == false) {
-									runObject(superview.TempLinkedProject, nodeObject.getName(), nodeObject.getType());
-									break;
-								} else {
-									openObject(superview.TempLinkedProject, nodeObject.getName(), nodeObject.getType());
-									break;
-								}
-							case Table:
-
-							default:
-								if (nodeParent.getDevObjProject() == false) {
-									runObject(superview.TempLinkedProject, nodeObject.getName(), nodeObject.getType());
-									break;
-								} else {
-									openObject(superview.TempLinkedProject, nodeObject.getName(), nodeObject.getType());
-									break;
-								}
-							}
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-				} else {
-					if (obj instanceof TreeObject) {
-						TypeOfEntry NodeType = ((TreeObject) obj).getType();
-						if (NodeType == TypeOfEntry.URL) {
-							try {
-								PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser()
-										.openURL(new URL(((TreeObject) obj).getTechnicalName()));
-							} catch (PartInitException | MalformedURLException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-					}
-				}
-
-			}
-		};
-	}
-
-	private void createDeleteAction(TreeViewer viewer) {
-		actDelete = new Action() {
+	private void createDeleteAction(final TreeViewer viewer) {
+		this.actDelete = new Action() {
 			@Override
 			public void run() {
 				deleteObjectFromAction(viewer);
 			}
 		};
-		actDelete.setText("Delete");
-		actDelete.setToolTipText("Delete");
-		actDelete.setImageDescriptor(
+		this.actDelete.setText("Delete");
+		this.actDelete.setToolTipText("Delete");
+		this.actDelete.setImageDescriptor(
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
 	}
 
-	private void createEditAction(TreeViewer viewer, AFIcons AFIcon) {
-		actEdit = new Action() {
+	private void createEditAction(final TreeViewer viewer, final AFIcons AFIcon) {
+		this.actEdit = new Action() {
 			@Override
 			public void run() {
 				if (viewer.getSelection() instanceof IStructuredSelection) {
-					IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+					final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 
-					TreeObject object = (TreeObject) selection.getFirstElement();
+					final TreeObject object = (TreeObject) selection.getFirstElement();
 					editObjectFromAction(object.getType(),
 							XMLhandler.getObjectXMLNode(object.getType()).isNameToUpper(), viewer);
 
 				}
 			}
 		};
-		actEdit.setText("Edit");
-		actEdit.setToolTipText("Edit");
-		actEdit.setImageDescriptor(AFIcon.getRenameIconImgDescr());
+		this.actEdit.setText("Edit");
+		this.actEdit.setToolTipText("Edit");
+		this.actEdit.setImageDescriptor(AFIcon.getRenameIconImgDescr());
 	}
 
-	private void createDelFolderAction(TreeViewer viewer) {
-		actDelFolder = new Action() {
+	private void createDelFolderAction(final TreeViewer viewer) {
+		this.actDelFolder = new Action() {
 			@Override
 			public void run() {
 				if (viewer.getSelection() instanceof IStructuredSelection) {
-					IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+					final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 
-					TreeObject object = (TreeObject) selection.getFirstElement();
+					final TreeObject object = (TreeObject) selection.getFirstElement();
 
 					if (object instanceof TreeParent) {
 						XMLhandler.delFolderFromXML(((TreeParent) object).getFolderID(),
@@ -384,109 +238,109 @@ public class Actions {
 				}
 			}
 		};
-		actDelFolder.setText("Delete Folder");
-		actDelFolder.setToolTipText("Folder");
-		actDelFolder.setImageDescriptor(
+		this.actDelFolder.setText("Delete Folder");
+		this.actDelFolder.setToolTipText("Folder");
+		this.actDelFolder.setImageDescriptor(
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
 	}
 
-	private void createAddFMAction(TreeViewer viewer, AFIcons AFIcon) {
-		actAddFunctionModule = new Action() {
+	private void createAddFMAction(final TreeViewer viewer, final AFIcons AFIcon) {
+		this.actAddFunctionModule = new Action() {
 			@Override
 			public void run() {
 				addObjectFromAction(TypeOfEntry.FunctionModule, true, viewer);
 			}
 
 		};
-		actAddFunctionModule.setText("Add function module");
-		actAddFunctionModule.setToolTipText("Function Module");
-		actAddFunctionModule.setImageDescriptor(AFIcon.getFunctionModuleIconImgDescr());
+		this.actAddFunctionModule.setText("Add function module");
+		this.actAddFunctionModule.setToolTipText("Function Module");
+		this.actAddFunctionModule.setImageDescriptor(AFIcon.getFunctionModuleIconImgDescr());
 	}
 
-	private void createAddFGAction(TreeViewer viewer, AFIcons AFIcon) {
-		actAddFunctionGroup = new Action() {
+	private void createAddFGAction(final TreeViewer viewer, final AFIcons AFIcon) {
+		this.actAddFunctionGroup = new Action() {
 			@Override
 			public void run() {
 				addObjectFromAction(TypeOfEntry.FunctionGroup, true, viewer);
 			}
 
 		};
-		actAddFunctionGroup.setText("Add function group");
-		actAddFunctionGroup.setToolTipText("Function Group");
-		actAddFunctionGroup.setImageDescriptor(AFIcon.getFunctionGroupIconImgDescr());
+		this.actAddFunctionGroup.setText("Add function group");
+		this.actAddFunctionGroup.setToolTipText("Function Group");
+		this.actAddFunctionGroup.setImageDescriptor(AFIcon.getFunctionGroupIconImgDescr());
 	}
 
-	private void createAddIterfaceAction(TreeViewer viewer, AFIcons AFIcon) {
-		actAddInterface = new Action() {
+	private void createAddIterfaceAction(final TreeViewer viewer, final AFIcons AFIcon) {
+		this.actAddInterface = new Action() {
 			@Override
 			public void run() {
 				addObjectFromAction(TypeOfEntry.Interface, true, viewer);
 			}
 
 		};
-		actAddInterface.setText("Add interface");
-		actAddInterface.setToolTipText("Interface");
-		actAddInterface.setImageDescriptor(AFIcon.getInterfaceIconImgDescr());
+		this.actAddInterface.setText("Add interface");
+		this.actAddInterface.setToolTipText("Interface");
+		this.actAddInterface.setImageDescriptor(AFIcon.getInterfaceIconImgDescr());
 	}
 
-	private void createAddClassAction(TreeViewer viewer, AFIcons AFIcon) {
-		actAddClass = new Action() {
+	private void createAddClassAction(final TreeViewer viewer, final AFIcons AFIcon) {
+		this.actAddClass = new Action() {
 			@Override
 			public void run() {
 				addObjectFromAction(TypeOfEntry.Class, true, viewer);
 			}
 
 		};
-		actAddClass.setText("Add class");
-		actAddClass.setToolTipText("Class");
-		actAddClass.setImageDescriptor(AFIcon.getClassIconImgDescr());
+		this.actAddClass.setText("Add class");
+		this.actAddClass.setToolTipText("Class");
+		this.actAddClass.setImageDescriptor(AFIcon.getClassIconImgDescr());
 	}
 
-	private void createAddAMDPAction(TreeViewer viewer, AFIcons AFIcon) {
-		actAddAMDP = new Action() {
+	private void createAddAMDPAction(final TreeViewer viewer, final AFIcons AFIcon) {
+		this.actAddAMDP = new Action() {
 			@Override
 			public void run() {
 				addObjectFromAction(TypeOfEntry.AMDP, true, viewer);
 			}
 
 		};
-		actAddAMDP.setText("Add AMDP");
-		actAddAMDP.setToolTipText("AMDP");
-		actAddAMDP.setImageDescriptor(AFIcon.getAMDPImgDescr());
+		this.actAddAMDP.setText("Add AMDP");
+		this.actAddAMDP.setToolTipText("AMDP");
+		this.actAddAMDP.setImageDescriptor(AFIcon.getAMDPImgDescr());
 	}
 
-	private void createAddCDSViewAction(TreeViewer viewer, AFIcons AFIcon) {
+	private void createAddCDSViewAction(final TreeViewer viewer, final AFIcons AFIcon) {
 
-		actAddCDS = new Action() {
+		this.actAddCDS = new Action() {
 			@Override
 			public void run() {
 				addObjectFromAction(TypeOfEntry.CDSView, true, viewer);
 			}
 
 		};
-		actAddCDS.setText("Add CDS View");
-		actAddCDS.setToolTipText("CDS");
-		actAddCDS.setImageDescriptor(AFIcon.getCDSViewImgDescr());
+		this.actAddCDS.setText("Add CDS View");
+		this.actAddCDS.setToolTipText("CDS");
+		this.actAddCDS.setImageDescriptor(AFIcon.getCDSViewImgDescr());
 	}
 
-	private void createAddAdtLinkAction(TreeViewer viewer, AFIcons AFIcon) {
-		actAddADTLink = new Action() {
+	private void createAddAdtLinkAction(final TreeViewer viewer, final AFIcons AFIcon) {
+		this.actAddADTLink = new Action() {
 			@Override
 			public void run() {
-				URLDialog URLDialog = new URLDialog(viewer.getControl().getShell());
+				final URLDialog URLDialog = new URLDialog(viewer.getControl().getShell());
 				URLDialog.create(TypeOfEntry.ADTLink, false);
 				if (URLDialog.open() == Window.OK) {
 					if (viewer.getSelection() instanceof IStructuredSelection) {
-						IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+						final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 
-						TreeObject object = (TreeObject) selection.getFirstElement();
+						final TreeObject object = (TreeObject) selection.getFirstElement();
 
 						if (object instanceof TreeParent) {
 							String ADTLink = URLDialog.getURL();
 							ADTLink = ADTLink.replace("(?<=\'/\'/)(.*?)(?=\'/)", "$system");
-							XMLhandler.addObjectToXML(
-									TypeOfEntry.ADTLink,URLDialog.getName(), URLDialog.getDescription(),
-									URLDialog.getLongDescription(), ADTLink, ((TreeParent) object).getFolderID(), object.getParent().getTypeOfFolder());
+							XMLhandler.addObjectToXML(TypeOfEntry.ADTLink, URLDialog.getName(),
+									URLDialog.getDescription(), URLDialog.getLongDescription(), ADTLink,
+									((TreeParent) object).getFolderID(), object.getParent().getTypeOfFolder());
 							System.out.println(URLDialog.getName());
 							System.out.println(URLDialog.getDescription());
 							Superview.refreshViewer(viewer);
@@ -497,104 +351,104 @@ public class Actions {
 			}
 		};
 
-		actAddADTLink.setText("Add ADT Link");
-		actAddADTLink.setToolTipText("ADT Link");
-		actAddADTLink.setImageDescriptor(AFIcon.getADTLinkImgDescr());
+		this.actAddADTLink.setText("Add ADT Link");
+		this.actAddADTLink.setToolTipText("ADT Link");
+		this.actAddADTLink.setImageDescriptor(AFIcon.getADTLinkImgDescr());
 	}
 
-	private void createAddTransactionAction(TreeViewer viewer, AFIcons AFIcon) {
-		actAddTransaction = new Action() {
+	private void createAddTransactionAction(final TreeViewer viewer, final AFIcons AFIcon) {
+		this.actAddTransaction = new Action() {
 			@Override
 			public void run() {
 				addObjectFromAction(TypeOfEntry.Transaction, true, viewer);
 			}
 
 		};
-		actAddTransaction.setText("Add Transaction");
-		actAddTransaction.setToolTipText("Transaction");
-		actAddTransaction.setImageDescriptor(AFIcon.getTransactionImgDescr());
+		this.actAddTransaction.setText("Add Transaction");
+		this.actAddTransaction.setToolTipText("Transaction");
+		this.actAddTransaction.setImageDescriptor(AFIcon.getTransactionImgDescr());
 	}
 
-	private void createAddProgramAction(TreeViewer viewer, AFIcons AFIcon) {
-		actAddProgram = new Action() {
+	private void createAddProgramAction(final TreeViewer viewer, final AFIcons AFIcon) {
+		this.actAddProgram = new Action() {
 			@Override
 			public void run() {
 				addObjectFromAction(TypeOfEntry.Program, true, viewer);
 			}
 
 		};
-		actAddProgram.setText("Add Program");
-		actAddProgram.setToolTipText("Program");
-		actAddProgram.setImageDescriptor(AFIcon.getProgramIconImgDescr());
+		this.actAddProgram.setText("Add Program");
+		this.actAddProgram.setToolTipText("Program");
+		this.actAddProgram.setImageDescriptor(AFIcon.getProgramIconImgDescr());
 	}
 
-	private void createAddViewAction(TreeViewer viewer, AFIcons AFIcon) {
-		actAddView = new Action() {
+	private void createAddViewAction(final TreeViewer viewer, final AFIcons AFIcon) {
+		this.actAddView = new Action() {
 			@Override
 			public void run() {
 				addObjectFromAction(TypeOfEntry.View, true, viewer);
 			}
 
 		};
-		actAddView.setText("Add View");
-		actAddView.setToolTipText("View");
-		actAddView.setImageDescriptor(AFIcon.getViewIconImgDescr());
+		this.actAddView.setText("Add View");
+		this.actAddView.setToolTipText("View");
+		this.actAddView.setImageDescriptor(AFIcon.getViewIconImgDescr());
 	}
 
-	private void createAddTableAction(TreeViewer viewer, AFIcons AFIcon) {
-		actAddTable = new Action() {
+	private void createAddTableAction(final TreeViewer viewer, final AFIcons AFIcon) {
+		this.actAddTable = new Action() {
 			@Override
 			public void run() {
 				addObjectFromAction(TypeOfEntry.Table, true, viewer);
 			}
 
 		};
-		actAddTable.setText("Add Table");
-		actAddTable.setToolTipText("Table");
-		actAddTable.setImageDescriptor(AFIcon.getTableIconImgDescr());
+		this.actAddTable.setText("Add Table");
+		this.actAddTable.setToolTipText("Table");
+		this.actAddTable.setImageDescriptor(AFIcon.getTableIconImgDescr());
 	}
 
-	private void createAddMessageClassAction(TreeViewer viewer, AFIcons AFIcon) {
-		actAddMessageClass = new Action() {
+	private void createAddMessageClassAction(final TreeViewer viewer, final AFIcons AFIcon) {
+		this.actAddMessageClass = new Action() {
 			@Override
 			public void run() {
 				addObjectFromAction(TypeOfEntry.MessageClass, true, viewer);
 			}
 
 		};
-		actAddMessageClass.setText("Add Message Class");
-		actAddMessageClass.setToolTipText("Message Class");
-		actAddMessageClass.setImageDescriptor(AFIcon.getMessageClassIconImgDescr());
+		this.actAddMessageClass.setText("Add Message Class");
+		this.actAddMessageClass.setToolTipText("Message Class");
+		this.actAddMessageClass.setImageDescriptor(AFIcon.getMessageClassIconImgDescr());
 	}
 
-	private void createAddSeachHelpAction(TreeViewer viewer, AFIcons AFIcon) {
-		actAddSearchHelp = new Action() {
+	private void createAddSeachHelpAction(final TreeViewer viewer, final AFIcons AFIcon) {
+		this.actAddSearchHelp = new Action() {
 			@Override
 			public void run() {
 				addObjectFromAction(TypeOfEntry.SearchHelp, true, viewer);
 			}
 
 		};
-		actAddSearchHelp.setText("Add Search Help");
-		actAddSearchHelp.setToolTipText("Search Help");
-		actAddSearchHelp.setImageDescriptor(AFIcon.getSearchHelpIconImgDescr());
+		this.actAddSearchHelp.setText("Add Search Help");
+		this.actAddSearchHelp.setToolTipText("Search Help");
+		this.actAddSearchHelp.setImageDescriptor(AFIcon.getSearchHelpIconImgDescr());
 	}
 
-	private void createAddUrlAction(TreeViewer viewer, AFIcons AFIcon) {
-		actAddURL = new Action() {
+	private void createAddUrlAction(final TreeViewer viewer, final AFIcons AFIcon) {
+		this.actAddURL = new Action() {
 			@Override
 			public void run() {
-				URLDialog URLDialog = new URLDialog(viewer.getControl().getShell());
+				final URLDialog URLDialog = new URLDialog(viewer.getControl().getShell());
 				URLDialog.create(TypeOfEntry.URL, false);
 				if (URLDialog.open() == Window.OK) {
 					if (viewer.getSelection() instanceof IStructuredSelection) {
-						IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+						final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 
-						TreeObject object = (TreeObject) selection.getFirstElement();
+						final TreeObject object = (TreeObject) selection.getFirstElement();
 
 						if (object instanceof TreeParent) {
 
-							XMLhandler.addObjectToXML(TypeOfEntry.URL,URLDialog.getName(), URLDialog.getDescription(),
+							XMLhandler.addObjectToXML(TypeOfEntry.URL, URLDialog.getName(), URLDialog.getDescription(),
 									URLDialog.getLongDescription(), URLDialog.getURL(),
 									((TreeParent) object).getFolderID(), object.getParent().getTypeOfFolder());
 							System.out.println(URLDialog.getName());
@@ -606,81 +460,27 @@ public class Actions {
 				}
 			}
 		};
-		actAddURL.setText("Add URL");
-		actAddURL.setToolTipText("URL");
-		actAddURL.setImageDescriptor(AFIcon.getURLIconImgDescr());
+		this.actAddURL.setText("Add URL");
+		this.actAddURL.setToolTipText("URL");
+		this.actAddURL.setImageDescriptor(AFIcon.getURLIconImgDescr());
 	}
 
-	@SuppressWarnings({ "restriction", "restriction" })
-	public static void runObject(IProject project, String reportName, TypeOfEntry type) {
-		String programName = "";
-		try {
-			List<IAdtObjectReference> res = AdtRisQuickSearchFactory
-					.createQuickSearch(project, new NullProgressMonitor()).execute(reportName, 10);
-			for (IAdtObjectReference ref : res) {
-				if (Common.checkType(ref.getType(), type)) {
-					Pattern regexPatern = Pattern.compile("^\\S*");
-					Matcher regexMatch = regexPatern.matcher(ref.getName());
-					while (regexMatch.find()) {
-						programName = regexMatch.group(0);
-					}
-					if (programName.equalsIgnoreCase(reportName)) {
-						AdtSapGuiEditorUtilityFactory.createSapGuiEditorUtility().openEditorForObject(project, ref,
-								store.getBoolean(PreferenceConstants.P_NAVIGATE_TO_ECLIPSE_FOR_SUPPORTED_DEV_OBJECTS), WorkbenchAction.EXECUTE.toString(), null, Collections.<String, String>emptyMap());
-						return;
-					}
-				}
-			}
-		} catch (OperationCanceledException | RisQuickSearchNotSupportedException e) {
-			// AdtLogging.getLogger(getClass()).error(e);
-		}
-	}
-
-	public static void openObject(IProject project, String reportName, TypeOfEntry type) {
-		String programName = "";
-		try {
-			List<IAdtObjectReference> res = AdtRisQuickSearchFactory
-					.createQuickSearch(project, new NullProgressMonitor()).execute(reportName, 10);
-			for (IAdtObjectReference ref : res) {
-				if (Common.checkType(ref.getType(), type)) {
-
-					Pattern regexPatern = Pattern.compile("^\\S*");
-					Matcher regexMatch = regexPatern.matcher(ref.getName());
-					while (regexMatch.find()) {
-						programName = regexMatch.group(0);
-					}
-					if (programName.equalsIgnoreCase(reportName)) {
-						AdtNavigationServiceFactory.createNavigationService().navigate(project, ref, true);
-						return;
-					}
-				}
-			}
-		} catch (OperationCanceledException | RisQuickSearchNotSupportedException e) {
-			// AdtLogging.getLogger(getClass()).error(e);
-		}
-	}
-
-	public static void openAdtLink(IProject project, String adtLink) {
-		adtLink = adtLink.replace("(?<=\'/\'/)(.*?)(?=\'/)", project.getName().toString());
-		AdtNavigationServiceFactory.createNavigationService().navigateWithExternalLink(adtLink, project);
-		return;
-	}
-
-	private static void importFavorites(TreeViewer viewer) {
-		Shell shell = viewer.getControl().getShell();
-		FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+	private static void importFavorites(final TreeViewer viewer) {
+		final Shell shell = viewer.getControl().getShell();
+		final FileDialog dialog = new FileDialog(shell, SWT.OPEN);
 		dialog.setFilterNames(new String[] { "XML", "All Files (*.*)" });
 		dialog.setFilterExtensions(new String[] { "*.xml", "*.*" });
 		dialog.setFileName("favorites.xml");
 
-		String ImportFileName = dialog.open();
-		if (!ImportFileName.equals(""))
+		final String ImportFileName = dialog.open();
+		if (!ImportFileName.equals("")) {
 			XMLhandler.replaceFavFile(ImportFileName);
+		}
 	}
 
-	private static void exportFavorites(TreeViewer viewer) {
-		Shell shell = viewer.getControl().getShell();
-		FileDialog dialog = new FileDialog(shell, SWT.SAVE);
+	private static void exportFavorites(final TreeViewer viewer) {
+		final Shell shell = viewer.getControl().getShell();
+		final FileDialog dialog = new FileDialog(shell, SWT.SAVE);
 		dialog.setFilterNames(new String[] { "XML", "All Files (*.*)" });
 		dialog.setFilterExtensions(new String[] { "*.xml", "*.*" }); // Windows
 		// wild
@@ -689,22 +489,24 @@ public class Actions {
 		dialog.setFileName("favorites.xml");
 		// System.out.println("Save to: " + dialog.open());
 
-		String ExportFileName = dialog.open();
-		if (!ExportFileName.equals(""))
+		final String ExportFileName = dialog.open();
+		if (!ExportFileName.equals("")) {
 			XMLhandler.copyFavFile(ExportFileName);
+		}
 	}
 
-	public static void editObjectFromAction(TypeOfEntry Type, Boolean NameToUpper, TreeViewer viewer) {
+	public static void editObjectFromAction(final TypeOfEntry Type, final Boolean NameToUpper,
+			final TreeViewer viewer) {
 
 		if (viewer.getSelection() instanceof IStructuredSelection) {
-			IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+			final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 
-			TreeObject Object = (TreeObject) selection.getFirstElement();
+			final TreeObject Object = (TreeObject) selection.getFirstElement();
 
 			if (Object instanceof TreeParent) {
-				TreeParent Folder = (TreeParent) Object;
-				Boolean DevObjFolder = Folder.getDevObjProject();
-				FolderDialog FoDialog = new FolderDialog(viewer.getControl().getShell(), DevObjFolder);
+				final TreeParent Folder = (TreeParent) Object;
+				final Boolean DevObjFolder = Folder.getDevObjProject();
+				final FolderDialog FoDialog = new FolderDialog(viewer.getControl().getShell(), DevObjFolder);
 				FoDialog.create(true);
 				String Name = Folder.getName();
 				if (NameToUpper) {
@@ -754,8 +556,9 @@ public class Actions {
 
 						XMLhandler.delObjectFromXML(Type, Object.getName(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
-						XMLhandler.addObjectToXML(TypeOfEntry.URL,Name, UrlDialog.getDescription(), UrlDialog.getLongDescription(),
-								UrlDialog.getURL(), Object.getParent().getFolderID(), Object.getParent().getTypeOfFolder());
+						XMLhandler.addObjectToXML(TypeOfEntry.URL, Name, UrlDialog.getDescription(),
+								UrlDialog.getLongDescription(), UrlDialog.getURL(), Object.getParent().getFolderID(),
+								Object.getParent().getTypeOfFolder());
 
 						Superview.refreshViewer(viewer);
 					}
@@ -782,15 +585,15 @@ public class Actions {
 
 						XMLhandler.delObjectFromXML(Type, Object.getName(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
-						XMLhandler.addObjectToXML(TypeOfEntry.ADTLink,Name, UrlDialog.getDescription(), UrlDialog.getLongDescription(),
-								UrlDialog.getURL(), Object.getParent().getFolderID(),
+						XMLhandler.addObjectToXML(TypeOfEntry.ADTLink, Name, UrlDialog.getDescription(),
+								UrlDialog.getLongDescription(), UrlDialog.getURL(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
 
 						Superview.refreshViewer(viewer);
 					}
 					break;
 				default:
-					NameDialog NaDialog = new NameDialog(viewer.getControl().getShell(), Type);
+					final NameDialog NaDialog = new NameDialog(viewer.getControl().getShell(), Type);
 					NaDialog.create(Type, true);
 					Name = Object.getName();
 					if (NameToUpper) {
@@ -806,8 +609,8 @@ public class Actions {
 						}
 						XMLhandler.delObjectFromXML(Type, Object.getName(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
-						XMLhandler.addObjectToXML(Type, Name, NaDialog.getDescription(), NaDialog.getLongDescription(),"",
-								Object.getParent().getFolderID(), Object.getParent().getTypeOfFolder());
+						XMLhandler.addObjectToXML(Type, Name, NaDialog.getDescription(), NaDialog.getLongDescription(),
+								"", Object.getParent().getFolderID(), Object.getParent().getTypeOfFolder());
 						Superview.refreshViewer(viewer);
 					}
 					break;
@@ -817,14 +620,14 @@ public class Actions {
 		}
 	}
 
-	public static void deleteObjectFromAction(TreeViewer viewer) {
+	public static void deleteObjectFromAction(final TreeViewer viewer) {
 		if (viewer.getSelection() instanceof IStructuredSelection) {
-			IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+			final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 
-			TreeObject object = (TreeObject) selection.getFirstElement();
+			final TreeObject object = (TreeObject) selection.getFirstElement();
 
 			if (object instanceof TreeObject) {
-				TreeObject treeObj = (TreeObject) object;
+				final TreeObject treeObj = object;
 				XMLhandler.delObjectFromXML(treeObj.getType(), object.getName(), object.getParent().getFolderID(),
 						object.getParent().getTypeOfFolder());
 				Superview.refreshViewer(viewer);
@@ -832,15 +635,15 @@ public class Actions {
 		}
 	}
 
-	public static void addObjectFromAction(TypeOfEntry Type, Boolean NameToUpper, TreeViewer viewer) {
-		NameDialog NaDialog = new NameDialog(viewer.getControl().getShell(), Type);
+	public static void addObjectFromAction(final TypeOfEntry Type, final Boolean NameToUpper, final TreeViewer viewer) {
+		final NameDialog NaDialog = new NameDialog(viewer.getControl().getShell(), Type);
 		NaDialog.create(Type, false);
 		if (NaDialog.open() == Window.OK) {
 
 			if (viewer.getSelection() instanceof IStructuredSelection) {
-				IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+				final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 
-				TreeObject Folder = (TreeObject) selection.getFirstElement();
+				final TreeObject Folder = (TreeObject) selection.getFirstElement();
 
 				if (Folder instanceof TreeParent) {
 					String Name = NaDialog.getName();
@@ -848,8 +651,8 @@ public class Actions {
 						Name = Name.toUpperCase();
 					}
 					XMLhandler.addObjectToXML(Type, Name, NaDialog.getDescription(),
-							((TreeParent) Folder).getLongDescription(),((TreeParent) Folder).getTechnicalName(), ((TreeParent) Folder).getFolderID(),
-							((TreeParent) Folder).getTypeOfFolder());
+							((TreeParent) Folder).getLongDescription(), ((TreeParent) Folder).getTechnicalName(),
+							((TreeParent) Folder).getFolderID(), ((TreeParent) Folder).getTypeOfFolder());
 					Superview.refreshViewer(viewer);
 				}
 
@@ -857,81 +660,27 @@ public class Actions {
 		}
 	}
 
-	public static void addOpenInProjectMenu(IMenuManager manager, TreeViewer viewer) {
+	public static void addOpenInProjectMenu(final IMenuManager manager, final TreeViewer viewer) {
 		// sub-menu for projects
-		MenuManager subMenu = new MenuManager("Open in project", null);
+		final MenuManager subMenu = new MenuManager("Open in project", null);
 
-		for (IProject ABAPProject : Common.getABAPProjects()) {
+		for (final IProject ABAPProject : Common.getABAPProjects()) {
 
 			try {
-				Action projectAction = new Action() {
+				final Action projectAction = new Action() {
 					@Override
 					public void run() {
-
-						ISelection selection = viewer.getSelection();
-						Object obj = ((IStructuredSelection) selection).getFirstElement();
-
-						if (ABAPProject != null) {
-							if (obj instanceof TreeObject) {
-
-								TreeObject nodeObject = ((TreeObject) obj);
-								TypeOfEntry NodeType = nodeObject.getType();
-								TreeParent nodeParent = nodeObject.getParent();
-								switch (NodeType) {
-								case Transaction:
-									IAdtSapGuiEditorUtility SGEU = AdtSapGuiEditorUtilityFactory
-											.createSapGuiEditorUtility();
-									SGEU.openEditorAndStartTransaction(ABAPProject, obj.toString(), true);
-									break;
-								case Folder:
-									break;
-								case URL:
-									try {
-										PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser()
-												.openURL(new URL(((TreeObject) obj).getTechnicalName()));
-									} catch (PartInitException | MalformedURLException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-
-									}
-									break;
-								case ADTLink:
-									openAdtLink(ABAPProject, new String(((TreeObject) obj).getTechnicalName()));
-									break;
-								case Program:
-									if (nodeParent.getDevObjProject() == false) {
-										runObject(ABAPProject, nodeObject.getName(), nodeObject.getType());
-										break;
-									} else {
-										openObject(ABAPProject, nodeObject.getName(), nodeObject.getType());
-										break;
-									}
-								case Table:
-
-								default:
-									if (nodeParent.getDevObjProject() == false) {
-										runObject(ABAPProject, nodeObject.getName(), nodeObject.getType());
-										break;
-									} else {
-										openObject(ABAPProject, nodeObject.getName(), nodeObject.getType());
-										break;
-									}
-								}
-							}
-
-						} else {
-							if (obj instanceof TreeObject) {
-								TypeOfEntry NodeType = ((TreeObject) obj).getType();
-								if (NodeType == TypeOfEntry.URL) {
-									try {
-										PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser()
-												.openURL(new URL(((TreeObject) obj).getTechnicalName()));
-									} catch (PartInitException | MalformedURLException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-								}
-							}
+						if (!AdtLogonServiceUIFactory.createLogonServiceUI().ensureLoggedOn(ABAPProject).isOK()) {
+							return;
+						}
+						final boolean enableEclipseNavigation = Activator.getDefault().getPreferenceStore()
+								.getBoolean(PreferenceConstants.P_NAVIGATE_TO_ECLIPSE_FOR_SUPPORTED_DEV_OBJECTS);
+						final ISelection selection = viewer.getSelection();
+						final Iterator<?> selIter = ((IStructuredSelection) selection).iterator();
+						while (selIter.hasNext()) {
+							final Object selObj = selIter.next();
+							final TreeObject treeObject = (TreeObject) selObj;
+							AdtObjectHandler.executeTreeObject(treeObject, ABAPProject, enableEclipseNavigation, false);
 						}
 					}
 				};
@@ -941,8 +690,7 @@ public class Actions {
 						PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_PROJECT));
 
 				subMenu.add(projectAction);
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
+			} catch (final Exception e1) {
 				e1.printStackTrace();
 
 			}
@@ -951,19 +699,18 @@ public class Actions {
 		}
 	}
 
-
-	private void createCopyToClipboardAction(TreeViewer viewer, AFIcons AFIcon) {
-		actCopyToClipboard = new Action() {
+	private void createCopyToClipboardAction(final TreeViewer viewer, final AFIcons AFIcon) {
+		this.actCopyToClipboard = new Action() {
 			@Override
 			public void run() {
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				TreeObject object = (TreeObject) viewer.getStructuredSelection().getFirstElement();
+				final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				final TreeObject object = (TreeObject) viewer.getStructuredSelection().getFirstElement();
 				clipboard.setContents(new StringSelection(object.getName()), null);
 			}
 		};
-		actCopyToClipboard.setText("Copy to Clipboard");
-		actCopyToClipboard.setToolTipText("Copy to Clipboard");
-		actCopyToClipboard.setImageDescriptor(AFIcon.getCopyToClipboardImgDescr());
+		this.actCopyToClipboard.setText("Copy to Clipboard");
+		this.actCopyToClipboard.setToolTipText("Copy to Clipboard");
+		this.actCopyToClipboard.setImageDescriptor(AFIcon.getCopyToClipboardImgDescr());
 	}
 
 }
