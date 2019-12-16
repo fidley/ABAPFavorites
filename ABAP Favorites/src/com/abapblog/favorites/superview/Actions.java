@@ -1,6 +1,7 @@
 package com.abapblog.favorites.superview;
 
 import java.awt.Toolkit;
+
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.util.Iterator;
@@ -44,6 +45,7 @@ public class Actions {
 	public Action actAddInterface;
 	public Action actAddMessageClass;
 	public Action actAddProgram;
+	public Action actAddPackage;
 	public Action actAddRootFolder;
 	public Action actAddSearchHelp;
 	public Action actAddTable;
@@ -83,6 +85,7 @@ public class Actions {
 		createExportFavoritesAction(superview.viewer);
 		createImportFavoritesAction(superview.viewer);
 		createCopyToClipboardAction(superview.viewer, AFIcon);
+		createAddPackageAction(superview.viewer, AFIcon);
 	}
 
 	private void createAddFolderAction(final Superview superview) {
@@ -380,6 +383,19 @@ public class Actions {
 		this.actAddProgram.setText("Add Program");
 		this.actAddProgram.setToolTipText("Program");
 		this.actAddProgram.setImageDescriptor(AFIcon.getProgramIconImgDescr());
+	}
+	
+	private void createAddPackageAction(final TreeViewer viewer, final AFIcons AFIcon) {
+		this.actAddPackage = new Action() {
+			@Override
+			public void run() {
+				addObjectFromAction(TypeOfEntry.Package, true, viewer);
+			}
+
+		};
+		this.actAddPackage.setText("Add Package");
+		this.actAddPackage.setToolTipText("Package");
+		this.actAddPackage.setImageDescriptor(AFIcon.getPackageIconImgDescr());
 	}
 
 	private void createAddViewAction(final TreeViewer viewer, final AFIcons AFIcon) {

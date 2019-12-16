@@ -62,6 +62,8 @@ public class ViewLabelProvider implements ITableLabelProvider {
 					return AFIcons.getCDSViewIcon();
 				case AMDP:
 					return AFIcons.getAMDPIcon();
+				case Package:
+					return AFIcons.getPackageIcon();
 				default:
 					break;
 				}
@@ -125,4 +127,5 @@ public class ViewLabelProvider implements ITableLabelProvider {
 	@Override
 	public void removeListener(ILabelProviderListener listener) {
 	}
+
 }

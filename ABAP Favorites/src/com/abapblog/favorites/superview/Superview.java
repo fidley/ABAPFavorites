@@ -540,6 +540,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 						manager.add(this.actions.actAddSearchHelp);
 						manager.add(this.actions.actAddADTLink);
 						manager.add(this.actions.actAddCDS);
+						manager.add(this.actions.actAddPackage);
 						manager.add(new Separator());
 					} else {
 						manager.add(this.actions.actAddFolder);

@@ -2,11 +2,11 @@
 <feature
       id="ABAP_Favorites_Feature_Project"
       label="ABAP Favorites"
-      version="1.0.55.qualifier"
+      version="1.0.56.qualifier"
       provider-name="ABAPBlog.com">
 
    <description>
-      ABAP Favorites - preferences page added and split into two plugins (Favorites and Extensions)
+      ABAP Favorites - additional views for creating and keeping favorite transactions and object lists.
    </description>
 
    <license url="https://www.apache.org/licenses/LICENSE-2.0">
