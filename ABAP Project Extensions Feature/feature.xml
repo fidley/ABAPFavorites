@@ -2,7 +2,7 @@
 <feature
       id="com.abapblog.adt.extension.feature"
       label="ADT Extensions - Commands"
-      version="1.0.0.4"
+      version="1.0.1.qualifier"
       provider-name="ABAPBlog.com">
 
    <description url="http://abapblog.com">

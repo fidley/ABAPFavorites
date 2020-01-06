@@ -1,6 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+<extension point="org.eclipse.ui.startup">
+  <startup class="com.abapblog.adt.extension.Startup"/>
+</extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="ABAP"
+            id="com.abapblog.adt.Passwords">
+      </category>
+      <view
+            name="Passwords"
+            category="com.abapblog.adt.Passwords"
+            class="com.abapblog.adt.extension.passwords.view.PasswordView"
+            id="com.abapblog.adt.extension.passwords.Passwords">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               ratio="0.5"
+               relative="org.eclipse.ui.views.ProblemView"
+               relationship="right"
+               id="com.abapblog.adt.extension.passwords.Preferences">
+         </view>
+      </perspectiveExtension>
+   </extension>   
   <extension
          point="org.eclipse.ui.menus">
    <menuContribution
@@ -8,6 +36,45 @@
             locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
              <menu label="ABAP Project"
              	icon="platform:/plugin/com.sap.adt.tools.core.ui/icons/obj/abap_application.png">
+             	         <command
+               commandId="com.abapblog.adt.extension.commands.LogWithSecureStorage"
+               style="push">
+                <visibleWhen
+                   checkEnabled="false">
+                <or>
+                   <iterate
+                         ifEmpty="false"
+                         operator="or">
+                      <and>
+                         <adapt
+                               type="org.eclipse.core.resources.IProject">
+                            <test
+                                  property="org.eclipse.core.resources.projectNature"
+                                  value="com.sap.adt.abapnature">
+                            </test>
+                         </adapt>
+                      </and>
+                   </iterate>
+                   <and>
+                      <adapt
+                            type="java.util.Collection">
+                         <count
+                               value="0">
+                         </count>
+                      </adapt>
+                      <with
+                            variable="activeContexts">
+                         <iterate
+                               operator="or">
+                            <equals
+                                  value="com.sap.adt.tools.core.ui.abap">
+                            </equals>
+                         </iterate>
+                      </with>
+                   </and>
+                </or>
+             </visibleWhen>
+         </command>
          <command
                commandId="com.abapblog.adt.extension.commands.LogToAllSAPSystems"
                style="push">
@@ -199,5 +266,28 @@
                      >
                      </command>
       </extension>
+                  <extension
+            point="org.eclipse.ui.commands">
+            <command id="com.abapblog.adt.extension.commands.LogWithSecureStorage"
+                     name="Logon with Secure Storage"
+                     defaultHandler="com.abapblog.adt.extension.commands.LogWithSecureStorage"
+                     >
+                     </command>
+      </extension>
+<extension
+         point="org.eclipse.ui.preferencePages">
+               <page
+               		 category="com.sap.adt.tools.core.ui.preferencePages.ABAP"
+                     class="com.abapblog.adt.extension.preferences.Preferences"
+                     id="com.abapblog.adt.extension.preferences.Preferences"
+                     name="Automatic Logon">
+               </page>
+</extension>
+            <extension
+                  point="org.eclipse.core.runtime.preferences">
+               <initializer
+                     class="com.abapblog.adt.extension.preferences.PreferenceInitializer">
+               </initializer>
+</extension>
 </plugin>
 
