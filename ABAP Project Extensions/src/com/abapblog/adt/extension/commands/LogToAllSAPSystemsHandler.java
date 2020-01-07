@@ -25,7 +25,7 @@ import com.sap.adt.tools.core.project.AdtProjectServiceFactory;
 import com.abapblog.adt.extension.preferences.*;
 
 public class LogToAllSAPSystemsHandler extends AbstractHandler {
-	private static final String ADT_PROJECT_SAP_BW_NATURE = "com.sap.bw.nature";
+
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -33,25 +33,24 @@ public class LogToAllSAPSystemsHandler extends AbstractHandler {
 		IAdtLogonService logonService = AdtLogonServiceFactory.createLogonService();
 		IAdtLogonServiceUI logonServiceUI = AdtLogonServiceUIFactory.createLogonServiceUI();
 
-		logonToABAPProjects(logonService, logonServiceUI);
-		logonToBWProjects(logonService, logonServiceUI);
+		logonToAdtProjects(logonService, logonServiceUI);
 		return null;
 	}
 
-	private void logonToABAPProjects(IAdtLogonService logonService, IAdtLogonServiceUI logonServiceUI) {
-		for (IProject ABAPProject : AdtProjectServiceFactory.createProjectService().getAvailableAbapProjects()) {
+	private void logonToAdtProjects(IAdtLogonService logonService, IAdtLogonServiceUI logonServiceUI) {
+		for (IProject AdtProject : AdtProjectServiceFactory.createProjectService().getAvailableAdtCoreProjects()) {
 			try {
-				if (logonService.isLoggedOn(ABAPProject.getName()) == false) {
+				if (logonService.isLoggedOn(AdtProject.getName()) == false) {
 
-					if (LogonServiceFactory.create().checkCanLogonWithSecureStorage(ABAPProject)) {
+					if (LogonServiceFactory.create().checkCanLogonWithSecureStorage(AdtProject)) {
 						LogonWithJob logonWithJob = new LogonWithJob();
-						logonWithJob.logon(ABAPProject);
+						logonWithJob.logon(AdtProject);
 					} else if (doAutomaticLogonForAllSystems()) {
-						logonServiceUI.ensureLoggedOn((IAdaptable) ABAPProject);
+						logonServiceUI.ensureLoggedOn((IAdaptable) AdtProject);
 					}
 				} else {
 
-					logonServiceUI.ensureLoggedOn((IAdaptable) ABAPProject);
+					logonServiceUI.ensureLoggedOn((IAdaptable) AdtProject);
 
 				}
 			} catch (Exception e) {
@@ -70,40 +69,5 @@ public class LogToAllSAPSystemsHandler extends AbstractHandler {
 		}
 	}
 
-	private void logonToBWProjects(IAdtLogonService logonService, IAdtLogonServiceUI logonServiceUI) {
-		for (IProject BWProject : getBWModelProjects()) {
-			try {
-				if (logonService.isLoggedOn(BWProject.getName()) == false) {
-					if (LogonServiceFactory.create().checkCanLogonWithSecureStorage(BWProject)) {
-						LogonWithJob logonWithJob = new LogonWithJob();
-						logonWithJob.logon(BWProject);
-					} else if (doAutomaticLogonForAllSystems()) {
-						logonServiceUI.ensureLoggedOn((IAdaptable) BWProject);
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-		}
-	}
-
-	public static List<IProject> getBWModelProjects() {
-		List<IProject> projectList = new LinkedList<IProject>();
-
-		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		IProject[] projects = workspaceRoot.getProjects();
-		for (int i = 0; i < projects.length; i++) {
-			IProject project = projects[i];
-			try {
-				if (project.hasNature(ADT_PROJECT_SAP_BW_NATURE)) {
-					projectList.add(project);
-				}
-			} catch (CoreException ce) {
-				ce.printStackTrace();
-			}
-		}
-		return projectList;
-	}
 
 }

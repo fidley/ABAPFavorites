@@ -12,6 +12,7 @@
       </category>
       <view
             name="Passwords"
+            icon="icons/passwords.png"
             category="com.abapblog.adt.Passwords"
             class="com.abapblog.adt.extension.passwords.view.PasswordView"
             id="com.abapblog.adt.extension.passwords.Passwords">
@@ -48,10 +49,16 @@
                       <and>
                          <adapt
                                type="org.eclipse.core.resources.IProject">
+                            <or>
+                            <test
+                                  property="org.eclipse.core.resources.projectNature"
+                                  value="com.sap.adt.corenature">
+                            </test>
                             <test
                                   property="org.eclipse.core.resources.projectNature"
                                   value="com.sap.adt.abapnature">
-                            </test>
+                            </test>                            
+                            </or>         
                          </adapt>
                       </and>
                    </iterate>
@@ -87,10 +94,16 @@
                       <and>
                          <adapt
                                type="org.eclipse.core.resources.IProject">
+                            <or>
+                            <test
+                                  property="org.eclipse.core.resources.projectNature"
+                                  value="com.sap.adt.corenature">
+                            </test>
                             <test
                                   property="org.eclipse.core.resources.projectNature"
                                   value="com.sap.adt.abapnature">
-                            </test>
+                            </test>                            
+                            </or>                             
                          </adapt>
                       </and>
                    </iterate>
@@ -126,10 +139,16 @@
                       <and>
                          <adapt
                                type="org.eclipse.core.resources.IProject">
+                            <or>
+                            <test
+                                  property="org.eclipse.core.resources.projectNature"
+                                  value="com.sap.adt.corenature">
+                            </test>
                             <test
                                   property="org.eclipse.core.resources.projectNature"
                                   value="com.sap.adt.abapnature">
-                            </test>
+                            </test>                            
+                            </or>                                    
                          </adapt>
                       </and>
                    </iterate>
@@ -165,10 +184,16 @@
                       <and>
                          <adapt
                                type="org.eclipse.core.resources.IProject">
+                            <or>
+                            <test
+                                  property="org.eclipse.core.resources.projectNature"
+                                  value="com.sap.adt.corenature">
+                            </test>
                             <test
                                   property="org.eclipse.core.resources.projectNature"
                                   value="com.sap.adt.abapnature">
-                            </test>
+                            </test>                            
+                            </or>                                 
                          </adapt>
                       </and>
                    </iterate>
@@ -204,10 +229,16 @@
                       <and>
                          <adapt
                                type="org.eclipse.core.resources.IProject">
+                            <or>
+                            <test
+                                  property="org.eclipse.core.resources.projectNature"
+                                  value="com.sap.adt.corenature">
+                            </test>
                             <test
                                   property="org.eclipse.core.resources.projectNature"
                                   value="com.sap.adt.abapnature">
-                            </test>
+                            </test>                            
+                            </or>                                 
                          </adapt>
                       </and>
                    </iterate>

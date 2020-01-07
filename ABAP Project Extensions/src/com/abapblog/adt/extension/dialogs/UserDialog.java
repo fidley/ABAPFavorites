@@ -15,9 +15,11 @@ import org.eclipse.swt.layout.GridData;
 public class UserDialog extends Dialog {
 	private Text user;
 	private String userValue;
+	private Boolean newUser = false;
 
 	/**
 	 * Create the dialog.
+	 * 
 	 * @param parentShell
 	 */
 	public UserDialog(Shell parentShell) {
@@ -25,13 +27,24 @@ public class UserDialog extends Dialog {
 
 	}
 
-	   protected void configureShell(Shell shell) {
-		      super.configureShell(shell);
-		      shell.setText("Change User for project");
-		   }
+	public UserDialog(Shell parentShell, Boolean newUser) {
+		super(parentShell);
+		this.newUser = newUser;
+
+	}
+
+	protected void configureShell(Shell shell) {
+		super.configureShell(shell);
+		if (newUser == false) {
+			shell.setText("Change User for project");
+		} else {
+			shell.setText("Add new user for client");
+		}
+	}
 
 	/**
 	 * Create contents of the dialog.
+	 * 
 	 * @param parent
 	 */
 	@Override
@@ -46,21 +59,26 @@ public class UserDialog extends Dialog {
 		composite.setLayoutData(gd_composite);
 		composite.setLayout(new GridLayout(3, false));
 
-				Label lblNewLabel = new Label(composite, SWT.NONE);
-				lblNewLabel.setText("Change User");
-				new Label(composite, SWT.NONE);
+		Label lblNewLabel = new Label(composite, SWT.NONE);
+		if (newUser == false) {
+			lblNewLabel.setText("Change User");
+		} else {
+			lblNewLabel.setText("User");
+		}
+		new Label(composite, SWT.NONE);
 
-						user = new Text(composite, SWT.BORDER);
-						GridData gd_client = new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1);
-						gd_client.widthHint = 91;
-						user.setLayoutData(gd_client);
-						user.setTextLimit(12);
+		user = new Text(composite, SWT.BORDER);
+		GridData gd_client = new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1);
+		gd_client.widthHint = 91;
+		user.setLayoutData(gd_client);
+		user.setTextLimit(12);
 
 		return container;
 	}
 
 	/**
 	 * Create contents of the button bar.
+	 * 
 	 * @param parent
 	 */
 	@Override
@@ -85,6 +103,7 @@ public class UserDialog extends Dialog {
 		this.userValue = user;
 		this.user.setText(user);
 	}
+
 	@Override
 	protected void okPressed() {
 		userValue = user.getText();

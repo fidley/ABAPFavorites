@@ -1,11 +1,13 @@
 package com.abapblog.adt.extension.passwords.view;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.dialogs.FilteredTree;
@@ -21,6 +23,7 @@ import com.abapblog.adt.extension.passwords.tree.TreePatternFilter;
 public class PasswordView extends ViewPart {
 	private final String ID = "com.abapblog.adt.extension.passwords.view";
 	private Actions actions = new Actions();
+	private static TreeViewer viewer;
 	public void createPartControl(Composite parent) {
 		SecureStorage secureStorage = new SecureStorage();
 		secureStorage.createNodesForSAPProjects();
@@ -30,19 +33,20 @@ public class PasswordView extends ViewPart {
 				true);
 		final ColumnControlListener columnListener = new ColumnControlListener();
 		columnListener.setID(getID());
-		TreeViewer viewer = filteredTree.getViewer();
+		viewer = filteredTree.getViewer();
 		addDoubleClickAction(viewer);
 		Tree tree = viewer.getTree();
 		setTreeColumns(columnListener, tree);
 		viewer.setContentProvider(new ViewContentProvider(getViewSite()));
 		viewer.setInput(getViewSite());
 		viewer.setLabelProvider(new ViewLabelProvider());
+		hookContextMenu();
 		refreshViewer(viewer);
 		
 		
     }
 	
-	public void refreshViewer(final TreeViewer viewer) {
+	public static void refreshViewer(final TreeViewer viewer) {
 
 		if (viewer != null) {
 
@@ -84,6 +88,16 @@ public class PasswordView extends ViewPart {
 		loadColumnSettings(ColumnEncrypted);
 	}
 	
+	protected void hookContextMenu() {
+		final MenuManager menuMgr = new MenuManager("#PopupMenu");
+		menuMgr.setRemoveAllWhenShown(true);
+		ContextMenu contextMenu = new ContextMenu(viewer);
+		
+		menuMgr.addMenuListener(manager -> contextMenu.fillContextMenu(manager));
+		final Menu menu = menuMgr.createContextMenu(this.viewer.getControl());
+		this.viewer.getControl().setMenu(menu);
+		getSite().registerContextMenu(menuMgr, this.viewer);
+	}
 	protected void loadColumnSettings(final TreeColumn Column) {
 		final IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(getID());
 		Column.setWidth(prefs.getInt("column_width" + Column.getText(), 300));

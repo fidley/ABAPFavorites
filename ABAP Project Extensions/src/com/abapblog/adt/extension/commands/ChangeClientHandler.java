@@ -14,6 +14,7 @@ import org.eclipse.ui.PlatformUI;
 import com.abapblog.adt.extension.dialogs.ClientDialog;
 import com.sap.adt.destinations.model.IDestinationData;
 import com.sap.adt.destinations.model.IDestinationDataWritable;
+import com.sap.adt.project.IAdtCoreProject;
 import com.sap.adt.tools.core.project.IAbapProject;
 
 public class ChangeClientHandler extends AbstractHandler {
@@ -29,16 +30,16 @@ public class ChangeClientHandler extends AbstractHandler {
 			if (firstElement instanceof IAdaptable) {
 
 				IProject project = (IProject) ((IAdaptable) firstElement).getAdapter(IProject.class);
-				IAbapProject ABAPProject = project.getAdapter(IAbapProject.class);
+				IAdtCoreProject AdtProject = project.getAdapter(IAdtCoreProject.class);
 
-				IDestinationData DestinationData = ABAPProject.getDestinationData();
+				IDestinationData DestinationData = AdtProject.getDestinationData();
 				IDestinationDataWritable DestinationDataWritable = DestinationData.getWritable();
 				ClientDialog ClientDialog = new ClientDialog(null);
 				if (ClientDialog.open() == Dialog.OK) {
 					String client = ClientDialog.getClient();
 					DestinationDataWritable.setClient(client);
 					IDestinationData newDestinationData = DestinationDataWritable.getReadOnlyClone();
-					ABAPProject.setDestinationData(newDestinationData);
+					AdtProject.setDestinationData(newDestinationData);
 
 					try {
 						project.close(null);

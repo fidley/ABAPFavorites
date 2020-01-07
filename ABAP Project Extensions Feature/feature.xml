@@ -2,12 +2,16 @@
 <feature
       id="com.abapblog.adt.extension.feature"
       label="ADT Extensions - Commands"
-      version="1.0.1.qualifier"
+      version="1.0.3.qualifier"
       provider-name="ABAPBlog.com">
 
    <description url="http://abapblog.com">
       Additional features for ADT plugin, like changing user, client and language of the project.
    </description>
+
+   <copyright>
+      Icons on a base of Fontawesome Icons https://fontawesome.com/license
+   </copyright>
 
    <license url="https://www.apache.org/licenses/LICENSE-2.0">
       TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION

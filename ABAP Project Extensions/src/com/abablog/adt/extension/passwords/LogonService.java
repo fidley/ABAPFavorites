@@ -1,11 +1,10 @@
 package com.abablog.adt.extension.passwords;
 
 import org.eclipse.core.resources.IProject;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.window.Window;
 
-import com.abapblog.adt.extension.dialogs.UserDialog;
 import com.sap.adt.destinations.logon.AdtLogonServiceFactory;
 import com.sap.adt.destinations.logon.IAdtLogonService;
 import com.sap.adt.destinations.model.IAuthenticationToken;
@@ -14,7 +13,7 @@ import com.sap.adt.destinations.model.IDestinationDataWritable;
 import com.sap.adt.destinations.model.internal.AuthenticationToken;
 import com.sap.adt.destinations.ui.logon.AdtLogonServiceUIFactory;
 import com.sap.adt.destinations.ui.logon.IAdtLogonServiceUI;
-import com.sap.adt.tools.core.project.IAbapProject;
+import com.sap.adt.project.IAdtCoreProject;
 
 public class LogonService implements ILogonService {
 	private SecureStorage secureStorage;
@@ -39,8 +38,8 @@ public class LogonService implements ILogonService {
 	@Override
 	public void LogonToProject(IProject project) {
 		if (checkCanLogonWithSecureStorage(project)) {
-			IAbapProject ABAPProject = project.getAdapter(IAbapProject.class);
-			IDestinationData DestinationData = ABAPProject.getDestinationData();
+			IAdtCoreProject AdtProject = project.getAdapter(IAdtCoreProject.class);
+			IDestinationData DestinationData = AdtProject.getDestinationData();
 			IAuthenticationToken AuthenticationToken = new AuthenticationToken();
 			AuthenticationToken.setPassword(secureStorage.getPassword(project));
 			adtLogonService.ensureLoggedOn(DestinationData, AuthenticationToken, new NullProgressMonitor());
@@ -54,8 +53,9 @@ public class LogonService implements ILogonService {
 		if (user == "" && client == "") {
 			LogonToProject(project);
 		} else {
-			IAbapProject ABAPProject = project.getAdapter(IAbapProject.class);
-			IDestinationData DestinationData = ABAPProject.getDestinationData();
+
+			IAdtCoreProject AdtProject = project.getAdapter(IAdtCoreProject.class);
+			IDestinationData DestinationData = AdtProject.getDestinationData();
 			IDestinationDataWritable DestinationDataWritable = DestinationData.getWritable();
 			if (user != "")
 				DestinationDataWritable.setUser(user);
@@ -69,6 +69,10 @@ public class LogonService implements ILogonService {
 		}
 	}
 
+	public Boolean isAlreadyLoggedOn(IProject project) {
+		return adtLogonService.isLoggedOn(project.getName());
+	}
+
 	@Override
 	public Boolean checkCanLogonWithSecureStorage(IProject project, String user, String client) {
 		if (user == "" && client == "") {
@@ -80,6 +84,12 @@ public class LogonService implements ILogonService {
 				return true;
 			}
 		}
+	}
+
+	public String getUserForProject(IProject project) {
+		IAdtCoreProject AdtProject = project.getAdapter(IAdtCoreProject.class);
+		IDestinationData DestinationData = AdtProject.getDestinationData();
+		return DestinationData.getUser();
 	}
 
 }

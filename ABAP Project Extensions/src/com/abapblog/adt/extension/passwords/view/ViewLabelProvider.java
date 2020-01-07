@@ -8,12 +8,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import com.abapblog.adt.extension.icons.Icons;
 import com.abapblog.adt.extension.passwords.tree.TreeObject;
 import com.abapblog.adt.extension.passwords.tree.TreeParent;
 
 
 public class ViewLabelProvider implements ITableLabelProvider {
-
+	private Icons icons = new Icons();
 	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
 		switch (columnIndex) {
@@ -30,7 +31,7 @@ public class ViewLabelProvider implements ITableLabelProvider {
 				} 
 				}
 			if (element instanceof TreeObject) {
-				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
+				return icons.getIcon(Icons.ICON_USER_NODE);
 				}
 
 			return PlatformUI.getWorkbench().getSharedImages().getImage(imageKey);

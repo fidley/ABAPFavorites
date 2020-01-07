@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ABAP Project Extensions
 Bundle-SymbolicName: com.abapblog.adt.extension;singleton:=true
-Bundle-Version: 1.0.1.qualifier
+Bundle-Version: 1.0.3.qualifier
 Bundle-Activator: com.abapblog.adt.extension.Activator
 Bundle-Vendor: ABAPblog.com
 Require-Bundle: org.eclipse.ui,

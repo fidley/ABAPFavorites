@@ -8,7 +8,8 @@ public interface ILogonService {
 	public Boolean checkCanLogonWithSecureStorage(IProject project,String user, String client);
 	public void LogonToProject(IProject project);
 	public void LogonToProject(IProject project, String user, String client);
-	
+	public String getUserForProject(IProject project);
+	public Boolean isAlreadyLoggedOn(IProject project);
 	
 	
 }

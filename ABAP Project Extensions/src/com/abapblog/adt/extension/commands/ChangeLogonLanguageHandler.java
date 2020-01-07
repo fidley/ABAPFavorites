@@ -15,6 +15,7 @@ import org.eclipse.ui.PlatformUI;
 import com.abapblog.adt.extension.dialogs.LanguageDialog;
 import com.sap.adt.destinations.model.IDestinationData;
 import com.sap.adt.destinations.model.IDestinationDataWritable;
+import com.sap.adt.project.IAdtCoreProject;
 import com.sap.adt.tools.core.project.IAbapProject;
 
 public class ChangeLogonLanguageHandler extends AbstractHandler {
@@ -29,16 +30,16 @@ public class ChangeLogonLanguageHandler extends AbstractHandler {
 			if (firstElement instanceof IAdaptable) {
 
 				IProject project = (IProject) ((IAdaptable) firstElement).getAdapter(IProject.class);
-				IAbapProject ABAPProject = project.getAdapter(IAbapProject.class);
+				IAdtCoreProject AdtProject = project.getAdapter(IAdtCoreProject.class);
 
-				IDestinationData DestinationData = ABAPProject.getDestinationData();
+				IDestinationData DestinationData = AdtProject.getDestinationData();
 				IDestinationDataWritable DestinationDataWritable = DestinationData.getWritable();
 				LanguageDialog LanguageDialog = new LanguageDialog(null);
 				LanguageDialog.create();
 				if (LanguageDialog.open() == Window.OK) {
 					DestinationDataWritable.setLanguage(LanguageDialog.getLanguage());
 					IDestinationData newDestinationData = DestinationDataWritable.getReadOnlyClone();
-					ABAPProject.setDestinationData(newDestinationData);
+					AdtProject.setDestinationData(newDestinationData);
 
 					try {
 						project.close(null);

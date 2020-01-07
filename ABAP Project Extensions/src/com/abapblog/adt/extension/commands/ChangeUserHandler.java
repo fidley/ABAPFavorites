@@ -14,6 +14,7 @@ import org.eclipse.ui.PlatformUI;
 import com.abapblog.adt.extension.dialogs.UserDialog;
 import com.sap.adt.destinations.model.IDestinationData;
 import com.sap.adt.destinations.model.IDestinationDataWritable;
+import com.sap.adt.project.IAdtCoreProject;
 import com.sap.adt.tools.core.project.IAbapProject;
 public class ChangeUserHandler extends AbstractHandler {
 
@@ -28,16 +29,16 @@ public class ChangeUserHandler extends AbstractHandler {
 			if (firstElement instanceof IAdaptable) {
 
 				IProject project = (IProject) ((IAdaptable) firstElement).getAdapter(IProject.class);
-				IAbapProject ABAPProject = project.getAdapter(IAbapProject.class);
+				IAdtCoreProject AdtProject = project.getAdapter(IAdtCoreProject.class);
 
-				IDestinationData DestinationData = ABAPProject.getDestinationData();
+				IDestinationData DestinationData = AdtProject.getDestinationData();
 				IDestinationDataWritable DestinationDataWritable = DestinationData.getWritable();
 				UserDialog UserDialog = new UserDialog(null);
 				UserDialog.create();
 				if (UserDialog.open() == Window.OK) {
 					DestinationDataWritable.setUser(UserDialog.getUser());
 					IDestinationData newDestinationData = DestinationDataWritable.getReadOnlyClone();
-					ABAPProject.setDestinationData(newDestinationData);
+					AdtProject.setDestinationData(newDestinationData);
 
 					try {
 						project.close(null);
