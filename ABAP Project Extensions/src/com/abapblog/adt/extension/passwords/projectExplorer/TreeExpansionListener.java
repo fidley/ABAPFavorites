@@ -24,7 +24,8 @@ public class TreeExpansionListener implements ITreeViewerListener {
 				IAdtCoreProject AdtProject = project.getAdapter(IAdtCoreProject.class);
 				if (AdtProject != null) {
 					ILogonService logonService = LogonServiceFactory.create();
-					logonService.LogonToProject(project);
+					if (logonService.checkCanLogonWithSecureStorage(project))
+						logonService.LogonToProject(project);
 				}
 
 			} catch (Exception e) {
