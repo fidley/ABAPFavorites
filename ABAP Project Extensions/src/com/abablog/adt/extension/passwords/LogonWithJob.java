@@ -14,7 +14,12 @@ public class LogonWithJob {
 			protected IStatus run(IProgressMonitor monitor) {
 				ILogonService logonService = LogonServiceFactory.create();
 				if (logonService.checkCanLogonWithSecureStorage(project)) {
-					logonService.LogonToProject(project);
+					try {
+						logonService.LogonToProject(project);
+					} catch (NullPointerException e) {
+						System.out.print("NullPointerException caught");
+					}
+
 					return Status.OK_STATUS;
 				} else {
 					return Status.CANCEL_STATUS;
@@ -32,7 +37,11 @@ public class LogonWithJob {
 			protected IStatus run(IProgressMonitor monitor) {
 				ILogonService logonService = LogonServiceFactory.create();
 				if (logonService.checkCanLogonWithSecureStorage(project, user, client)) {
+					try {
 					logonService.LogonToProject(project, user, client);
+					} catch (NullPointerException e) {
+						System.out.print("NullPointerException caught");
+					}
 					return Status.OK_STATUS;
 				} else {
 					return Status.CANCEL_STATUS;

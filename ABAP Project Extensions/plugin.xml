@@ -320,5 +320,18 @@
                      class="com.abapblog.adt.extension.preferences.PreferenceInitializer">
                </initializer>
 </extension>
+  <extension
+       point="org.eclipse.ui.navigator.navigatorContent">
+    <actionProvider
+          class="com.abapblog.adt.extension.passwords.projectExplorer.ActionProvider"
+          id="org.eclipse.ui.navigator.resources.actions.OpenActions">
+       <enablement>
+             <or>         
+                <instanceof 
+                        value="org.eclipse.core.resources.IResource" /> 
+             </or>    
+          </enablement>    
+    </actionProvider>
+ </extension>
 </plugin>
 

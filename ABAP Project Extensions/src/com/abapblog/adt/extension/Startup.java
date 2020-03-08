@@ -11,6 +11,7 @@ public class Startup implements IStartup {
 
 	@Override
 	public void earlyStartup() {
+		
 		LogToAllSAPSystemsHandler logToAllSystems = new LogToAllSAPSystemsHandler();
 		try {
 			if (Activator.getDefault().getPreferenceStore()
@@ -22,5 +23,4 @@ public class Startup implements IStartup {
 		}
 
 	}
-
 }

@@ -49,7 +49,7 @@ public class ChangePasswordDialog extends Dialog {
 		Composite composite = new Composite(container, SWT.NONE);
 		GridData gd_composite = new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1);
 		gd_composite.widthHint = 285;
-		gd_composite.heightHint = 60;
+		gd_composite.heightHint = 90;
 		composite.setLayoutData(gd_composite);
 		composite.setLayout(new GridLayout(3, false));
 
@@ -85,7 +85,7 @@ public class ChangePasswordDialog extends Dialog {
 	 */
 	@Override
 	protected Point getInitialSize() {
-		return new Point(313, 175);
+		return new Point(313, 200);
 	}
 
 	public String getPassword() {

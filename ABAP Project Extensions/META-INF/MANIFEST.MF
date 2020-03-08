@@ -11,7 +11,9 @@ Require-Bundle: org.eclipse.ui,
  com.sap.adt.tools.core.base,
  com.sap.adt.destinations;bundle-version="2.102.2",
  com.sap.adt.destinations.ui;bundle-version="2.102.2",
- org.eclipse.equinox.security
+ org.eclipse.equinox.security,
+ org.eclipse.ui.navigator,
+ org.eclipse.text
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: com.abapblog.adt.extension
 Bundle-ActivationPolicy: lazy
