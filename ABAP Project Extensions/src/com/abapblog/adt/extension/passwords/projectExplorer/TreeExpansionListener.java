@@ -10,16 +10,16 @@ import com.sap.adt.project.IAdtCoreProject;
 public class TreeExpansionListener implements ITreeViewerListener {
 
 	@Override
-	public void treeCollapsed(org.eclipse.jface.viewers.TreeExpansionEvent arg0) {
+	public void treeCollapsed(org.eclipse.jface.viewers.TreeExpansionEvent collapseEvent) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void treeExpanded(org.eclipse.jface.viewers.TreeExpansionEvent arg0) {
+	public void treeExpanded(org.eclipse.jface.viewers.TreeExpansionEvent expansionEvent) {
 		// TODO Auto-generated method stub
-		if (arg0.getElement() instanceof IProject) {
-			IProject project = (IProject) arg0.getElement();
+		if (expansionEvent.getElement() instanceof IProject) {
+			IProject project = (IProject) expansionEvent.getElement();
 			try {
 				IAdtCoreProject AdtProject = project.getAdapter(IAdtCoreProject.class);
 				if (AdtProject != null) {
