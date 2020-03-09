@@ -11,5 +11,7 @@ public interface ILogonService {
 	public String getUserForProject(IProject project);
 	public Boolean isAlreadyLoggedOn(IProject project);
 	
+	public Boolean isAdtProject(IProject project);
+	
 	
 }

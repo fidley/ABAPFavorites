@@ -322,9 +322,48 @@
 </extension>
   <extension
        point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            appearsBefore="com.sap.adt.semanticfs.packageContent"
+            contentProvider="com.abapblog.adt.extension.passwords.projectExplorer.ContentProvider"
+            icon="icons/obj/package_obj.png"
+            id="com.abapblog.adt.extensions.NavigatorContent"
+            labelProvider="com.abapblog.adt.extension.passwords.projectExplorer.LabelProvider"
+            name="%navigatorContent.packages"
+            activeByDefault="true"
+            priority="highest">    
+ 		    <triggerPoints>
+            <or>
+               <instanceof
+                     value="com.sap.adt.projectexplorer.ui.internal.node.AbapRepositoryPackageNode">
+               </instanceof>
+               <instanceof
+                     value="com.sap.adt.projectexplorer.ui.internal.node.AbapSystemLibraryNode">
+               </instanceof>
+               <and>
+                  <instanceof
+                        value="org.eclipse.core.resources.IProject">
+                  </instanceof>
+               </and>
+            </or>
+         </triggerPoints>
+         <possibleChildren>
+            <or>
+               <instanceof
+                     value="com.sap.adt.projectexplorer.ui.node.IAbapRepositoryBaseNode">
+               </instanceof>
+               <instanceof
+                     value="com.sap.adt.projectexplorer.ui.internal.node.AbapRepositoryPackageNode">
+               </instanceof>
+               <instanceof
+                     value="com.sap.adt.projectexplorer.ui.internal.node.AbapFavoritePackagesNode">
+               </instanceof>
+            </or>
+         </possibleChildren>
+	   </navigatorContent>            
     <actionProvider
           class="com.abapblog.adt.extension.passwords.projectExplorer.ActionProvider"
-          id="org.eclipse.ui.navigator.resources.actions.OpenActions">
+          id="org.eclipse.ui.navigator.resources.actions.OpenActions"
+          priority="highest">
        <enablement>
              <or>         
                 <instanceof 
@@ -333,5 +372,18 @@
           </enablement>    
     </actionProvider>
  </extension>
+ 
+  <extension
+         id="com.abapblog.adt.extensions.passwords.ProjectExplorer"
+         point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+         <includes>
+            <contentExtension
+                  isRoot="false"
+                  pattern="com.abapblog.adt.extensions.NavigatorContent">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+   </extension>
 </plugin>
 
