@@ -33,7 +33,7 @@ public class ChangePasswordDialog extends Dialog {
 
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
-		shell.setText("Change password");
+		shell.setText("Create/Change Password");
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class ChangePasswordDialog extends Dialog {
 		composite.setLayout(new GridLayout(3, false));
 
 		Label lblNewLabel = new Label(composite, SWT.NONE);
-		lblNewLabel.setText("Change Password");
+		lblNewLabel.setText("Create/Change Password");
 		new Label(composite, SWT.NONE);
 
 		password = new Text(composite, SWT.BORDER);

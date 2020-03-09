@@ -13,6 +13,8 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	private final IPreferenceStore store;
 	private Boolean doAutomaticLogonAtStart = false;
 	private Boolean AutomaticLogonOnlyForStoredPasswords = false;
+	private Boolean doAutomaticLogonAtExpandOfProject = false;
+	private Boolean askForPasswordAtProjectCreation = false;
 
 	public Preferences() {
 		super(GRID);
@@ -27,6 +29,10 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 				"&Logon Automatically at Eclipse Start?", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(PreferenceConstants.AutomaticLogonOnlyForStoredPasswords,
 				"&Logon Automatically only to Systems with stored password?", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PreferenceConstants.doAutomaticLogonAtExpandOfProject,
+				"&Logon Automatically at expand of the project?", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PreferenceConstants.askForPasswordAtProjectCreation,
+				"&Ask for password to be stored at creation of new project?", getFieldEditorParent()));		
 
 	}
 
@@ -35,6 +41,10 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		this.doAutomaticLogonAtStart = this.store.getBoolean(PreferenceConstants.doAutomaticLogonAtStart);
 		this.AutomaticLogonOnlyForStoredPasswords = this.store
 				.getBoolean(PreferenceConstants.AutomaticLogonOnlyForStoredPasswords);
+		this.askForPasswordAtProjectCreation = this.store
+				.getBoolean(PreferenceConstants.askForPasswordAtProjectCreation);
+		this.doAutomaticLogonAtExpandOfProject = this.store
+				.getBoolean(PreferenceConstants.doAutomaticLogonAtExpandOfProject);		
 	}
 
 	@Override

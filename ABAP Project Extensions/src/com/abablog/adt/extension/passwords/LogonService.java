@@ -107,6 +107,7 @@ public class LogonService implements ILogonService {
 		IDestinationData DestinationData = AdtProject.getDestinationData();
 		return DestinationData.getUser();
 	}
+	
 
 	@Override
 	public Boolean isAdtProject(IProject project) {
@@ -120,6 +121,18 @@ public class LogonService implements ILogonService {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+
+	@Override
+	public String getProjectName(IProject project) {
+		return project.getName();
+	}
+
+	@Override
+	public String getClientForProject(IProject project) {
+		IAdtCoreProject AdtProject = project.getAdapter(IAdtCoreProject.class);
+		IDestinationData DestinationData = AdtProject.getDestinationData();
+		return DestinationData.getClient();
 	}
 
 }

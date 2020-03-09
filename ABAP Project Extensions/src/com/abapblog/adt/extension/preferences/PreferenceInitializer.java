@@ -13,6 +13,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		store.setDefault(PreferenceConstants.doAutomaticLogonAtStart, true);
 		store.setDefault(PreferenceConstants.AutomaticLogonOnlyForStoredPasswords, true);
+		store.setDefault(PreferenceConstants.doAutomaticLogonAtExpandOfProject, true);
+		store.setDefault(PreferenceConstants.askForPasswordAtProjectCreation, true);
 
 	}
 

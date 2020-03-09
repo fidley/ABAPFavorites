@@ -360,17 +360,6 @@
             </or>
          </possibleChildren>
 	   </navigatorContent>            
-    <actionProvider
-          class="com.abapblog.adt.extension.passwords.projectExplorer.ActionProvider"
-          id="org.eclipse.ui.navigator.resources.actions.OpenActions"
-          priority="highest">
-       <enablement>
-             <or>         
-                <instanceof 
-                        value="org.eclipse.core.resources.IResource" /> 
-             </or>    
-          </enablement>    
-    </actionProvider>
  </extension>
  
   <extension

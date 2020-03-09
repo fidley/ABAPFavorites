@@ -60,6 +60,21 @@ public class PasswordView extends ViewPart {
 			viewer.refresh();
 		}
 	}
+	
+	public static void refreshViewer() {
+
+		if (viewer != null) {
+
+			final Object ContentProvider = viewer.getContentProvider();
+			try {
+				final java.lang.reflect.Method initialize = ContentProvider.getClass().getMethod("initialize");
+				initialize.invoke(ContentProvider);
+			} catch (final Exception e) {
+
+			}
+			viewer.refresh();
+		}
+	}
  
     /**
      * Passing the focus request to the viewer's control.

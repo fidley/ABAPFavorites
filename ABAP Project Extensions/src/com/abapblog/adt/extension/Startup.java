@@ -15,8 +15,12 @@ public class Startup implements IStartup {
 	@Override
 	public void earlyStartup() {
 		
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		workspace.addResourceChangeListener(new ProjectListener());
+		addProjectListener();
+		logonToAllAdtSystems();
+
+	}
+
+	private void logonToAllAdtSystems() {
 		LogToAllSAPSystemsHandler logToAllSystems = new LogToAllSAPSystemsHandler();
 		try {
 			if (Activator.getDefault().getPreferenceStore()
@@ -26,6 +30,10 @@ public class Startup implements IStartup {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
 
+	private void addProjectListener() {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		workspace.addResourceChangeListener(new ProjectListener());
 	}
 }
