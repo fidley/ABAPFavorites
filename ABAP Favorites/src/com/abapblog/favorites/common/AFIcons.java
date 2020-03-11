@@ -37,6 +37,9 @@ public class AFIcons {
 		return getIcon("url.png");
 	}
 
+	public Image getPackageIcon() {
+		return getIcon("package.png");
+	}
 	public Image getProgramIcon() {
 		return getIcon("program.png");
 	}
@@ -179,6 +182,10 @@ public class AFIcons {
 	
 	public ImageDescriptor getCopyToClipboardImgDescr() {
 		return getImageDescriptor("clipboard.png");
+	}
+	
+	public ImageDescriptor getPackageIconImgDescr() {
+		return getImageDescriptor("package.png");
 	}
 
 }

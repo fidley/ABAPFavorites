@@ -346,6 +346,9 @@ public class XMLhandler {
 		if (nodeName.equals(TypeOfXMLNode.AMDPNode.toString())) {
 			return TypeOfEntry.AMDP;
 		}
+		if (nodeName.equals(TypeOfXMLNode.Package.toString())) {
+			return TypeOfEntry.Package;
+		}		
 		return null;
 	}
 
@@ -444,6 +447,8 @@ public class XMLhandler {
 			return TypeOfXMLNode.CDSViewNode;
 		case AMDP:
 			return TypeOfXMLNode.AMDPNode;
+		case Package:
+			return TypeOfXMLNode.Package;			
 		default:
 			return TypeOfXMLNode.programNode;
 		}

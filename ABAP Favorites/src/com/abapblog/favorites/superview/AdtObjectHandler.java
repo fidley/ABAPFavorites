@@ -178,7 +178,7 @@ public class AdtObjectHandler {
 			return null;
 		}
 		for (final IAdtObjectReference ref : res) {
-			if (Common.checkType(ref.getType(), type)) {
+			if (Common.isSAPTypeHandled(ref.getType(), type)) {
 				final Pattern regexPatern = Pattern.compile("^\\S*");
 				final Matcher regexMatch = regexPatern.matcher(ref.getName());
 				while (regexMatch.find()) {

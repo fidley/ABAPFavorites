@@ -180,102 +180,62 @@ public class Common {
 			return "ADT Link";
 		case CDSView:
 			return "CDS View";
+		case Package:
+			return "Package";			
 		default:
 			return "object";
 		}
 
 	}
 
-	public static boolean checkType(String sapType, TypeOfEntry type) {
+	public static boolean isSAPTypeHandled(String sapType, TypeOfEntry type) {
 
-		if (sapType.equals(TypeOfObject.classType.toString()) && type == TypeOfEntry.Class) {
+		if (sapType.equals(TypeOfObject.classType.toString()) && type == TypeOfEntry.Class)
 			return true;
-		}
 
-		if (sapType.equals(TypeOfObject.interfaceType.toString()) && type == TypeOfEntry.Interface) {
+		if (sapType.equals(TypeOfObject.interfaceType.toString()) && type == TypeOfEntry.Interface)
 			return true;
-		}
 
-		if (sapType.equals(TypeOfObject.FunctionGroupIncludeType.toString()) && type == TypeOfEntry.Program) {
+		if (sapType.equals(TypeOfObject.FunctionGroupIncludeType.toString()) && type == TypeOfEntry.Program)
 			return true;
-		}
-		if (sapType.equals(TypeOfObject.FunctionGroupType.toString()) && type == TypeOfEntry.FunctionGroup) {
-			return true;
-		}
 
-		if (sapType.equals(TypeOfObject.FunctionModuleType.toString()) && type == TypeOfEntry.FunctionModule) {
+		if (sapType.equals(TypeOfObject.FunctionGroupType.toString()) && type == TypeOfEntry.FunctionGroup)
 			return true;
-		}
+
+		if (sapType.equals(TypeOfObject.FunctionModuleType.toString()) && type == TypeOfEntry.FunctionModule)
+			return true;
 
 		//if (sapType.equals(TypeOfObject.FunctionModuleRFCType.toString()) && type == TypeOfEntry.FunctionModule) {
 		//	return true;
 		//}
 
 
-		if (sapType.equals(TypeOfObject.includeType.toString()) && type == TypeOfEntry.Program) {
+		if (sapType.equals(TypeOfObject.includeType.toString()) && type == TypeOfEntry.Program)
 			return true;
-		}
 
-		if (sapType.equals(TypeOfObject.programType.toString()) && type == TypeOfEntry.Program) {
+		if (sapType.equals(TypeOfObject.programType.toString()) && type == TypeOfEntry.Program)
 			return true;
-		}
 
-		if (sapType.equals(TypeOfObject.ViewType.toString()) && type == TypeOfEntry.View) {
+		if (sapType.equals(TypeOfObject.ViewType.toString()) && type == TypeOfEntry.View)
 			return true;
-		}
 
-		if (sapType.equals(TypeOfObject.TableType.toString()) && type == TypeOfEntry.Table) {
+		if (sapType.equals(TypeOfObject.TableType.toString()) && type == TypeOfEntry.Table)
 			return true;
-		}
 
-		if (sapType.equals(TypeOfObject.MessageClassType.toString()) && type == TypeOfEntry.MessageClass) {
+		if (sapType.equals(TypeOfObject.MessageClassType.toString()) && type == TypeOfEntry.MessageClass)
 			return true;
-		}
 
-		if (sapType.equals(TypeOfObject.SearchHelpType.toString()) && type == TypeOfEntry.SearchHelp) {
+		if (sapType.equals(TypeOfObject.SearchHelpType.toString()) && type == TypeOfEntry.SearchHelp)
 			return true;
-		}
 
-		if (sapType.equals(TypeOfObject.CDSViewType.toString()) && type == TypeOfEntry.CDSView) {
+		if (sapType.equals(TypeOfObject.CDSViewType.toString()) && type == TypeOfEntry.CDSView)
 			return true;
-		}
 
-		if (sapType.equals(TypeOfObject.AMDPType.toString()) && type == TypeOfEntry.AMDP) {
+		if (sapType.equals(TypeOfObject.AMDPType.toString()) && type == TypeOfEntry.AMDP)
 			return true;
-		}
-
+		if (sapType.equals(TypeOfObject.PackageType.toString()) && type == TypeOfEntry.Package)
+			return true;
 		return false;
-	}
-
-	public static void logonToAllSAPs() {
-		IAdtLogonService logonService = AdtLogonServiceFactory.createLogonService();
-		IAdtLogonServiceUI logonServiceUI = AdtLogonServiceUIFactory.createLogonServiceUI();
-		for (IProject ABAPProject : Common.getABAPProjects()) {
-			try {
-				if (logonService.isLoggedOn(ABAPProject.getName()) == false) {
-
-					logonServiceUI.ensureLoggedOn((IAdaptable) ABAPProject);
-				} else {
-
-					logonServiceUI.ensureLoggedOn((IAdaptable) ABAPProject);
-
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-		}
-
-		for (IProject BWProject : Common.getBWModelProjects()) {
-			try {
-				if (logonService.isLoggedOn(BWProject.getName()) == false) {
-					logonServiceUI.ensureLoggedOn((IAdaptable) BWProject);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-		}
 	}
 
 	@SuppressWarnings("restriction")
@@ -287,7 +247,7 @@ public class Common {
 			List<IAdtObjectReference> res = AdtRisQuickSearchFactory
 					.createQuickSearch(project, new NullProgressMonitor()).execute(objectName, 10, false, false, null);
 			for (IAdtObjectReference ref : res) {
-				if (Common.checkType(ref.getType(), type)) {
+				if (Common.isSAPTypeHandled(ref.getType(), type)) {
 
 					Pattern regexPatern = Pattern.compile("^\\S*");
 					Matcher regexMatch = regexPatern.matcher(ref.getName());
