@@ -1,7 +1,6 @@
 package com.abapblog.favorites.superview;
 
 import java.awt.Toolkit;
-
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.util.Iterator;
@@ -24,6 +23,7 @@ import com.abapblog.favorites.Activator;
 import com.abapblog.favorites.common.AFIcons;
 import com.abapblog.favorites.common.Common;
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
+import com.abapblog.favorites.common.NameSorting;
 import com.abapblog.favorites.dialog.FolderDialog;
 import com.abapblog.favorites.dialog.NameDialog;
 import com.abapblog.favorites.dialog.URLDialog;
@@ -59,6 +59,8 @@ public class Actions {
 	public Action actImportFavorites;
 	public ITreeNodeAction actDoubleClick;
 	public Action actCopyToClipboard;
+	public Action sortObjectByName;
+	public Action sortObjectByDescription;
 
 	public void makeActions(final Superview superview) {
 		final AFIcons AFIcon = new AFIcons();
@@ -86,6 +88,34 @@ public class Actions {
 		createImportFavoritesAction(superview.viewer);
 		createCopyToClipboardAction(superview.viewer, AFIcon);
 		createAddPackageAction(superview.viewer, AFIcon);
+		createSortObjectByName(superview, AFIcon);
+		createSortObjectByDescription(superview, AFIcon);
+	}
+
+	private void createSortObjectByDescription(Superview superView, AFIcons aFIcon) {
+		this.sortObjectByDescription = new Action() {
+			@Override
+			public void run() {
+				superView.setSortingTypeOfObjects(NameSorting.objectDescription.toString());
+				superView.sortTable();
+				Superview.refreshViewer(superView.viewer);
+			}
+
+		};
+		this.sortObjectByDescription.setText("Sort by Description");
+	}
+
+	private void createSortObjectByName(Superview superView, AFIcons aFIcon) {
+		this.sortObjectByName = new Action() {
+			@Override
+			public void run() {
+				superView.setSortingTypeOfObjects(NameSorting.objectName.toString());
+				superView.sortTable();
+				Superview.refreshViewer(superView.viewer);
+			}
+
+		};
+		this.sortObjectByName.setText("Sort by Name");
 	}
 
 	private void createAddFolderAction(final Superview superview) {
@@ -384,7 +414,7 @@ public class Actions {
 		this.actAddProgram.setToolTipText("Program");
 		this.actAddProgram.setImageDescriptor(AFIcon.getProgramIconImgDescr());
 	}
-	
+
 	private void createAddPackageAction(final TreeViewer viewer, final AFIcons AFIcon) {
 		this.actAddPackage = new Action() {
 			@Override
