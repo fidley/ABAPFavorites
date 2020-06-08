@@ -2,8 +2,9 @@
 <feature
       id="ABAP_Favorites_Feature_Project"
       label="ABAP Favorites"
-      version="1.0.57.qualifier"
-      provider-name="ABAPBlog.com">
+      version="1.0.60.qualifier"
+      provider-name="ABAPBlog.com"
+      plugin="com.abapblog.branding">
 
    <description>
       ABAP Favorites - additional views for creating and keeping favorite transactions and object lists.

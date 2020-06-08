@@ -68,6 +68,7 @@ import com.abapblog.favorites.common.Common;
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLAttr;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
+import com.abapblog.favorites.common.NameSorting;
 import com.abapblog.favorites.preferences.PreferenceConstants;
 import com.abapblog.favorites.tree.ColumnControlListener;
 import com.abapblog.favorites.tree.TreeExpansionListener;
@@ -79,6 +80,12 @@ import com.sap.adt.project.ui.util.ProjectUtil;
 import com.sap.adt.tools.core.AdtObjectReference;
 
 public abstract class Superview extends ViewPart implements ILinkedWithEditorView, IFavorites {
+	private static final String EXPANDED_NODES = "expanded_nodes";
+	private static final String LINKED_PROJECT = "linked_project";
+	private static final String LINKING_ACTIVE = "linking_active";
+	private static final String COLUMN_WIDTH = "column_width";
+	private static final String OBJECT_SORT = "object_sort";
+
 	@Override
 	public void dispose() {
 		getSite().getPage().removePartListener(this.linkWithEditorPartListener);
@@ -91,6 +98,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 	protected IPartListener2 linkWithEditorPartListener = new LinkWithEditorPartListener(this);
 	protected Action linkWithEditorAction;
 	private boolean linkingActive = true;
+	private NameSorting objectSorting = NameSorting.objectName;
 	public TreeViewer viewer;
 	protected Common Utils;
 	protected DrillDownAdapter drillDownAdapter;
@@ -155,14 +163,15 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 	public static void savePluginSettings(final IFavorites Favorite) {
 		final IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(Favorite.getID());
 
-		prefs.putBoolean("linking_active", Favorite.isLinkingActive());
-		prefs.put("linked_project", Favorite.getLinkedEditorProject());
+		prefs.putBoolean(LINKING_ACTIVE, Favorite.isLinkingActive());
+		prefs.put(LINKED_PROJECT, Favorite.getLinkedEditorProject());
+		prefs.put(OBJECT_SORT, Favorite.getObjectSortingType());
 
 		if (Superview.isSaveFolderExpansionState()) {
 			final String[] expNodes = Favorite.getExpandedNodes().toArray(new String[0]);
-			prefs.put("expanded_nodes", String.join(";", expNodes));
+			prefs.put(EXPANDED_NODES, String.join(";", expNodes));
 		} else {
-			prefs.put("expanded_nodes", "");
+			prefs.put(EXPANDED_NODES, "");
 		}
 		try {
 			// prefs are automatically flushed during a plugin's "super.stop()".
@@ -514,6 +523,8 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 	protected void fillLocalPullDown(final IMenuManager manager) {
 		manager.add(this.actions.actExportFavorites);
 		manager.add(this.actions.actImportFavorites);
+		manager.add(this.actions.sortObjectByName);
+		manager.add(this.actions.sortObjectByDescription);
 
 	}
 
@@ -599,7 +610,30 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 				} else if (e1 instanceof TreeObject && e2 instanceof TreeParent) {
 					return 1;
 				} else if (e1 instanceof TreeObject && e2 instanceof TreeObject) {
-					return ((TreeObject) e1).getName().compareToIgnoreCase(((TreeObject) e2).getName());
+					String descriptionFirst = ((TreeObject) e1).getDescription();
+					String descriptionSecond = ((TreeObject) e2).getDescription();
+					String nameFirst = ((TreeObject) e1).getName();
+					String nameSecond = ((TreeObject) e2).getName();
+					switch (objectSorting) {
+					case objectDescription:
+						if (descriptionFirst != descriptionSecond) {
+							return descriptionFirst.compareToIgnoreCase(descriptionSecond);
+						} else {
+							return nameFirst.compareToIgnoreCase(nameSecond);
+						}
+					case objectName:
+						if (nameFirst != nameSecond) {
+							return nameFirst.compareToIgnoreCase(nameSecond);
+						} else {
+							return descriptionFirst.compareToIgnoreCase(descriptionSecond);
+						}
+					default:
+						if (nameFirst != nameSecond) {
+							return nameFirst.compareToIgnoreCase(nameSecond);
+						} else {
+							return descriptionFirst.compareToIgnoreCase(descriptionSecond);
+						}
+					}
 
 				} else {
 					throw new IllegalArgumentException("Not comparable: " + e1 + " " + e2);
@@ -622,7 +656,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 
 	protected void loadColumnSettings(final TreeColumn Column) {
 		final IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(getID());
-		Column.setWidth(prefs.getInt("column_width" + Column.getText(), 300));
+		Column.setWidth(prefs.getInt(COLUMN_WIDTH + Column.getText(), 300));
 	}
 
 	protected void loadPluginSettings() {
@@ -633,16 +667,27 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		setLinkingActive(prefs.getBoolean("linking_active", true));
-		setLinkedEditorProject(prefs.get("linked_project", ""));
+		setLinkingActive(prefs.getBoolean(LINKING_ACTIVE, true));
+		setLinkedEditorProject(prefs.get(LINKED_PROJECT, ""));
+		setSortingTypeOfObjects(prefs.get(OBJECT_SORT, ""));
 		expandTreeNodes(prefs);
 		this.LinkedProject = Common.getProjectByName(getLinkedEditorProject());
+	}
+
+	public void setSortingTypeOfObjects(String sortTypeString) {
+
+		if (sortTypeString.equals(NameSorting.objectDescription.toString())) {
+			this.objectSorting = NameSorting.objectDescription;
+
+		} else if (sortTypeString.equals(NameSorting.objectName.toString())) {
+			this.objectSorting = NameSorting.objectName;
+		}
 	}
 
 	private void expandTreeNodes(final IEclipsePreferences prefs) {
 		String expandedNodesString = "";
 		String[] expNodes = null;
-		expandedNodesString = prefs.get("expanded_nodes", expandedNodesString);
+		expandedNodesString = prefs.get(EXPANDED_NODES, expandedNodesString);
 		if (expandedNodesString != "") {
 			expNodes = expandedNodesString.split(";");
 		}
@@ -842,5 +887,10 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 
 	public static void addFavoritesToActive(final IFavorites Favorite) {
 		activeFavorites.add(Favorite);
+	}
+
+	@Override
+	public String getObjectSortingType() {
+		return objectSorting.toString();
 	}
 }

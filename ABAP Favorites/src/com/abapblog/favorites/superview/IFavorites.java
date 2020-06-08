@@ -10,11 +10,14 @@ import com.abapblog.favorites.tree.TreeParent;
 public interface IFavorites {
 
 	public String getID();
+
 	public IFavorites getFavorites();
 
 	public String getLinkedEditorProject();
 
 	public boolean isLinkingActive();
+
+	public String getObjectSortingType();
 
 	public TypeOfXMLNode getFolderType();
 
@@ -27,6 +30,7 @@ public interface IFavorites {
 	public TreeViewer getTreeViewer();
 
 	public ArrayList<String> getExpandedNodes();
+
 	public ArrayList<TreeParent> getExpandedParentNodes();
 
 }
