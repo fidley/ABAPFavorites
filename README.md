@@ -1,6 +1,9 @@
 # ABAPFavorites
 ABAP Favorites Eclipse Plugin
 
+Eclipse Marketplace Stats: ![Eclipse Marketplace](https://img.shields.io/eclipse-marketplace/favorites/abap-favorites)
+![Downloads](https://img.shields.io/eclipse-marketplace/dt/abap-favorites)
+
 This repository contains code for Favorites plugin, Feature plugin and Update Site Plugin
 # Version 1.0.29
   
