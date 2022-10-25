@@ -22,4 +22,4 @@ Open in Project functionality added
 
 From now on two views are delivered with plugin - Favorites and Favorite Dev Objects
 
-Update site - http://abapblog.com/eclipse/plugin/ABAPFavorites/
+Update site - https://fidley.github.io/ADTPluginsUpdateSite/UpdateSite/
