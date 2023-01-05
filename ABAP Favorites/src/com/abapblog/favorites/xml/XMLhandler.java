@@ -7,7 +7,6 @@ import java.util.UUID;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -95,8 +94,8 @@ public class XMLhandler {
 
 	}
 
-	public static void addObjectToXML(TypeOfEntry type, String name, String description, String longDescription,String technicalName,
-			String parent, TypeOfXMLNode parentType) {
+	public static void addObjectToXML(TypeOfEntry type, String name, String description, String longDescription,
+			String technicalName, String parent, TypeOfXMLNode parentType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {
@@ -109,8 +108,8 @@ public class XMLhandler {
 
 	}
 
-	private static void addObjectToXMLStream(TypeOfEntry type, String name, String description, String longDescription, String technicalName,
-			String parent, TypeOfXMLNode parentType, DocumentBuilder dBuilder)
+	private static void addObjectToXMLStream(TypeOfEntry type, String name, String description, String longDescription,
+			String technicalName, String parent, TypeOfXMLNode parentType, DocumentBuilder dBuilder)
 			throws TransformerFactoryConfigurationError {
 		Document doc;
 		try {
@@ -149,6 +148,7 @@ public class XMLhandler {
 			e.printStackTrace();
 		}
 	}
+
 	public static void delFolderFromXML(String FolderId, TypeOfXMLNode ParentNodeType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
@@ -166,6 +166,9 @@ public class XMLhandler {
 
 					NamedNodeMap attributes = nNode.getAttributes();
 					Node FolderName = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
+					if (FolderName == null) {
+						continue;
+					}
 					if (FolderName.getNodeValue().equals(FolderId)) {
 						Node parent = nNode.getParentNode();
 						parent.removeChild(nNode);
@@ -207,6 +210,9 @@ public class XMLhandler {
 
 					NamedNodeMap attributes = nNode.getAttributes();
 					Node FolderName = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
+					if (FolderName == null) {
+						continue;
+					}
 					if (FolderName.getNodeValue().equals(ParentID)) {
 
 						NodeList FolderEntries = nNode.getChildNodes();
@@ -348,7 +354,7 @@ public class XMLhandler {
 		}
 		if (nodeName.equals(TypeOfXMLNode.Package.toString())) {
 			return TypeOfEntry.Package;
-		}		
+		}
 		return null;
 	}
 
@@ -448,7 +454,7 @@ public class XMLhandler {
 		case AMDP:
 			return TypeOfXMLNode.AMDPNode;
 		case Package:
-			return TypeOfXMLNode.Package;			
+			return TypeOfXMLNode.Package;
 		default:
 			return TypeOfXMLNode.programNode;
 		}

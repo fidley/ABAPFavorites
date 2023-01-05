@@ -1,5 +1,8 @@
 package com.abapblog.favorites.superview;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.graphics.Image;
@@ -11,70 +14,78 @@ import com.abapblog.favorites.tree.TreeObject;
 import com.abapblog.favorites.tree.TreeParent;
 
 public class ViewLabelProvider implements ITableLabelProvider {
+	private final List<Image> imagesToBeDisposed = new ArrayList<>();
+	private static final AFIcons afIcons = AFIcons.getInstance();
 
 	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
-		AFIcons AFIcons = new AFIcons();
 		switch (columnIndex) {
 		case 0:
 			String imageKey = ISharedImages.IMG_OBJ_ELEMENT;
 			if (element instanceof TreeParent)
 				if (((TreeParent) element).getDevObjProject() == true) {
-					return AFIcons.getFodlerDevObjIcon();
+					return addToBeDisposed(afIcons.getFodlerDevObjIcon());
 				} else {
-					return AFIcons.getFolderIcon();
+					return addToBeDisposed(afIcons.getFolderIcon());
 				}
 
 			if (element instanceof TreeObject) {
 				TreeObject Node = (TreeObject) element;
 				switch (Node.getType()) {
 				case Transaction:
-					return AFIcons.getTransactionIcon();
+					return addToBeDisposed(afIcons.getTransactionIcon());
 				case URL:
-					return AFIcons.getURLIcon();
+					return addToBeDisposed(afIcons.getURLIcon());
 				case Program:
-					return AFIcons.getProgramIcon();
+					return addToBeDisposed(afIcons.getProgramIcon());
 				case Class:
-					return AFIcons.getClassIcon();
+					return addToBeDisposed(afIcons.getClassIcon());
 				case Interface:
-					return AFIcons.getInterfaceIcon();
+					return addToBeDisposed(afIcons.getInterfaceIcon());
 				case Include:
-					return AFIcons.getProgramIncludeIcon();
+					return addToBeDisposed(afIcons.getProgramIncludeIcon());
 				case FunctionGroup:
-					return AFIcons.getFunctionGroupIcon();
+					return addToBeDisposed(afIcons.getFunctionGroupIcon());
 				case FunctionModule:
-					return AFIcons.getFunctionModuleIcon();
+					return addToBeDisposed(afIcons.getFunctionModuleIcon());
 				case Folder:
-					return AFIcons.getFolderIcon();
+					return addToBeDisposed(afIcons.getFolderIcon());
 				case FolderDO:
-					return AFIcons.getFodlerDevObjIcon();
+					return addToBeDisposed(afIcons.getFodlerDevObjIcon());
 				case MessageClass:
-					return AFIcons.getMessageClassIcon();
+					return addToBeDisposed(afIcons.getMessageClassIcon());
 				case View:
-					return AFIcons.getViewIcon();
+					return addToBeDisposed(afIcons.getViewIcon());
 				case Table:
-					return AFIcons.getTableIcon();
+					return addToBeDisposed(afIcons.getTableIcon());
 				case SearchHelp:
-					return AFIcons.getSearchHelpIcon();
+					return addToBeDisposed(afIcons.getSearchHelpIcon());
 				case ADTLink:
-					return AFIcons.getADTLinkIcon();
+					return addToBeDisposed(afIcons.getADTLinkIcon());
 				case CDSView:
-					return AFIcons.getCDSViewIcon();
+					return addToBeDisposed(afIcons.getCDSViewIcon());
 				case AMDP:
-					return AFIcons.getAMDPIcon();
+					return addToBeDisposed(afIcons.getAMDPIcon());
 				case Package:
-					return AFIcons.getPackageIcon();
+					return addToBeDisposed(afIcons.getPackageIcon());
 				default:
 					break;
 				}
 
 			}
 
-			return PlatformUI.getWorkbench().getSharedImages().getImage(imageKey);
+			return addToBeDisposed(PlatformUI.getWorkbench().getSharedImages().getImage(imageKey));
 		case 1:
 			return null;
 		}
 		return null;
+	}
+
+	private Image addToBeDisposed(Image image) {
+		if (image != null && !imagesToBeDisposed.contains(image)) {
+			imagesToBeDisposed.add(image);
+		}
+		return image;
 	}
 
 	@Override
@@ -96,13 +107,11 @@ public class ViewLabelProvider implements ITableLabelProvider {
 				if (((TreeParent) element).getDevObjProject() == true)
 					return "true";
 		case 5:
-			if (element instanceof TreeParent)
-				{ TreeParent parent = ((TreeParent) element);
+			if (element instanceof TreeParent) {
+				TreeParent parent = ((TreeParent) element);
 				if (parent.getProjectIndependent() == false)
-				return ((TreeParent) element).getProject().toString();
-				}
-			else if (element instanceof TreeObject)
-			{
+					return ((TreeParent) element).getProject().toString();
+			} else if (element instanceof TreeObject) {
 				TreeObject object = ((TreeObject) element);
 				if (object.getParent().getProjectIndependent() == false)
 					return object.getParent().getProject().toString();
@@ -117,6 +126,10 @@ public class ViewLabelProvider implements ITableLabelProvider {
 
 	@Override
 	public void dispose() {
+		for (Image image : imagesToBeDisposed) {
+			image.dispose();
+		}
+		imagesToBeDisposed.clear();
 	}
 
 	@Override

@@ -224,7 +224,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 		setLinkingWithEditor();
 		setNewViewName();
 		sortTable();
-		refreshViewer(this.viewer);
+		// refreshViewer(this.viewer);
 		this.viewer.setExpandedElements(getExpandedParentNodes().toArray());
 
 	}
