@@ -63,7 +63,7 @@ public class Actions {
 	public Action sortObjectByDescription;
 
 	public void makeActions(final Superview superview) {
-		final AFIcons AFIcon = new AFIcons();
+		final AFIcons AFIcon = AFIcons.getInstance();
 		createAddFolderAction(superview);
 		createAddRootFolderAction(superview);
 		createAddTransactionAction(superview.viewer, AFIcon);

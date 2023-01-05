@@ -126,7 +126,7 @@ public class AdtObjectHandler {
 		AdtSapGuiEditorUtilityFactory.createSapGuiEditorUtility().openEditorForObject(project, adtObjectRef,
 				Activator.getDefault().getPreferenceStore()
 						.getBoolean(PreferenceConstants.P_NAVIGATE_TO_ECLIPSE_FOR_SUPPORTED_DEV_OBJECTS),
-				WorkbenchAction.EXECUTE.toString(), null, Collections.<String, String>emptyMap());
+				WorkbenchAction.DISPCREATE.toString(), null, Collections.<String, String>emptyMap());
 	}
 
 	/**

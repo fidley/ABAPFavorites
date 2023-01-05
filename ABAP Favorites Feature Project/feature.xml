@@ -2,7 +2,7 @@
 <feature
       id="ABAP_Favorites_Feature_Project"
       label="ABAP Favorites"
-      version="1.0.60.qualifier"
+      version="1.0.61.qualifier"
       provider-name="ABAPBlog.com"
       plugin="com.abapblog.branding">
 
@@ -61,11 +61,33 @@ END OF TERMS AND CONDITIONS
    </license>
 
    <url>
-      <update label="ABAPBlog.com ABAPFavorites Update Site" url="https://abapblog.com/eclipse/plugin/ABAPFavorites"/>
+      <update label="ABAPBlog.com ABAPFavorites Update Site" url="http://abapblog.com/eclipse/plugin/ABAPFavorites"/>
    </url>
+
+   <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="com.sap.adt.sapgui.ui" version="2.73.1" match="greaterOrEqual"/>
+      <import plugin="com.sap.adt.project.ui" version="2.73.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="com.sap.adt.tools.core" version="2.73.1" match="greaterOrEqual"/>
+      <import plugin="com.sap.adt.ris.search" version="2.73.1" match="greaterOrEqual"/>
+      <import plugin="com.sap.adt.logging" version="2.73.0" match="greaterOrEqual"/>
+      <import plugin="com.sap.adt.util" version="2.83.0" match="greaterOrEqual"/>
+      <import plugin="com.sap.adt.tools.core.ui" version="2.73.1" match="greaterOrEqual"/>
+      <import plugin="com.sap.adt.destinations" version="2.102.0" match="greaterOrEqual"/>
+      <import plugin="com.sap.adt.destinations.ui" version="2.102.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui"/>
+   </requires>
 
    <plugin
          id="com.abapblog.favorites"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.abapblog.branding"
          download-size="0"
          install-size="0"
          version="0.0.0"
