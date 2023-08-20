@@ -103,6 +103,38 @@
           </visibleWhen>
        </command>
        </menuContribution>
+                    <menuContribution
+                          allPopups="false"
+                          locationURI="menu:com.abapblog.favorites.views.Favorites">
+                       <command
+                             commandId="com.abapblog.favorites.openGithub"
+                             icon="icons/github.png"
+                             label="Feedback, Bugs &amp; Enhancements"
+                             style="push">
+                       </command>
+                       <command
+                             commandId="com.abapblog.favorites.buyABeer"
+                             icon="icons/beer.png"
+                             label="Buy Me a Beer"
+                             style="push">
+                       </command>
+                    </menuContribution>
+                    <menuContribution
+                          allPopups="false"
+                          locationURI="menu:com.abapblog.favoritesDO.views.FavoritesDO">
+                       <command
+                             commandId="com.abapblog.favorites.openGithub"
+                             icon="icons/github.png"
+                             label="Feedback, Bugs &amp; Enhancements"
+                             style="push">
+                       </command>
+                       <command
+                             commandId="com.abapblog.favorites.buyABeer"
+                             icon="icons/beer.png"
+                             label="Buy Me a Beer"
+                             style="push">
+                       </command>
+                    </menuContribution>
     </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -117,5 +149,18 @@
 
 </handler>
     </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="com.abapblog.favorites.commands.OpenGithub"
+            id="com.abapblog.favorites.openGithub"
+            name="Feedback, Bugs &amp; Enhancements">
+      </command>
+      <command
+            defaultHandler="com.abapblog.favorites.commands.BuyMeABeer"
+            id="com.abapblog.favorites.buyABeer"
+            name="Buy Me a Beer">
+      </command>
+   </extension>
 </plugin>
 
