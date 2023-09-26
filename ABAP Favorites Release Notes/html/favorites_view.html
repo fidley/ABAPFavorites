@@ -1,0 +1,101 @@
+<html id="doc-page">
+
+<head>
+	<link rel="stylesheet" type="text/css" href="../css/toc.css" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>ABAP Favorites</title>
+</head>
+
+<body id="doc-body">
+	<h1 class="heading">ABAP Favorites - Favorites View</h1>
+
+
+	<figure>
+		<img src="../media/1.0.62 Favorites View.png">
+		<figcaption><strong>Figure 1:</strong> Favorites View</figcaption>
+	</figure>
+	<h2 class="heading">Favorites folders</h2>
+	<figure>
+		<img src="../media/1.0.62 New Folder entry.png">
+		<figcaption><strong>Figure 2:</strong> New folder dialog</figcaption>
+	</figure>
+	<h3 class="heading">Name, Description, Long Description</h3>
+	Name and description will be visible on favorites list. It will be also used for filtering. Long description will be only visible at edit.
+	<h3 class="heading">Project independent?</h3>
+	<P>When selected, it will make that doesn’t matter on which SAP system you have currently active editor/GUI, the folder will be visible. If you’ll make your folder project dependent (unselected) then it will appear on the list only if your active editor/GUI is linked to the same SAP system.<br>Additionally, when the folder is project dependent, the favorite object will be always run/open in that project (SAP system)</P>
+	<h3 class="heading">Development Objects Folder?</h3>
+	<p>There are two type of folders available:
+	<ul>
+		<li>Standard one</li>
+		<li>For Development Objects (checkbox selected)</li>
+	</ul>
+	</p>
+	<P>Standard folders can only be created in Favorites view, and they can contain only following objects:
+	<ul>
+		<li>Transactions</li>
+		<li>Programs</li>
+		<li>URLs</li>
+	</ul>
+	When you double-click on one of this objects then they will be run in new tab of SAP GUI.</P>
+	<figure>
+		<img src="../media/1.0.62 Possible Objects For Run.png">
+		<figcaption><strong>Figure 3:</strong> Objects possible for standard folders</figcaption>
+	</figure>
+	<p>Development Objects folder can be created in both Favorites and Favorites Dev Objects views. It can contain
+		following development objects:
+	<ul>
+		<li>Programs</li>
+		<li>Classes</li>
+		<li>Interfaces</li>
+		<li>Function Groups</li>
+		<li>Function Modules</li>
+		<li>Tables</li>
+		<li>Views</li>
+		<li>Message Classes</li>
+		<li>Search Helps</li>
+		<li>ADT Links</li>
+		<li>CDS Views</li>
+		<li>Packages</li>
+	</ul>
+	When you double-click on one of this objects then they will be opened in new Editor tab.</p>
+	<figure>
+		<img src="../media/1.0.62 Possible Objects for Edit.png">
+		<figcaption><strong>Figure 4:</strong> Objects possible for development objects folders</figcaption>
+	</figure>
+	<h2 class="heading">New Favorite entry</h2>
+	<p>When you're adding new objects, you can see two kinds of dialogs.</p>
+	<h3 class="heading">New entry for ABAP objects</h3>
+	<p>For most of the objects you'll be able to choose Name (object name in SAP), description, long description and shortcut command (one of 10)</p>
+	<figure>
+		<img src="../media/1.0.62 New Favorite entry.png">
+		<figcaption><strong>Figure 5:</strong> New favorite entry</figcaption>
+	</figure>
+
+	<h3 class="heading">New entry for URL and ADT link objects</h3>
+	<p>For URLs and ADT Links, name, description and long description can be fill freely, important is to fill correctly the URL of the entry.</p>
+	<figure>
+		<img src="../media/1.0.62 New URL and ADT link entry.png">
+		<figcaption><strong>Figure 6:</strong> New URL or ADT link entry</figcaption>
+	</figure>
+	<h3>Commands</h3>
+		<p>It is possible to bind the favorite to a key combination, which can be used to run or open favorite
+		object.<br>When the folder containing object is linked to a certain project, it will be used as project in which the
+		favorite will be run/open. In other case, current active ADT project will be used.
+		<br>There are 10 key bindings foreseen.
+	</p>
+	<h2 class="heading">Additional view menu functions</h2>
+	<figure>
+		<img src="../media/1.0.62 View menu.png">
+		<figcaption><strong>Figure 7:</strong> Additional functions</figcaption>
+	</figure>
+	<h3 class="heading">Export/Import</h3>
+	<p>Can be used to export favorites to XML file, or to import favorites from XML file.</p>
+	<h3 class="heading">Sorting</h3>
+	<P>For the moment sorting by name or description is possible.</P>
+	<h3 class="heading">Preferences</h3>
+	<P>The shortcut to <a href="preferences.html">preferences</a> of the plugin.</p>
+	<h3 class="heading">Release info</h3>
+	<p>If you want to be reminded what has changed in the last version, you can call release notes from here.</p>
+	<h3 class="heading">Feedback, Bugs, Enhancements</h3>
+	<P>If you'd like to place a feedback, report bug, ask for enhancement or to do it by yourself, use this function to open github repository of the plugin.</P>
+</body>

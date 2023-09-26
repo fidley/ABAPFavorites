@@ -373,7 +373,8 @@ public class Actions {
 							ADTLink = ADTLink.replace("(?<=\'/\'/)(.*?)(?=\'/)", "$system");
 							XMLhandler.addObjectToXML(TypeOfEntry.ADTLink, URLDialog.getName(),
 									URLDialog.getDescription(), URLDialog.getLongDescription(), ADTLink,
-									((TreeParent) object).getFolderID(), object.getParent().getTypeOfFolder());
+									((TreeParent) object).getFolderID(), object.getParent().getTypeOfFolder(),
+									URLDialog.getCommandID());
 							System.out.println(URLDialog.getName());
 							System.out.println(URLDialog.getDescription());
 							Superview.refreshViewer(viewer);
@@ -496,7 +497,8 @@ public class Actions {
 
 							XMLhandler.addObjectToXML(TypeOfEntry.URL, URLDialog.getName(), URLDialog.getDescription(),
 									URLDialog.getLongDescription(), URLDialog.getURL(),
-									((TreeParent) object).getFolderID(), object.getParent().getTypeOfFolder());
+									((TreeParent) object).getFolderID(), object.getParent().getTypeOfFolder(),
+									URLDialog.getCommandID());
 							System.out.println(URLDialog.getName());
 							System.out.println(URLDialog.getDescription());
 							Superview.refreshViewer(viewer);
@@ -594,17 +596,20 @@ public class Actions {
 					UrlDialog.SetDescription(Object.getDescription());
 					UrlDialog.setURL(Object.getTechnicalName());
 					UrlDialog.setLongDescription(Object.getLongDescription());
+					UrlDialog.setCommandID(Object.getCommandID());
 					if (UrlDialog.open() == Window.OK) {
 						Name = UrlDialog.getName();
 						if (NameToUpper) {
 							Name = Name.toUpperCase();
 						}
+						if (!UrlDialog.getCommandID().isEmpty())
+							XMLhandler.removeCommandIDFromObject(UrlDialog.getCommandID());
 
 						XMLhandler.delObjectFromXML(Type, Object.getName(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
 						XMLhandler.addObjectToXML(TypeOfEntry.URL, Name, UrlDialog.getDescription(),
 								UrlDialog.getLongDescription(), UrlDialog.getURL(), Object.getParent().getFolderID(),
-								Object.getParent().getTypeOfFolder());
+								Object.getParent().getTypeOfFolder(), UrlDialog.getCommandID());
 
 						Superview.refreshViewer(viewer);
 					}
@@ -622,18 +627,19 @@ public class Actions {
 					UrlDialog.SetDescription(Object.getDescription());
 					UrlDialog.setURL(Object.getTechnicalName());
 					UrlDialog.setLongDescription(Object.getLongDescription());
-
+					UrlDialog.setCommandID(Object.getCommandID());
 					if (UrlDialog.open() == Window.OK) {
 						Name = UrlDialog.getName();
 						if (NameToUpper) {
 							Name = Name.toUpperCase();
 						}
-
+						if (!UrlDialog.getCommandID().isEmpty())
+							XMLhandler.removeCommandIDFromObject(UrlDialog.getCommandID());
 						XMLhandler.delObjectFromXML(Type, Object.getName(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
 						XMLhandler.addObjectToXML(TypeOfEntry.ADTLink, Name, UrlDialog.getDescription(),
 								UrlDialog.getLongDescription(), UrlDialog.getURL(), Object.getParent().getFolderID(),
-								Object.getParent().getTypeOfFolder());
+								Object.getParent().getTypeOfFolder(), UrlDialog.getCommandID());
 
 						Superview.refreshViewer(viewer);
 					}
@@ -648,15 +654,19 @@ public class Actions {
 					NaDialog.setName(Name);
 					NaDialog.setDescription(Object.getDescription());
 					NaDialog.setLongDescription(Object.getLongDescription());
+					NaDialog.setCommandID(Object.getCommandID());
 					if (NaDialog.open() == Window.OK) {
 						Name = NaDialog.getName();
 						if (NameToUpper) {
 							Name = Name.toUpperCase();
 						}
+						if (!NaDialog.getCommandID().isEmpty())
+							XMLhandler.removeCommandIDFromObject(NaDialog.getCommandID());
 						XMLhandler.delObjectFromXML(Type, Object.getName(), Object.getParent().getFolderID(),
 								Object.getParent().getTypeOfFolder());
 						XMLhandler.addObjectToXML(Type, Name, NaDialog.getDescription(), NaDialog.getLongDescription(),
-								"", Object.getParent().getFolderID(), Object.getParent().getTypeOfFolder());
+								"", Object.getParent().getFolderID(), Object.getParent().getTypeOfFolder(),
+								NaDialog.getCommandID());
 						Superview.refreshViewer(viewer);
 					}
 					break;
@@ -698,7 +708,8 @@ public class Actions {
 					}
 					XMLhandler.addObjectToXML(Type, Name, NaDialog.getDescription(),
 							((TreeParent) Folder).getLongDescription(), ((TreeParent) Folder).getTechnicalName(),
-							((TreeParent) Folder).getFolderID(), ((TreeParent) Folder).getTypeOfFolder());
+							((TreeParent) Folder).getFolderID(), ((TreeParent) Folder).getTypeOfFolder(),
+							NaDialog.getCommandID());
 					Superview.refreshViewer(viewer);
 				}
 

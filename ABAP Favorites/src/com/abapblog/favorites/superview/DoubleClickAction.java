@@ -83,19 +83,6 @@ public class DoubleClickAction extends Action implements ITreeNodeAction {
 		if (selection == null || selection.isEmpty()) {
 			return null;
 		}
-		IProject projectForAll = null;
-		IProject currentProject = null;
-		if (doubleClickBehavior == DoubleClickBehavior.OPEN_VIA_PROJECT_DIALOG) {
-			projectForAll = getProjectFromProjectChooserDialog();
-			if (projectForAll == null) {
-				return null;
-			}
-		} else {
-			currentProject = getCurrentAbapProject();
-			if (currentProject == null) {
-				currentProject = getProjectFromProjectChooserDialog();
-			}
-		}
 
 		final List<TreeObjectProxy> treeObjects = new ArrayList<>();
 		final Iterator<?> selIter = ((IStructuredSelection) selection).iterator();
@@ -116,6 +103,19 @@ public class DoubleClickAction extends Action implements ITreeNodeAction {
 			final TreeObjectProxy treeObjProxy = new TreeObjectProxy(treeObj, null);
 
 			if (treeObjProxy.needsProjectForExecution()) {
+				IProject projectForAll = null;
+				IProject currentProject = null;
+				if (doubleClickBehavior == DoubleClickBehavior.OPEN_VIA_PROJECT_DIALOG) {
+					projectForAll = getProjectFromProjectChooserDialog();
+					if (projectForAll == null) {
+						return null;
+					}
+				} else {
+					currentProject = getCurrentAbapProject();
+					if (currentProject == null) {
+						currentProject = getProjectFromProjectChooserDialog();
+					}
+				}
 				if (projectForAll != null) {
 					treeObjProxy.setProject(projectForAll);
 				} else {

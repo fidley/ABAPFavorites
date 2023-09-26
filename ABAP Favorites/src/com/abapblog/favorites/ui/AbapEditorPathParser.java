@@ -1,10 +1,9 @@
 package com.abapblog.favorites.ui;
 
 import java.util.regex.Matcher;
-
 import java.util.regex.Pattern;
 
-import com.abapblog.favorites.common.*;
+import com.abapblog.favorites.common.CommonTypes;
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 
 public class AbapEditorPathParser {
@@ -17,6 +16,7 @@ public class AbapEditorPathParser {
 	private static final String ADT_MC_MESSAGECLASSES = "(?<=adt\\/mc\\/messageclasses\\/)(.*)(?=\\/)";
 	private static final String ADT_PROGRAMS_PROGRAMS = "(?<=adt\\/programs\\/programs\\/)(.*)(?=\\/)";
 	private static final String ADT_PROGRAMS_INCLUDES = "(?<=adt\\/programs\\/includes\\/)(.*)(?=\\/)";
+	private static final String ADT_CDS_VIEW = "(?<=adt\\/ddic\\/ddlsources\\/)(.*)(?=\\/)";
 	private static final Pattern patternClasses = Pattern.compile(ADT_CLASSLIB_CLASSES);
 	private static final Pattern patternInterfaces = Pattern.compile(ADT_CLASSLIB_INTERFACES);
 	private static final Pattern patternFM = Pattern.compile(ADT_FUNCTIONS_GROUPS_FMODULES);
@@ -25,6 +25,7 @@ public class AbapEditorPathParser {
 	private static final Pattern patternMessageClasses = Pattern.compile(ADT_MC_MESSAGECLASSES);
 	private static final Pattern patternPrograms = Pattern.compile(ADT_PROGRAMS_PROGRAMS);
 	private static final Pattern patternIncludes = Pattern.compile(ADT_PROGRAMS_INCLUDES);
+	private static final Pattern patternCDSView = Pattern.compile(ADT_CDS_VIEW);
 
 	private AbapEditorPathParser() {
 		throw new IllegalStateException("Static class");
@@ -35,7 +36,7 @@ public class AbapEditorPathParser {
 		case AMDP:
 			break;
 		case CDSView:
-			break;
+			return getName(path, patternCDSView);
 		case Program:
 			String progName = getName(path, patternFGInclude);
 			if (progName == "")
@@ -88,6 +89,8 @@ public class AbapEditorPathParser {
 			return TypeOfEntry.Program;
 		} else if (checkInclude(path)) {
 			return TypeOfEntry.Include;
+		} else if (checkCDSView(path)) {
+			return TypeOfEntry.CDSView;
 		} else {
 			return null;
 		}
@@ -124,6 +127,10 @@ public class AbapEditorPathParser {
 
 	private static Boolean checkInclude(String path) {
 		return checkRegex(path, patternIncludes);
+	}
+
+	private static Boolean checkCDSView(String path) {
+		return checkRegex(path, patternCDSView);
 	}
 
 	private static Boolean checkRegex(String path, Pattern pattern) {

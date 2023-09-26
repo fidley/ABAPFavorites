@@ -64,6 +64,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.abapblog.favorites.Activator;
+import com.abapblog.favorites.commands.DynamicCommandHandler;
 import com.abapblog.favorites.common.Common;
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLAttr;
@@ -362,8 +363,8 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 							final String objectType = AdtRef.getType();
 							final String objectName = AdtRef.getName();
 							final TypeOfEntry typeOfEntry = Common.getTypeOfEntryFromSAPType(objectType);
-							XMLhandler.addObjectToXML(typeOfEntry, objectName.toUpperCase(), "", "", "", ID,
-									ParentType);
+							XMLhandler.addObjectToXML(typeOfEntry, objectName.toUpperCase(), "", "", "", ID, ParentType,
+									"");
 
 						} catch (final SecurityException e) {
 							// TODO Auto-generated catch block
@@ -407,7 +408,8 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 //
 //								}
 								XMLhandler.addObjectToXML(item.getType(), item.getName(), item.getDescription(),
-										item.getLongDescription(), item.getTechnicalName(), ID, ParentType);
+										item.getLongDescription(), item.getTechnicalName(), ID, ParentType,
+										item.getCommandID());
 								XMLhandler.delObjectFromXML(item.getType(), item.getName(),
 										item.getParent().getFolderID(), item.getParent().getTypeOfFolder());
 							}
@@ -729,7 +731,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 			final Boolean selectFolderDialog) {
 
 		String LinkedEditorProject = "";
-
+		DynamicCommandHandler.commandsLink.clear();
 		Favorite.getExpandedParentNodes().clear();
 
 		if (isHideOfDepProject() == true && Favorite != null) {
@@ -856,7 +858,8 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 									XMLhandler.getEntryTypeFromXMLNode(nNodeChild.getNodeName()),
 									eElementChild.getAttribute(TypeOfXMLAttr.description.toString()),
 									eElementChild.getAttribute(TypeOfXMLAttr.technicalName.toString()),
-									eElementChild.getAttribute(TypeOfXMLAttr.longDescription.toString()), favorite);
+									eElementChild.getAttribute(TypeOfXMLAttr.longDescription.toString()), favorite,
+									eElementChild.getAttribute(TypeOfXMLAttr.commandID.toString()));
 							parent.addChild(child);
 						}
 					}

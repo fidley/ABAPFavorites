@@ -95,12 +95,13 @@ public class XMLhandler {
 	}
 
 	public static void addObjectToXML(TypeOfEntry type, String name, String description, String longDescription,
-			String technicalName, String parent, TypeOfXMLNode parentType) {
+			String technicalName, String parent, TypeOfXMLNode parentType, String commandID) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {
 			dBuilder = dbFactory.newDocumentBuilder();
-			addObjectToXMLStream(type, name, description, longDescription, technicalName, parent, parentType, dBuilder);
+			addObjectToXMLStream(type, name, description, longDescription, technicalName, parent, parentType, dBuilder,
+					commandID);
 
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
@@ -109,7 +110,7 @@ public class XMLhandler {
 	}
 
 	private static void addObjectToXMLStream(TypeOfEntry type, String name, String description, String longDescription,
-			String technicalName, String parent, TypeOfXMLNode parentType, DocumentBuilder dBuilder)
+			String technicalName, String parent, TypeOfXMLNode parentType, DocumentBuilder dBuilder, String commandID)
 			throws TransformerFactoryConfigurationError {
 		Document doc;
 		try {
@@ -133,7 +134,7 @@ public class XMLhandler {
 					ObjectElement.setAttribute(TypeOfXMLAttr.description.toString(), description);
 					ObjectElement.setAttribute(TypeOfXMLAttr.longDescription.toString(), longDescription);
 					ObjectElement.setAttribute(TypeOfXMLAttr.technicalName.toString(), technicalName);
-
+					ObjectElement.setAttribute(TypeOfXMLAttr.commandID.toString(), commandID);
 					nNode.appendChild(ObjectElement);
 
 					DOMSource source = new DOMSource(doc);
@@ -589,5 +590,48 @@ public class XMLhandler {
 	}
 
 	public static final String FAV_FILE_NAME = "favorites.xml";
+
+	public static void removeCommandIDFromObject(String commandID) {
+
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder;
+		try {
+			dBuilder = dbFactory.newDocumentBuilder();
+			Document doc;
+			try {
+				doc = dBuilder.parse(getFavFile());
+				doc.getDocumentElement().normalize();
+				NodeList elements = doc.getElementsByTagName("*");
+
+				for (int temp = 0; temp < elements.getLength(); temp++) {
+
+					Node nNode = elements.item(temp);
+
+					NamedNodeMap attributes = nNode.getAttributes();
+					Node currentNode = attributes.getNamedItem(TypeOfXMLAttr.commandID.toString());
+					if (currentNode == null)
+						continue;
+					if (currentNode.getNodeValue().equals(commandID)) {
+						Element FolderEl = (Element) nNode;
+						FolderEl.setAttribute(TypeOfXMLAttr.commandID.toString(), "");
+						DOMSource source = new DOMSource(doc);
+
+						TransformerFactory transformerFactory = TransformerFactory.newInstance();
+						Transformer transformer = transformerFactory.newTransformer();
+						StreamResult result = new StreamResult(getFavFile().getPath());
+						transformer.transform(source, result);
+					}
+
+				}
+
+			} catch (SAXException | IOException | TransformerException e) {
+				e.printStackTrace();
+			}
+
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+
+	}
 
 }
