@@ -107,6 +107,18 @@
                           allPopups="false"
                           locationURI="menu:com.abapblog.favorites.views.Favorites">
                        <command
+                             commandId="com.abapblog.favorites.openPreferences"
+                             icon="icons/preferences.png"
+                             label="Preferences"
+                             style="push">
+                       </command>
+                       <command
+                             commandId="com.abapblog.favorites.ReleaseInfo"
+                             icon="platform:/plugin/org.eclipse.ui/icons/full/obj16/info_tsk.png"
+                             label="Release Info"
+                             style="push">
+                       </command>
+                       <command
                              commandId="com.abapblog.favorites.openGithub"
                              icon="icons/github.png"
                              label="Feedback, Bugs &amp; Enhancements"
@@ -122,6 +134,18 @@
                     <menuContribution
                           allPopups="false"
                           locationURI="menu:com.abapblog.favoritesDO.views.FavoritesDO">
+                       <command
+                             commandId="com.abapblog.favorites.openPreferences"
+                             icon="icons/preferences.png"
+                             label="Preferences"
+                             style="push">
+                       </command>
+                       <command
+                             commandId="com.abapblog.favorites.ReleaseInfo"
+                             icon="platform:/plugin/org.eclipse.ui/icons/full/obj16/info_tsk.png"
+                             label="Release Info"
+                             style="push">
+                       </command>
                        <command
                              commandId="com.abapblog.favorites.openGithub"
                              icon="icons/github.png"
@@ -161,6 +185,184 @@
             id="com.abapblog.favorites.buyABeer"
             name="Buy Me a Beer">
       </command>
+      <category
+            id="com.abapblog.favorites.commands.category"
+            name="ABAP Favorites">
+      </category>
+      <command
+            categoryId="com.abapblog.favorites.commands.category"
+            defaultHandler="com.abapblog.favorites.commands.DynamicCommandHandler"
+            description="Dynamic Command for ABAP Favorites asssignment (0)"
+            id="com.abapblog.favorites.commands.command0"
+            name="Favorite 0">
+      </command>
+      <command
+            categoryId="com.abapblog.favorites.commands.category"
+            defaultHandler="com.abapblog.favorites.commands.DynamicCommandHandler"
+            description="Dynamic Command for ABAP Favorites asssignment (1)"
+            id="com.abapblog.favorites.commands.command1"
+            name="Favorite 1">
+      </command>
+      <command
+            categoryId="com.abapblog.favorites.commands.category"
+            defaultHandler="com.abapblog.favorites.commands.DynamicCommandHandler"
+            description="Dynamic Command for ABAP Favorites asssignment (2)"
+            id="com.abapblog.favorites.commands.command2"
+            name="Favorite 2">
+      </command>
+      <command
+            categoryId="com.abapblog.favorites.commands.category"
+            defaultHandler="com.abapblog.favorites.commands.DynamicCommandHandler"
+            description="Dynamic Command for ABAP Favorites asssignment (3)"
+            id="com.abapblog.favorites.commands.command3"
+            name="Favorite 3">
+      </command>
+      <command
+            categoryId="com.abapblog.favorites.commands.category"
+            defaultHandler="com.abapblog.favorites.commands.DynamicCommandHandler"
+            description="Dynamic Command for ABAP Favorites asssignment (4)"
+            id="com.abapblog.favorites.commands.command4"
+            name="Favorite 4">
+      </command>
+      <command
+            categoryId="com.abapblog.favorites.commands.category"
+            defaultHandler="com.abapblog.favorites.commands.DynamicCommandHandler"
+            description="Dynamic Command for ABAP Favorites asssignment (5)"
+            id="com.abapblog.favorites.commands.command5"
+            name="Favorite 5">
+      </command>
+      <command
+            categoryId="com.abapblog.favorites.commands.category"
+            defaultHandler="com.abapblog.favorites.commands.DynamicCommandHandler"
+            description="Dynamic Command for ABAP Favorites asssignment (6)"
+            id="com.abapblog.favorites.commands.command6"
+            name="Favorite 6">
+      </command>
+      <command
+            categoryId="com.abapblog.favorites.commands.category"
+            defaultHandler="com.abapblog.favorites.commands.DynamicCommandHandler"
+            description="Dynamic Command for ABAP Favorites asssignment (7)"
+            id="com.abapblog.favorites.commands.command7"
+            name="Favorite 7">
+      </command>
+      <command
+            categoryId="com.abapblog.favorites.commands.category"
+            defaultHandler="com.abapblog.favorites.commands.DynamicCommandHandler"
+            description="Dynamic Command for ABAP Favorites asssignment (8)"
+            id="com.abapblog.favorites.commands.command8"
+            name="Favorite 8">
+      </command>
+      <command
+            categoryId="com.abapblog.favorites.commands.category"
+            defaultHandler="com.abapblog.favorites.commands.DynamicCommandHandler"
+            description="Dynamic Command for ABAP Favorites asssignment (9)"
+            id="com.abapblog.favorites.commands.command9"
+            name="Favorite 9">
+      </command>
+      <command
+            defaultHandler="com.abapblog.favorites.commands.OpenPreferences"
+            id="com.abapblog.favorites.openPreferences"
+            name="Open Preferences">
+      </command>
+      <command
+            defaultHandler="com.abapblog.favorites.commands.RleaseNotes"
+            id="com.abapblog.favorites.ReleaseInfo"
+            name="Show Release Notes">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.abapblog.favorites.commands.command0"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+NUMPAD_0">
+      </key>
+      <key
+            commandId="com.abapblog.favorites.commands.command1"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+NUMPAD_1">
+      </key>
+      <key
+            commandId="com.abapblog.favorites.commands.command2"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+NUMPAD_2">
+      </key>
+      <key
+            commandId="com.abapblog.favorites.commands.command3"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+NUMPAD_3">
+      </key>
+      <key
+            commandId="com.abapblog.favorites.commands.command4"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+NUMPAD_4">
+      </key>
+      <key
+            commandId="com.abapblog.favorites.commands.command5"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+NUMPAD_5">
+      </key>
+      <key
+            commandId="com.abapblog.favorites.commands.command6"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+NUMPAD_6">
+      </key>
+      <key
+            commandId="com.abapblog.favorites.commands.command7"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+NUMPAD_7">
+      </key>
+      <key
+            commandId="com.abapblog.favorites.commands.command8"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+NUMPAD_8">
+      </key>
+      <key
+            commandId="com.abapblog.favorites.commands.command9"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+NUMPAD_9">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            description="ABAP Favorites"
+            id="com.abapblog.favorites.ui.context"
+            name="ABAP Favorites">
+      </context>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.abapblog.favorites.release.notes.ReleaseNotesEditor"
+            default="false"
+            icon="icons/favorite16.png"
+            id="com.abapblog.favorites.release.notes.editor"
+            name="ABAP Favorites Release Notes">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="com.abapblog.favorites.release.notes.Startup">
+      </startup>
+   </extension>
+   <extension
+         point="org.eclipse.ui.elementFactories">
+      <factory
+            class="com.abapblog.favorites.release.notes.EditorInputPersistant"
+            id="com.abapblog.favorites.release.notes.EditorInputPersistant">
+      </factory>
    </extension>
 </plugin>
 

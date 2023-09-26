@@ -1,8 +1,5 @@
 package com.abapblog.favorites.superview;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.graphics.Image;
@@ -14,7 +11,6 @@ import com.abapblog.favorites.tree.TreeObject;
 import com.abapblog.favorites.tree.TreeParent;
 
 public class ViewLabelProvider implements ITableLabelProvider {
-	private final List<Image> imagesToBeDisposed = new ArrayList<>();
 	private static final AFIcons afIcons = AFIcons.getInstance();
 
 	@Override
@@ -24,68 +20,61 @@ public class ViewLabelProvider implements ITableLabelProvider {
 			String imageKey = ISharedImages.IMG_OBJ_ELEMENT;
 			if (element instanceof TreeParent)
 				if (((TreeParent) element).getDevObjProject() == true) {
-					return addToBeDisposed(afIcons.getFodlerDevObjIcon());
+					return afIcons.getFodlerDevObjIcon();
 				} else {
-					return addToBeDisposed(afIcons.getFolderIcon());
+					return afIcons.getFolderIcon();
 				}
 
 			if (element instanceof TreeObject) {
 				TreeObject Node = (TreeObject) element;
 				switch (Node.getType()) {
 				case Transaction:
-					return addToBeDisposed(afIcons.getTransactionIcon());
+					return afIcons.getTransactionIcon();
 				case URL:
-					return addToBeDisposed(afIcons.getURLIcon());
+					return afIcons.getURLIcon();
 				case Program:
-					return addToBeDisposed(afIcons.getProgramIcon());
+					return afIcons.getProgramIcon();
 				case Class:
-					return addToBeDisposed(afIcons.getClassIcon());
+					return afIcons.getClassIcon();
 				case Interface:
-					return addToBeDisposed(afIcons.getInterfaceIcon());
+					return afIcons.getInterfaceIcon();
 				case Include:
-					return addToBeDisposed(afIcons.getProgramIncludeIcon());
+					return afIcons.getProgramIncludeIcon();
 				case FunctionGroup:
-					return addToBeDisposed(afIcons.getFunctionGroupIcon());
+					return afIcons.getFunctionGroupIcon();
 				case FunctionModule:
-					return addToBeDisposed(afIcons.getFunctionModuleIcon());
+					return afIcons.getFunctionModuleIcon();
 				case Folder:
-					return addToBeDisposed(afIcons.getFolderIcon());
+					return afIcons.getFolderIcon();
 				case FolderDO:
-					return addToBeDisposed(afIcons.getFodlerDevObjIcon());
+					return afIcons.getFodlerDevObjIcon();
 				case MessageClass:
-					return addToBeDisposed(afIcons.getMessageClassIcon());
+					return afIcons.getMessageClassIcon();
 				case View:
-					return addToBeDisposed(afIcons.getViewIcon());
+					return afIcons.getViewIcon();
 				case Table:
-					return addToBeDisposed(afIcons.getTableIcon());
+					return afIcons.getTableIcon();
 				case SearchHelp:
-					return addToBeDisposed(afIcons.getSearchHelpIcon());
+					return afIcons.getSearchHelpIcon();
 				case ADTLink:
-					return addToBeDisposed(afIcons.getADTLinkIcon());
+					return afIcons.getADTLinkIcon();
 				case CDSView:
-					return addToBeDisposed(afIcons.getCDSViewIcon());
+					return afIcons.getCDSViewIcon();
 				case AMDP:
-					return addToBeDisposed(afIcons.getAMDPIcon());
+					return afIcons.getAMDPIcon();
 				case Package:
-					return addToBeDisposed(afIcons.getPackageIcon());
+					return afIcons.getPackageIcon();
 				default:
 					break;
 				}
 
 			}
 
-			return addToBeDisposed(PlatformUI.getWorkbench().getSharedImages().getImage(imageKey));
+			return PlatformUI.getWorkbench().getSharedImages().getImage(imageKey);
 		case 1:
 			return null;
 		}
 		return null;
-	}
-
-	private Image addToBeDisposed(Image image) {
-		if (image != null && !imagesToBeDisposed.contains(image)) {
-			imagesToBeDisposed.add(image);
-		}
-		return image;
 	}
 
 	@Override
@@ -126,10 +115,7 @@ public class ViewLabelProvider implements ITableLabelProvider {
 
 	@Override
 	public void dispose() {
-		for (Image image : imagesToBeDisposed) {
-			image.dispose();
-		}
-		imagesToBeDisposed.clear();
+
 	}
 
 	@Override

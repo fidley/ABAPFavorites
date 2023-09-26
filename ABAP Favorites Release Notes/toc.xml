@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+<toc label="abapBlog.com - ABAP Favorites" topic="html/maintopic.html">
+      <topic href="html/changelog.html" label="Changelog">
+         <topic href="html/changelog/version1.0.62.html" label="1.0.062">
+         </topic>
+      </topic>
+      <topic href="html/maintopic.html" label="Plugin description">
+         <topic href="html/maintopic.html" label="Views">
+            <topic href="html/favorites_view.html" label="Favorites">
+            </topic>
+            <topic href="html/favorites_dev_objects_view.html" label="Favorites DO">
+            </topic>
+         </topic>
+         <topic href="html/preferences.html" label="Preferences">
+         </topic>
+      </topic>
+
+</toc>

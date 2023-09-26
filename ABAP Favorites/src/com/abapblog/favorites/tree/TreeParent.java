@@ -19,7 +19,7 @@ public class TreeParent extends TreeObject {
 
 	public TreeParent(String name, String description, boolean projectIndependent, String project,
 			String longDescription, IFavorites favorite, boolean devObjProj, String folderID) {
-		super(name, TypeOfEntry.Folder, description, "", longDescription, favorite);
+		super(name, TypeOfEntry.Folder, description, "", longDescription, favorite, "");
 		children = new ArrayList<>();
 		this.projectIndependent = projectIndependent;
 		this.setProject(project);

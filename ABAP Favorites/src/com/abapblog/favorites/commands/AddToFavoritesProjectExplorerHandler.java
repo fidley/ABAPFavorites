@@ -1,12 +1,11 @@
 package com.abapblog.favorites.commands;
 
 import org.eclipse.core.commands.AbstractHandler;
-
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jface.window.*;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
@@ -28,12 +27,12 @@ public class AddToFavoritesProjectExplorerHandler extends AbstractHandler {
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		if (window != null) {
 			IStructuredSelection selection = (IStructuredSelection) window.getSelectionService().getSelection();
-			Object[] Items = ((IStructuredSelection) selection).toArray();
+			Object[] Items = selection.toArray();
 			for (int i = 0; i < Items.length; i++) {
 				IAdaptable item = (IAdaptable) Items[i];
 				if (item instanceof IAdaptable) {
 					try {
-						AdtObjectReference AdtRef = ((IAdaptable) item).getAdapter(AdtObjectReference.class);
+						AdtObjectReference AdtRef = item.getAdapter(AdtObjectReference.class);
 						String objectType = AdtRef.getType();
 						String objectName = AdtRef.getName();
 						TypeOfEntry typeOfEntry = Common.getTypeOfEntryFromSAPType(objectType);
@@ -49,18 +48,20 @@ public class AddToFavoritesProjectExplorerHandler extends AbstractHandler {
 									if (newObjectDialog.open() == Window.OK) {
 										XMLhandler.addObjectToXML(selectFolderDialog.getTypeOfEntry(),
 												newObjectDialog.getName(), newObjectDialog.getDescription(),
-												newObjectDialog.getLongDescription(),"", selectFolderDialog.getFolderID(),
-												selectFolderDialog.getFolderType());
+												newObjectDialog.getLongDescription(), "",
+												selectFolderDialog.getFolderID(), selectFolderDialog.getFolderType(),
+												newObjectDialog.getCommandID());
 									}
 								} else {
 									XMLhandler.addObjectToXML(typeOfEntry, objectName.toUpperCase(), "", "",
-											selectFolderDialog.getFolderID(),"",selectFolderDialog.getFolderType());
+											selectFolderDialog.getFolderID(), "", selectFolderDialog.getFolderType(),
+											"");
 								}
 							}
 
 						} else {
 							XMLhandler.addObjectToXML(typeOfEntry, objectName.toUpperCase(), "", "", "",
-									selectFolderDialog.getFolderID(), selectFolderDialog.getFolderType());
+									selectFolderDialog.getFolderID(), selectFolderDialog.getFolderType(), "");
 						}
 
 					} catch (SecurityException e) {

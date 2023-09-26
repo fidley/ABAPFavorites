@@ -1,15 +1,15 @@
 package com.abapblog.favorites.commands;
 
 import org.eclipse.core.commands.AbstractHandler;
-
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.window.*;
+import org.eclipse.jface.window.Window;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorInput;
+
 import com.abapblog.favorites.common.CommonTypes;
 import com.abapblog.favorites.dialog.NameDialog;
 import com.abapblog.favorites.superview.Superview;
@@ -30,7 +30,8 @@ public class AddToFavoritesHandler extends AbstractHandler {
 
 			CommonTypes.TypeOfEntry objectType = AbapEditorPathParser.getType(input.toString());
 			String objectName = AbapEditorPathParser.getObjectName(input.toString());
-			//In case of objects in own namespace we have to convert %2f to / character to have correct name
+			// In case of objects in own namespace we have to convert %2f to / character to
+			// have correct name
 			objectName = objectName.replaceAll("%2f", "/");
 
 			SelectFolderDialog selectFolderDialog = new SelectFolderDialog(null, objectType, objectName);
@@ -39,8 +40,9 @@ public class AddToFavoritesHandler extends AbstractHandler {
 						selectFolderDialog.getObjectName().toUpperCase());
 				if (newObjectDialog.open() == Window.OK) {
 					XMLhandler.addObjectToXML(selectFolderDialog.getTypeOfEntry(), newObjectDialog.getName(),
-							newObjectDialog.getDescription(), newObjectDialog.getLongDescription(),"",
-							selectFolderDialog.getFolderID(), selectFolderDialog.getFolderType());
+							newObjectDialog.getDescription(), newObjectDialog.getLongDescription(), "",
+							selectFolderDialog.getFolderID(), selectFolderDialog.getFolderType(),
+							newObjectDialog.getCommandID());
 					Superview.refreshActiveViews();
 				}
 
