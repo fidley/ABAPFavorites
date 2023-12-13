@@ -107,6 +107,12 @@
                           allPopups="false"
                           locationURI="menu:com.abapblog.favorites.views.Favorites">
                        <command
+                             commandId="com.abapblog.favorites.importFromGui"
+                             icon="icons/importdir_wiz.png"
+                             label="Import Favorties from GUI"
+                             style="push">
+                       </command>
+                       <command
                              commandId="com.abapblog.favorites.openPreferences"
                              icon="icons/preferences.png"
                              label="Preferences"
@@ -268,6 +274,11 @@
             defaultHandler="com.abapblog.favorites.commands.RleaseNotes"
             id="com.abapblog.favorites.ReleaseInfo"
             name="Show Release Notes">
+      </command>
+      <command
+            defaultHandler="com.abapblog.favorites.commands.sapgui.ImportFavoritesFromSAPGui"
+            id="com.abapblog.favorites.importFromGui"
+            name="Import From SAP GUI">
       </command>
    </extension>
    <extension

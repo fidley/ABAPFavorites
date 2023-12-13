@@ -36,11 +36,12 @@ public class XMLhandler {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static void addFolderToXML(String name, String description, String longDescription,
+	public static String addFolderToXML(String name, String description, String longDescription,
 			Boolean projectIndependent, String projectName, Boolean devObjFolder, String parentID,
 			TypeOfXMLNode parentType) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
+		String newFolderId = UUID.randomUUID().toString();
 		try {
 			dBuilder = dbFactory.newDocumentBuilder();
 			Document doc;
@@ -55,7 +56,7 @@ public class XMLhandler {
 				folder.setAttribute(TypeOfXMLAttr.projectIndependent.toString(), projectIndependent.toString());
 				folder.setAttribute(TypeOfXMLAttr.project.toString(), projectName);
 				folder.setAttribute(TypeOfXMLAttr.devObjFolder.toString(), devObjFolder.toString());
-				folder.setAttribute(TypeOfXMLAttr.folderID.toString(), UUID.randomUUID().toString());
+				folder.setAttribute(TypeOfXMLAttr.folderID.toString(), newFolderId);
 
 				if (parentID.equals("")) {
 					Element root = doc.getDocumentElement();
@@ -86,11 +87,14 @@ public class XMLhandler {
 
 			} catch (SAXException | IOException | TransformerException e) {
 				e.printStackTrace();
+				newFolderId = "";
 			}
 
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
+			newFolderId = "";
 		}
+		return newFolderId;
 
 	}
 
@@ -221,8 +225,9 @@ public class XMLhandler {
 
 							Node nNodeFol = FolderEntries.item(tempfol);
 							try {
-								if (nNodeFol.getAttributes().getNamedItem(TypeOfXMLAttr.name.toString()).getNodeValue()
-										.equals(Name)
+								if (nNodeFol.getAttributes() != null
+										&& nNodeFol.getAttributes().getNamedItem(TypeOfXMLAttr.name.toString())
+												.getNodeValue().equals(Name)
 										&& nNodeFol.getNodeName().toString().equals(getObjectXMLNode(Type).toString()))
 
 								{

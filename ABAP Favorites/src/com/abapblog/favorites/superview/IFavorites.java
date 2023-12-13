@@ -33,4 +33,8 @@ public interface IFavorites {
 
 	public ArrayList<TreeParent> getExpandedParentNodes();
 
+	public void showHideLinkedToColumn();
+
+	public void showHideLongDescriptionColumn();
+
 }

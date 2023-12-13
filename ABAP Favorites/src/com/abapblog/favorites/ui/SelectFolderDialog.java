@@ -4,11 +4,12 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -24,16 +25,15 @@ import org.eclipse.ui.dialogs.FilteredTree;
 import com.abapblog.favorites.common.Common;
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
-import com.abapblog.favorites.dialog.NameDialog;
 import com.abapblog.favorites.superview.AFPatternFilter;
-import com.abapblog.favorites.superview.Superview;
 import com.abapblog.favorites.superview.ViewContentProvider;
-import com.abapblog.favorites.superview.ViewLabelProvider;
+import com.abapblog.favorites.superview.labelproviders.LinkedToCellLabelProvider;
+import com.abapblog.favorites.superview.labelproviders.LongDecriptionCellLabelProvider;
+import com.abapblog.favorites.superview.labelproviders.NameCellLabelProviderForDialog;
 import com.abapblog.favorites.tree.ColumnControlListener;
 import com.abapblog.favorites.tree.TreeObject;
 import com.abapblog.favorites.tree.TreeParent;
 import com.abapblog.favorites.views.Favorites;
-import com.abapblog.favorites.xml.XMLhandler;
 import com.abapblog.favoritesDO.views.FavoritesDO;
 
 public class SelectFolderDialog extends Dialog {
@@ -51,6 +51,7 @@ public class SelectFolderDialog extends Dialog {
 		this.setTypeOfEntry(typeOfEntry);
 		this.setObjectName(objectName);
 	}
+
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
@@ -71,10 +72,12 @@ public class SelectFolderDialog extends Dialog {
 
 		return container;
 	}
+
 	private static void initializeFavoritesDO() {
 		if (Common.FavoriteDO == null)
 			Common.FavoriteDO = new FavoritesDO();
 	}
+
 	private static void initializeFavorites() {
 		if (Common.Favorite == null) {
 			Common.Favorite = new Favorites();
@@ -95,11 +98,11 @@ public class SelectFolderDialog extends Dialog {
 		Tree treeFavoritesFoldersDO = treeViewerFavDO.getTree();
 		tbtmFavoritesDO.setControl(filteredTreeDO);
 
-		setTreeColumns(columnListenerDO, treeFavoritesFoldersDO, ID_FOLDER_FAVORITES_DO);
+		setTreeColumns(columnListenerDO, treeFavoritesFoldersDO, ID_FOLDER_FAVORITES_DO, treeViewerFavDO);
 		treeViewerFavDO
 				.setContentProvider(new ViewContentProvider(TypeOfXMLNode.folderDONode, Common.FavoriteDO, container));
 		treeViewerFavDO.setInput(container);
-		treeViewerFavDO.setLabelProvider(new ViewLabelProvider());
+//		treeViewerFavDO.setLabelProvider(new ViewLabelProvider());
 		sortTreeViewer(treeViewerFavDO);
 	}
 
@@ -116,13 +119,12 @@ public class SelectFolderDialog extends Dialog {
 		Tree treeFavoritesFolders = treeViewerFav.getTree();
 		tbtmFavorites.setControl(filteredTree);
 
-		setTreeColumns(columnListener, treeFavoritesFolders, ID_FOLDER_FAVORITES);
+		setTreeColumns(columnListener, treeFavoritesFolders, ID_FOLDER_FAVORITES, treeViewerFav);
 		treeViewerFav.setContentProvider(new ViewContentProvider(TypeOfXMLNode.folderNode, Common.Favorite, container));
 		treeViewerFav.setInput(container);
-		treeViewerFav.setLabelProvider(new ViewLabelProvider());
+//		treeViewerFav.setLabelProvider(new ViewLabelProvider());
 		sortTreeViewer(treeViewerFav);
 	}
-
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
@@ -135,35 +137,28 @@ public class SelectFolderDialog extends Dialog {
 		return new Point(600, 450);
 	}
 
-	private void setTreeColumns(ColumnControlListener columnListener, Tree tree, String id) {
+	private void setTreeColumns(ColumnControlListener columnListener, Tree tree, String id, TreeViewer viewer) {
 		tree.setHeaderVisible(true);
-		TreeColumn columnName = new TreeColumn(tree, SWT.LEFT);
-		columnName.setText("Name");
-		columnName.addControlListener(columnListener);
-		loadColumnSettings(columnName, id);
-		TreeColumn columnDescr = new TreeColumn(tree, SWT.LEFT);
-		columnDescr.setText("Description");
-		columnDescr.addControlListener(columnListener);
-		loadColumnSettings(columnDescr, id);
-		TreeColumn columnID = new TreeColumn(tree, SWT.LEFT);
-		columnID.setText("ID");
-		columnID.addControlListener(columnListener);
-		columnID.setWidth(0);
-		columnID.setResizable(false);
-		TreeColumn columnFolderType = new TreeColumn(tree, SWT.LEFT);
-		columnFolderType.setText("FolderType");
-		columnFolderType.addControlListener(columnListener);
-		columnFolderType.setWidth(0);
-		columnFolderType.setResizable(false);
-		TreeColumn columnDevObj = new TreeColumn(tree, SWT.LEFT);
-		columnDevObj.setText("DevObjects");
-		columnDevObj.addControlListener(columnListener);
-		columnDevObj.setWidth(0);
-		columnDevObj.setResizable(false);
-		TreeColumn columnLinkedTo = new TreeColumn(tree, SWT.LEFT);
-		columnLinkedTo.setText("Linked To");
-		columnLinkedTo.addControlListener(columnListener);
-		loadColumnSettings(columnLinkedTo, id);
+		TreeViewerColumn columnName = new TreeViewerColumn(viewer, SWT.LEFT);
+		columnName.getColumn().setText("Name");
+		columnName.getColumn().addControlListener(columnListener);
+		columnName.setLabelProvider(new NameCellLabelProviderForDialog());
+		loadColumnSettings(columnName.getColumn(), id);
+
+		TreeViewerColumn ColumnLinkedTo = new TreeViewerColumn(viewer, SWT.LEFT);
+		ColumnLinkedTo.getColumn().setText("Linked To");
+		ColumnLinkedTo.getColumn().addControlListener(columnListener);
+		ColumnLinkedTo.setLabelProvider(new LinkedToCellLabelProvider());
+		loadColumnSettings(ColumnLinkedTo.getColumn(), id);
+		TreeViewerColumn ColumnLongDescription = new TreeViewerColumn(viewer, SWT.LEFT);
+		ColumnLongDescription.getColumn().setText("Long text");
+		ColumnLongDescription.getColumn().addControlListener(columnListener);
+		ColumnLongDescription.setLabelProvider(new LongDecriptionCellLabelProvider());
+		loadColumnSettings(ColumnLongDescription.getColumn(), id);
+		if (ColumnLongDescription.getColumn().getWidth() == 0)
+			ColumnLongDescription.getColumn().setWidth(300);
+		ColumnViewerToolTipSupport.enableFor(viewer);
+
 	}
 
 	protected void loadColumnSettings(TreeColumn column, String id) {
@@ -217,8 +212,7 @@ public class SelectFolderDialog extends Dialog {
 			setFolderID(((TreeParent) folder).getFolderID());
 			setFolderType(((TreeParent) folder).getTypeOfFolder());
 
-				super.okPressed();
-
+			super.okPressed();
 
 		}
 
@@ -231,35 +225,35 @@ public class SelectFolderDialog extends Dialog {
 		super.cancelPressed();
 	}
 
-	public  String getObjectName() {
+	public String getObjectName() {
 		return objectName;
 	}
 
-	public  void setObjectName(String objectName) {
+	public void setObjectName(String objectName) {
 		this.objectName = objectName;
 	}
 
-	public  String getFolderID() {
+	public String getFolderID() {
 		return folderID;
 	}
 
-	public  void setFolderID(String folderID) {
+	public void setFolderID(String folderID) {
 		this.folderID = folderID;
 	}
 
-	public  TypeOfXMLNode getFolderType() {
+	public TypeOfXMLNode getFolderType() {
 		return folderType;
 	}
 
-	public  void setFolderType(TypeOfXMLNode folderType) {
+	public void setFolderType(TypeOfXMLNode folderType) {
 		this.folderType = folderType;
 	}
 
-	public  TypeOfEntry getTypeOfEntry() {
+	public TypeOfEntry getTypeOfEntry() {
 		return typeOfEntry;
 	}
 
-	public  void setTypeOfEntry(TypeOfEntry typeOfEntry) {
+	public void setTypeOfEntry(TypeOfEntry typeOfEntry) {
 		this.typeOfEntry = typeOfEntry;
 	}
 
