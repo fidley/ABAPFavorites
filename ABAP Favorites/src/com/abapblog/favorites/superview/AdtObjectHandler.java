@@ -168,6 +168,8 @@ public class AdtObjectHandler {
 	 */
 	public static IAdtObjectReference lookupObjectReference(final IProject project, final String technicalObjectName,
 			final TypeOfEntry type) {
+		if (type.equals(TypeOfEntry.URL) || type.equals(TypeOfEntry.ADTLink))
+			return null;
 		String programName = "";
 		List<IAdtObjectReference> res = null;
 		try {

@@ -130,6 +130,11 @@
                              label="Buy Me a Beer"
                              style="push">
                        </command>
+                       <command
+                             commandId="com.abapblog.favorites.importFromGui"
+                             label="Import Favorties from GUI"
+                             style="push">
+                       </command>
                     </menuContribution>
                     <menuContribution
                           allPopups="false"
@@ -268,6 +273,11 @@
             defaultHandler="com.abapblog.favorites.commands.RleaseNotes"
             id="com.abapblog.favorites.ReleaseInfo"
             name="Show Release Notes">
+      </command>
+      <command
+            defaultHandler="com.abapblog.favorites.commands.sapgui.ImportFavoritesFromSAPGui"
+            id="com.abapblog.favorites.importFromGui"
+            name="Import From SAP GUI">
       </command>
    </extension>
    <extension

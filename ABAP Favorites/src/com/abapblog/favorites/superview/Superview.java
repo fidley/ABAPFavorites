@@ -27,9 +27,11 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.LocalSelectionTransfer;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
@@ -71,6 +73,9 @@ import com.abapblog.favorites.common.CommonTypes.TypeOfXMLAttr;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.common.NameSorting;
 import com.abapblog.favorites.preferences.PreferenceConstants;
+import com.abapblog.favorites.superview.labelproviders.LinkedToCellLabelProvider;
+import com.abapblog.favorites.superview.labelproviders.LongDecriptionCellLabelProvider;
+import com.abapblog.favorites.superview.labelproviders.NameCellLabelProvider;
 import com.abapblog.favorites.tree.ColumnControlListener;
 import com.abapblog.favorites.tree.TreeExpansionListener;
 import com.abapblog.favorites.tree.TreeObject;
@@ -110,6 +115,8 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 	public IProject TempLinkedProject;
 	private ArrayList<String> expandedNodes;
 	private ArrayList<TreeParent> expandedParentNodes;
+	private TreeViewerColumn ColumnLinkedTo;
+	private TreeViewerColumn ColumnLongDescription;
 
 	protected TypeOfXMLNode FolderNode;
 	private static List<TreeViewer> activeViewers = new ArrayList<>();
@@ -125,6 +132,8 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 		});
 		getActiveFavorites().forEach((favorite) -> {
 			toggleLinkingOfEditor(favorite);
+			favorite.showHideLongDescriptionColumn();
+			favorite.showHideLinkedToColumn();
 		});
 	}
 
@@ -209,10 +218,10 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 		tree.addTreeListener(new TreeExpansionListener(this));
 		addDragAndDropSupport(tree);
 
-		setTreeColumns(columnListener, tree);
+		setTreeColumns(columnListener, tree, this.viewer);
 		this.viewer.setContentProvider(new ViewContentProvider(getFolderType(), this, getViewSite()));
 		this.viewer.setInput(getViewSite());
-		this.viewer.setLabelProvider(new ViewLabelProvider());
+//		this.viewer.setLabelProvider(new ViewLabelProvider());
 
 		loadPluginSettings();
 		// Create the help context id for the viewer's control
@@ -394,19 +403,6 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 						} else {
 							if (item.getParent().getDevObjProject() == DevObjProjBool
 									&& !ID.equals(item.getParent().getFolderID())) {
-//								if (item.getType() == TypeOfEntry.URL) {
-//									XMLhandler.addURLToXML(item.getName(), item.getDescription(),
-//											item.getLongDescription(), item.getTechnicalName(), ID,
-//											TypeOfXMLNode.urlNode, ParentType);
-//								} else if (item.getType() == TypeOfEntry.ADTLink) {
-//									XMLhandler.addURLToXML(item.getName(), item.getDescription(),
-//											item.getLongDescription(), item.getTechnicalName(), ID,
-//											TypeOfXMLNode.ADTLinkNode, ParentType);
-//								} else {
-//									XMLhandler.addObjectToXML(item.getType(), item.getName(), item.getDescription(),
-//											item.getLongDescription(), ID, ParentType);
-//
-//								}
 								XMLhandler.addObjectToXML(item.getType(), item.getName(), item.getDescription(),
 										item.getLongDescription(), item.getTechnicalName(), ID, ParentType,
 										item.getCommandID());
@@ -435,35 +431,56 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 		this.linkWithEditorAction.setEnabled(false);
 	}
 
-	private void setTreeColumns(final ColumnControlListener columnListener, final Tree tree) {
+	private void setTreeColumns(final ColumnControlListener columnListener, final Tree tree, TreeViewer viewer) {
 		tree.setHeaderVisible(true);
-		final TreeColumn columnName = new TreeColumn(tree, SWT.LEFT);
-		columnName.setText("Name");
-		columnName.addControlListener(columnListener);
-		loadColumnSettings(columnName);
-		final TreeColumn columnDescr = new TreeColumn(tree, SWT.LEFT);
-		columnDescr.setText("Description");
-		columnDescr.addControlListener(columnListener);
-		loadColumnSettings(columnDescr);
-		final TreeColumn ColumnID = new TreeColumn(tree, SWT.LEFT);
-		ColumnID.setText("ID");
-		ColumnID.addControlListener(columnListener);
-		ColumnID.setWidth(0);
-		ColumnID.setResizable(false);
-		final TreeColumn ColumnFolderType = new TreeColumn(tree, SWT.LEFT);
-		ColumnFolderType.setText("FolderType");
-		ColumnFolderType.addControlListener(columnListener);
-		ColumnFolderType.setWidth(0);
-		ColumnFolderType.setResizable(false);
-		final TreeColumn ColumnDevObj = new TreeColumn(tree, SWT.LEFT);
-		ColumnDevObj.setText("DevObjects");
-		ColumnDevObj.addControlListener(columnListener);
-		ColumnDevObj.setWidth(0);
-		ColumnDevObj.setResizable(false);
-		final TreeColumn ColumnLinkedTo = new TreeColumn(tree, SWT.LEFT);
-		ColumnLinkedTo.setText("Linked To");
-		ColumnLinkedTo.addControlListener(columnListener);
-		loadColumnSettings(ColumnLinkedTo);
+		TreeViewerColumn columnName = new TreeViewerColumn(viewer, SWT.LEFT);
+		columnName.getColumn().setText("Name");
+		columnName.getColumn().addControlListener(columnListener);
+		columnName.getColumn().setMoveable(false);
+		columnName.setLabelProvider(new NameCellLabelProvider());
+		loadColumnSettings(columnName.getColumn());
+
+		ColumnLinkedTo = new TreeViewerColumn(viewer, SWT.LEFT);
+		ColumnLinkedTo.getColumn().setText("Linked To");
+		ColumnLinkedTo.getColumn().addControlListener(columnListener);
+		ColumnLinkedTo.getColumn().setMoveable(true);
+		showHideLinkedToColumn();
+		ColumnLinkedTo.setLabelProvider(new LinkedToCellLabelProvider());
+
+		ColumnLongDescription = new TreeViewerColumn(viewer, SWT.LEFT);
+		ColumnLongDescription.getColumn().setText("Long text");
+		ColumnLongDescription.getColumn().addControlListener(columnListener);
+		ColumnLongDescription.getColumn().setMoveable(true);
+		showHideLongDescriptionColumn();
+		ColumnLongDescription.setLabelProvider(new LongDecriptionCellLabelProvider());
+
+		ColumnViewerToolTipSupport.enableFor(viewer);
+	}
+
+	@Override
+	public void showHideLongDescriptionColumn() {
+		loadColumnSettings(ColumnLongDescription.getColumn());
+		if (store.getBoolean(PreferenceConstants.P_SHOW_LONG_TEXT_COLUMN)) {
+			if (ColumnLongDescription.getColumn().getWidth() == 0)
+				ColumnLongDescription.getColumn().setWidth(300);
+			ColumnLongDescription.getColumn().setResizable(true);
+		} else {
+			ColumnLongDescription.getColumn().setWidth(0);
+			ColumnLongDescription.getColumn().setResizable(false);
+		}
+	}
+
+	@Override
+	public void showHideLinkedToColumn() {
+		loadColumnSettings(ColumnLinkedTo.getColumn());
+		if (store.getBoolean(PreferenceConstants.P_SHOW_LINKED_TO_COLUMN)) {
+			if (ColumnLinkedTo.getColumn().getWidth() == 0)
+				ColumnLinkedTo.getColumn().setWidth(100);
+			ColumnLinkedTo.getColumn().setResizable(true);
+		} else {
+			ColumnLinkedTo.getColumn().setWidth(0);
+			ColumnLinkedTo.getColumn().setResizable(false);
+		}
 	}
 
 	@Override
@@ -483,7 +500,6 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 					this.viewer.setExpandedElements(getExpandedParentNodes().toArray());
 				}
 			}
-			return;
 		}
 
 	}
@@ -511,9 +527,10 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 		final MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(manager -> fillContextMenu(manager));
-		final Menu menu = menuMgr.createContextMenu(this.viewer.getControl());
-		this.viewer.getControl().setMenu(menu);
-		getSite().registerContextMenu(menuMgr, this.viewer);
+		final Menu menu = menuMgr.createContextMenu(viewer.getControl());
+		viewer.getControl().setMenu(menu);
+		getSite().registerContextMenu(menuMgr, viewer);
+		getSite().setSelectionProvider(viewer);
 	}
 
 	protected void contributeToActionBars() {
@@ -540,7 +557,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 
 				if (object instanceof TreeParent) {
 					final TreeParent parent = (TreeParent) object;
-					if (parent.getDevObjProject() == true) {
+					if (parent.getDevObjProject()) {
 						manager.add(this.actions.actAddFolder);
 						manager.add(this.actions.actAddProgram);
 						manager.add(this.actions.actAddClass);
@@ -555,6 +572,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 						manager.add(this.actions.actAddCDS);
 						manager.add(this.actions.actAddPackage);
 						manager.add(new Separator());
+						manager.remove(IWorkbenchActionConstants.MB_ADDITIONS);
 					} else {
 						manager.add(this.actions.actAddFolder);
 						manager.add(this.actions.actAddTransaction);
@@ -567,8 +585,7 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 					manager.add(this.actions.actEdit);
 					manager.add(new Separator());
 					this.drillDownAdapter.addNavigationActions(manager);
-					// Other plug-ins can contribute there actions here
-					manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+					manager.remove(IWorkbenchActionConstants.MB_ADDITIONS);
 				} else if (object instanceof TreeObject) {
 
 					manager.add(new Separator());
@@ -581,12 +598,10 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 
 					Actions.addOpenInProjectMenu(manager, this.viewer);
 					this.drillDownAdapter.addNavigationActions(manager);
-					// Other plug-ins can contribute there actions here
-					manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+					manager.remove(IWorkbenchActionConstants.MB_ADDITIONS);
 				}
 
 			} catch (final Exception e) {
-				// TODO: handle exception
 				showMessage(e.toString());
 			}
 		}

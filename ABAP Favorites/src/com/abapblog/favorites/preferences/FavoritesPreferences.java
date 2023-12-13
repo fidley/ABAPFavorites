@@ -14,6 +14,8 @@ import com.abapblog.favorites.superview.Superview;
 public class FavoritesPreferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 	private final IPreferenceStore store;
 	private Boolean hideProjectDepFolders;
+	private Boolean showLinkedToColumn;
+	private Boolean showLongTextColumn;
 
 	public FavoritesPreferences() {
 		super(GRID);
@@ -38,11 +40,19 @@ public class FavoritesPreferences extends FieldEditorPreferencePage implements I
 				"Project to be used during double click with pressed Ctrl key", 1, DoubleClickBehavior.toNamesAndKeys(),
 				getFieldEditorParent(), true));
 
+		addField(new BooleanFieldEditor(PreferenceConstants.P_SHOW_LINKED_TO_COLUMN,
+				"&Show Linked To column in the views", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PreferenceConstants.P_SHOW_LONG_TEXT_COLUMN,
+				"&Show Long Description column in the views", getFieldEditorParent()));
+
 	}
 
 	@Override
 	public void init(final IWorkbench workbench) {
-		this.hideProjectDepFolders = this.store.getBoolean(PreferenceConstants.P_HIDE_PROJECT_DEP_FOLDERS);
+		hideProjectDepFolders = store.getBoolean(PreferenceConstants.P_HIDE_PROJECT_DEP_FOLDERS);
+		showLinkedToColumn = store.getBoolean(PreferenceConstants.P_SHOW_LINKED_TO_COLUMN);
+		showLongTextColumn = store.getBoolean(PreferenceConstants.P_SHOW_LONG_TEXT_COLUMN);
+
 	}
 
 	@Override
@@ -61,9 +71,13 @@ public class FavoritesPreferences extends FieldEditorPreferencePage implements I
 	}
 
 	private void checkFavoritesNeedRefresh() {
-		final Boolean _hideProjectDepFolders = this.store.getBoolean(PreferenceConstants.P_HIDE_PROJECT_DEP_FOLDERS);
-		if (_hideProjectDepFolders != this.hideProjectDepFolders) {
-			this.hideProjectDepFolders = _hideProjectDepFolders;
+
+		if (hideProjectDepFolders != store.getBoolean(PreferenceConstants.P_HIDE_PROJECT_DEP_FOLDERS)
+				|| showLinkedToColumn != store.getBoolean(PreferenceConstants.P_SHOW_LINKED_TO_COLUMN)
+				|| showLongTextColumn != store.getBoolean(PreferenceConstants.P_SHOW_LONG_TEXT_COLUMN)) {
+			hideProjectDepFolders = store.getBoolean(PreferenceConstants.P_HIDE_PROJECT_DEP_FOLDERS);
+			showLinkedToColumn = store.getBoolean(PreferenceConstants.P_SHOW_LINKED_TO_COLUMN);
+			showLongTextColumn = store.getBoolean(PreferenceConstants.P_SHOW_LONG_TEXT_COLUMN);
 			Superview.refreshActiveViews();
 
 		}

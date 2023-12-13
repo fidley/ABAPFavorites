@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ABAP Favorites Release Notes
 Bundle-SymbolicName: com.abapblog.favorites.release.notes.content;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.63.qualifier
 Bundle-Activator: com.abapblog.favorites.release.notes.content.Activator
 Eclipse-BundleShape: dir
 Bundle-Vendor: abapBlog.com

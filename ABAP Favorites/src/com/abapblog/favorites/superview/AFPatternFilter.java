@@ -16,6 +16,9 @@ public class AFPatternFilter extends PatternFilter {
 			if (isMatch == false) {
 				isMatch |= wordMatches(leaf.getDescription());
 			}
+			if (isMatch == false) {
+				isMatch |= wordMatches(leaf.getLongDescription());
+			}
 		}
 		return isMatch;
 	}
