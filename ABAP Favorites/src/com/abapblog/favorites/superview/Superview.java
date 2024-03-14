@@ -59,6 +59,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -232,10 +233,37 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 		hookDoubleClickAction();
 		contributeToActionBars();
 		setLinkingWithEditor();
+		createExpandAllCollapseAllActions();
 		setNewViewName();
 		sortTable();
-		// refreshViewer(this.viewer);
 		this.viewer.setExpandedElements(getExpandedParentNodes().toArray());
+
+	}
+
+	private void createExpandAllCollapseAllActions() {
+		final Action actExpandAll = new Action("Expand All") {
+			@Override
+			public void run() {
+				viewer.expandAll();
+			}
+
+		};
+		actExpandAll.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ui.editors",
+				"icons/full/elcl16/expandall.png"));
+		actExpandAll.setToolTipText("Expand All");
+
+		final Action actCollapseAll = new Action("Collapse All") {
+			@Override
+			public void run() {
+				viewer.collapseAll();
+			}
+		};
+		actCollapseAll.setImageDescriptor(
+				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ELCL_COLLAPSEALL));
+		actCollapseAll.setToolTipText("Collapse All");
+		final IActionBars bars = getViewSite().getActionBars();
+		bars.getToolBarManager().add(actExpandAll);
+		bars.getToolBarManager().add(actCollapseAll);
 
 	}
 
