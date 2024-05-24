@@ -14,7 +14,8 @@ import com.abapblog.favorites.superview.Superview;
 
 public class FavoritesDO extends Superview {
 
-	private String ID = "com.abapblog.favoritesDO.views.FavoritesDO";
+	public static final String ID = "com.abapblog.favoritesDO.views.FavoritesDO";
+
 	/**
 	 * The constructor.
 	 */

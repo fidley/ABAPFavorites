@@ -18,6 +18,10 @@ public class TreeObject implements IAdaptable {
 		result = prime * result + ((technicalName == null) ? 0 : technicalName.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		result = prime * result + ((parent == null) ? 0 : parent.hashCode());
+		if (this instanceof TreeParent) {
+			TreeParent folder = (TreeParent) this;
+			result = prime * result + ((folder.getFolderID() == null) ? 0 : folder.getFolderID().hashCode());
+		}
 		return result;
 	}
 
@@ -54,6 +58,12 @@ public class TreeObject implements IAdaptable {
 				return false;
 		} else if (!parent.equals(other.parent))
 			return false;
+		if (this instanceof TreeParent && obj instanceof TreeParent) {
+			TreeParent folderThis = (TreeParent) this;
+			TreeParent folderOther = (TreeParent) obj;
+			if (folderThis.getFolderID() != folderOther.getFolderID())
+				return false;
+		}
 		return true;
 	}
 

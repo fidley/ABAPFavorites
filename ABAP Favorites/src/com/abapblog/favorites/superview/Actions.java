@@ -30,7 +30,10 @@ import com.abapblog.favorites.dialog.URLDialog;
 import com.abapblog.favorites.preferences.PreferenceConstants;
 import com.abapblog.favorites.tree.TreeObject;
 import com.abapblog.favorites.tree.TreeParent;
+import com.abapblog.favorites.ui.SelectFolderDialog;
+import com.abapblog.favorites.views.Favorites;
 import com.abapblog.favorites.xml.XMLhandler;
+import com.abapblog.favoritesDO.views.FavoritesDO;
 import com.sap.adt.destinations.ui.logon.AdtLogonServiceUIFactory;
 
 public class Actions {
@@ -61,6 +64,8 @@ public class Actions {
 	public Action actCopyToClipboard;
 	public Action sortObjectByName;
 	public Action sortObjectByDescription;
+	public Action actMoveFolderToRoot;
+	public Action actMoveToFolder;
 
 	public void makeActions(final Superview superview) {
 		final AFIcons AFIcon = AFIcons.getInstance();
@@ -90,6 +95,56 @@ public class Actions {
 		createAddPackageAction(superview.viewer, AFIcon);
 		createSortObjectByName(superview, AFIcon);
 		createSortObjectByDescription(superview, AFIcon);
+		createMoveFolderToRootAction(superview.viewer);
+		createMoveToFolderAction(superview);
+	}
+
+	private void createMoveToFolderAction(Superview superview) {
+		this.actMoveToFolder = new Action() {
+			@Override
+			public void run() {
+				if (superview.viewer.getSelection() instanceof IStructuredSelection) {
+					final IStructuredSelection selection = (IStructuredSelection) superview.viewer.getSelection();
+
+					final TreeObject object = (TreeObject) selection.getFirstElement();
+					int tabToShow = 0;
+					switch (superview.getID()) {
+					case Favorites.ID:
+						tabToShow = 1;
+						break;
+					case FavoritesDO.ID:
+						tabToShow = 2;
+						break;
+					}
+
+					SelectFolderDialog selectFolderDialog = new SelectFolderDialog(null, object.getType(),
+							object.getName(), tabToShow);
+					if (selectFolderDialog.open() == Window.OK) {
+						if (object instanceof TreeParent) {
+							TreeParent folderToMove = (TreeParent) object;
+							XMLhandler.moveFolderInXML(folderToMove.getFolderID(), selectFolderDialog.getFolderID(),
+									folderToMove.getTypeOfFolder(), selectFolderDialog.getFolderType());
+
+						} else {
+							XMLhandler.addObjectToXML(object.getType(), object.getName(), object.getDescription(),
+									object.getLongDescription(), object.getTechnicalName(),
+									selectFolderDialog.getFolderID(), selectFolderDialog.getFolderType(),
+									object.getCommandID());
+							XMLhandler.delObjectFromXML(object.getType(), object.getName(),
+									object.getParent().getFolderID(), object.getParent().getTypeOfFolder());
+						}
+						Superview.refreshViewer(superview.viewer);
+
+					}
+
+				}
+			}
+		};
+		this.actMoveToFolder.setText("Move to folder");
+		this.actMoveToFolder.setToolTipText("Move folder");
+		this.actMoveToFolder.setImageDescriptor(
+				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_FORWARD));
+
 	}
 
 	private void createSortObjectByDescription(Superview superView, AFIcons aFIcon) {
@@ -275,6 +330,33 @@ public class Actions {
 		this.actDelFolder.setToolTipText("Folder");
 		this.actDelFolder.setImageDescriptor(
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
+	}
+
+	private void createMoveFolderToRootAction(final TreeViewer viewer) {
+		this.actMoveFolderToRoot = new Action() {
+			@Override
+			public void run() {
+				if (viewer.getSelection() instanceof IStructuredSelection) {
+					final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+
+					final TreeObject object = (TreeObject) selection.getFirstElement();
+
+					if (object instanceof TreeParent) {
+						TreeParent folderToMove = (TreeParent) object;
+						if (folderToMove.getParent().getFolderID().equals("root"))
+							return;
+						XMLhandler.moveFolderInXML(folderToMove.getFolderID(), "root", folderToMove.getTypeOfFolder(),
+								folderToMove.getTypeOfFolder());
+						Superview.refreshViewer(viewer);
+					}
+
+				}
+			}
+		};
+		this.actMoveFolderToRoot.setText("Move Folder to Root");
+		this.actMoveFolderToRoot.setToolTipText("Move to Root");
+		this.actMoveFolderToRoot.setImageDescriptor(
+				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_FORWARD));
 	}
 
 	private void createAddFMAction(final TreeViewer viewer, final AFIcons AFIcon) {
@@ -680,14 +762,18 @@ public class Actions {
 		if (viewer.getSelection() instanceof IStructuredSelection) {
 			final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 
-			final TreeObject object = (TreeObject) selection.getFirstElement();
+			for (int i = 0; i < selection.size(); i++) {
+				TreeObject object = (TreeObject) selection.toArray()[i];
+				if (object instanceof TreeObject) {
+					TreeObject treeObj = object;
+					XMLhandler.delObjectFromXML(treeObj.getType(), object.getName(), object.getParent().getFolderID(),
+							object.getParent().getTypeOfFolder());
+					treeObj.getParent().removeChild(treeObj);
+					treeObj = null;
 
-			if (object instanceof TreeObject) {
-				final TreeObject treeObj = object;
-				XMLhandler.delObjectFromXML(treeObj.getType(), object.getName(), object.getParent().getFolderID(),
-						object.getParent().getTypeOfFolder());
-				Superview.refreshViewer(viewer);
+				}
 			}
+			Superview.refreshViewer(viewer);
 		}
 	}
 

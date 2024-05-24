@@ -183,6 +183,7 @@ public class XMLhandler {
 						Transformer transformer = transformerFactory.newTransformer();
 						StreamResult result = new StreamResult(getFavFile().getPath());
 						transformer.transform(source, result);
+						return;
 					}
 
 				}
@@ -225,10 +226,10 @@ public class XMLhandler {
 
 							Node nNodeFol = FolderEntries.item(tempfol);
 							try {
-								if (nNodeFol.getAttributes() != null
+								if (nNodeFol.getNodeName().toString().equals(getObjectXMLNode(Type).toString())
+										&& nNodeFol.getAttributes() != null
 										&& nNodeFol.getAttributes().getNamedItem(TypeOfXMLAttr.name.toString())
-												.getNodeValue().equals(Name)
-										&& nNodeFol.getNodeName().toString().equals(getObjectXMLNode(Type).toString()))
+												.getNodeValue().toUpperCase().equals(Name.toUpperCase()))
 
 								{
 									nNode.removeChild(nNodeFol);
@@ -239,6 +240,7 @@ public class XMLhandler {
 									Transformer transformer = transformerFactory.newTransformer();
 									StreamResult result = new StreamResult(getFavFile().getPath());
 									transformer.transform(source, result);
+									break;
 								}
 							} catch (Exception e) {
 								e.printStackTrace();
@@ -292,6 +294,7 @@ public class XMLhandler {
 						Transformer transformer = transformerFactory.newTransformer();
 						StreamResult result = new StreamResult(getFavFile().getPath());
 						transformer.transform(source, result);
+						break;
 					}
 
 				}
@@ -394,17 +397,35 @@ public class XMLhandler {
 
 							NamedNodeMap attributesTarget = nNodeTarget.getAttributes();
 							Node FolderNameTarget = attributesTarget.getNamedItem(TypeOfXMLAttr.folderID.toString());
-							if (FolderNameTarget.getNodeValue().equals(TargetFolderId)) {
 
-								nNodeTarget.appendChild(nNode);
+							if (TargetFolderId.equals("root")) {
+
+								Element root = doc.getDocumentElement();
+								nNode.getParentNode().removeChild(nNode);
+								root.appendChild(nNode);
 								DOMSource source = new DOMSource(doc);
 
 								TransformerFactory transformerFactory = TransformerFactory.newInstance();
 								Transformer transformer = transformerFactory.newTransformer();
 								StreamResult result = new StreamResult(getFavFile().getPath());
 								transformer.transform(source, result);
+								break;
+							}
+
+							if (FolderNameTarget.getNodeValue().equals(TargetFolderId)) {
+								nNode.getParentNode().removeChild(nNode);
+								nNodeTarget.appendChild(nNode);
+
+								DOMSource source = new DOMSource(doc);
+
+								TransformerFactory transformerFactory = TransformerFactory.newInstance();
+								Transformer transformer = transformerFactory.newTransformer();
+								StreamResult result = new StreamResult(getFavFile().getPath());
+								transformer.transform(source, result);
+								break;
 							}
 						}
+						break;
 
 					}
 
@@ -423,7 +444,9 @@ public class XMLhandler {
 	private static File favFile;
 
 	public static TypeOfXMLNode getObjectXMLNode(TypeOfEntry ObjectType) {
-
+		if (ObjectType == null) {
+			return TypeOfXMLNode.programNode;
+		}
 		switch (ObjectType) {
 		case Class:
 			return TypeOfXMLNode.classNode;
@@ -637,6 +660,102 @@ public class XMLhandler {
 			e.printStackTrace();
 		}
 
+	}
+
+	public static void copyFolderInXML(String SourceFolderId, String TargetFolderId, TypeOfXMLNode SourceParentNodeType,
+			TypeOfXMLNode TargetParentNodeType) {
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder;
+		Boolean changed = false;
+		try {
+			dBuilder = dbFactory.newDocumentBuilder();
+			Document doc;
+			try {
+				doc = dBuilder.parse(getFavFile());
+				doc.getDocumentElement().normalize();
+				NodeList sourceFolders = doc.getElementsByTagName(SourceParentNodeType.toString());
+
+				for (int temp = 0; temp < sourceFolders.getLength(); temp++) {
+
+					Node nNode = sourceFolders.item(temp);
+
+					NamedNodeMap attributes = nNode.getAttributes();
+					Node FolderName = attributes.getNamedItem(TypeOfXMLAttr.folderID.toString());
+					if (FolderName == null) {
+						continue;
+					}
+
+					if (FolderName.getNodeValue().equals(SourceFolderId)) {
+
+						Node copiedNode = doc.importNode(nNode, true);
+						copiedNode.getAttributes().getNamedItem(TypeOfXMLAttr.folderID.toString())
+								.setNodeValue(UUID.randomUUID().toString());
+						updateFolderIdInCopiedFolders(copiedNode);
+
+						if (TargetFolderId.equals("root")) {
+
+							Element root = doc.getDocumentElement();
+							root.appendChild(copiedNode);
+							DOMSource source = new DOMSource(doc);
+
+							TransformerFactory transformerFactory = TransformerFactory.newInstance();
+							Transformer transformer = transformerFactory.newTransformer();
+							StreamResult result = new StreamResult(getFavFile().getPath());
+							transformer.transform(source, result);
+							break;
+
+						} else {
+							NodeList targetFolders = doc.getElementsByTagName(TargetParentNodeType.toString());
+							for (int tempTarget = 0; tempTarget < targetFolders.getLength(); tempTarget++) {
+
+								Node nNodeTarget = targetFolders.item(tempTarget);
+
+								NamedNodeMap attributesTarget = nNodeTarget.getAttributes();
+								Node FolderNameTarget = attributesTarget
+										.getNamedItem(TypeOfXMLAttr.folderID.toString());
+
+								if (FolderNameTarget.getNodeValue().equals(TargetFolderId)) {
+									nNodeTarget.appendChild(copiedNode);
+									changed = true;
+									break;
+
+								}
+							}
+							break;
+						}
+					}
+
+				}
+				if (changed == true) {
+					DOMSource source = new DOMSource(doc);
+
+					TransformerFactory transformerFactory = TransformerFactory.newInstance();
+					Transformer transformer = transformerFactory.newTransformer();
+					StreamResult result = new StreamResult(getFavFile().getPath());
+					transformer.transform(source, result);
+				}
+			} catch (SAXException | IOException e) {
+				e.printStackTrace();
+			}
+
+		} catch (ParserConfigurationException | TransformerException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private static void updateFolderIdInCopiedFolders(Node nNode) {
+		for (int i = 0; i < nNode.getChildNodes().getLength(); i++) {
+			Node nNodeChild = nNode.getChildNodes().item(i);
+			if (nNodeChild.getNodeType() == Node.ELEMENT_NODE) {
+				NamedNodeMap attributesChild = nNodeChild.getAttributes();
+				Node childFolderId = attributesChild.getNamedItem(TypeOfXMLAttr.folderID.toString());
+				if (childFolderId != null) {
+					childFolderId.setNodeValue(UUID.randomUUID().toString());
+				}
+				updateFolderIdInCopiedFolders(nNodeChild);
+			}
+		}
 	}
 
 }
