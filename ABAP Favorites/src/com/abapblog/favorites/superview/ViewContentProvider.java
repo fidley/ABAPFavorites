@@ -1,12 +1,12 @@
 package com.abapblog.favorites.superview;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 
 import com.abapblog.favorites.common.Common;
-import com.abapblog.favorites.common.CommonTypes;
 import com.abapblog.favorites.common.CommonTypes.TypeOfXMLNode;
 import com.abapblog.favorites.tree.TreeObject;
 import com.abapblog.favorites.tree.TreeParent;
@@ -20,6 +20,7 @@ public class ViewContentProvider implements ITreeContentProvider {
 	private IViewSite viewSite;
 	private Composite container;
 	private Boolean selectFolderDialog = false;
+	public IProject TempLinkedProject;
 
 	public ViewContentProvider(TypeOfXMLNode folderNode, Superview favorite, IViewSite viewSite) {
 		super();
@@ -38,7 +39,7 @@ public class ViewContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getElements(Object parent) {
-		if ( (viewSite != null && parent.equals(viewSite))|| (viewSite == null && parent.equals(container))) {
+		if ((viewSite != null && parent.equals(viewSite)) || (viewSite == null && parent.equals(container))) {
 			if (invisibleRoot == null)
 				initialize();
 			return getChildren(invisibleRoot);
@@ -62,6 +63,26 @@ public class ViewContentProvider implements ITreeContentProvider {
 		return new Object[0];
 	}
 
+	public TreeParent getFolderById(String folderID) {
+		return getFolderByIdFromChildren(invisibleRoot, folderID);
+	}
+
+	private TreeParent getFolderByIdFromChildren(TreeParent parent, String folderID) {
+		for (int i = 0; i < parent.getChildren().length; i++) {
+			if (parent.getChildren()[i] instanceof TreeParent) {
+				TreeParent folder = (TreeParent) parent.getChildren()[i];
+				if (folder.getFolderID().equals(folderID)) {
+					return folder;
+				}
+				folder = getFolderByIdFromChildren(folder, folderID);
+				if (folder != null) {
+					return folder;
+				}
+			}
+		}
+		return null;
+	}
+
 	@Override
 	public boolean hasChildren(Object parent) {
 		if (parent instanceof TreeParent)
@@ -71,10 +92,15 @@ public class ViewContentProvider implements ITreeContentProvider {
 
 	public void initialize() {
 		try {
-
-			invisibleRoot = Superview.createTreeNodes(folderNode, favorite,selectFolderDialog);
+			invisibleRoot = null;
+			invisibleRoot = Superview.createTreeNodes(folderNode, favorite, selectFolderDialog);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
+	public TreeObject getRoot() {
+		return invisibleRoot;
+	}
+
 }

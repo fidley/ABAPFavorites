@@ -2,7 +2,7 @@
 <feature
       id="ABAP_Favorites_Feature_Project"
       label="ABAP Favorites"
-      version="1.0.63.qualifier"
+      version="1.0.64.qualifier"
       provider-name="ABAPBlog.com"
       plugin="com.abapblog.branding">
 
@@ -81,22 +81,14 @@ END OF TERMS AND CONDITIONS
 
    <plugin
          id="com.abapblog.favorites"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.abapblog.branding"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.abapblog.favorites.release.notes.content"
-         download-size="0"
-         install-size="0"
          version="0.0.0"/>
 
 </feature>

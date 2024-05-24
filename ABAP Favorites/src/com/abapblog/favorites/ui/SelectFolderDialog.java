@@ -45,11 +45,25 @@ public class SelectFolderDialog extends Dialog {
 	private String objectName;
 	private String folderID;
 	private TypeOfXMLNode folderType;
+	private int tabToShow = 0;
 
 	public SelectFolderDialog(Shell parentShell, TypeOfEntry typeOfEntry, String objectName) {
 		super(parentShell);
 		this.setTypeOfEntry(typeOfEntry);
 		this.setObjectName(objectName);
+	}
+
+	/*
+	 * Constructor for dialog in case of moving object from one folder to another
+	 * tabsToShow = 1 - show only Favorites tab tabsToShow = 2 - show only
+	 * FavoritesDO tab tabsToShow = 0 - show both tabs
+	 */
+
+	public SelectFolderDialog(Shell parentShell, TypeOfEntry typeOfEntry, String objectName, int tabsToShow) {
+		super(parentShell);
+		this.setTypeOfEntry(typeOfEntry);
+		this.setObjectName(objectName);
+		this.tabToShow = tabsToShow;
 	}
 
 	@Override
@@ -64,12 +78,15 @@ public class SelectFolderDialog extends Dialog {
 		tabFolder = new TabFolder(container, SWT.NONE);
 		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-		initializeFavorites();
-		createFavoritesTree(container, tabFolder);
+		if (tabToShow == 1 || tabToShow == 0) {
 
-		initializeFavoritesDO();
-		createFavoritesDOTree(container, tabFolder);
-
+			initializeFavorites();
+			createFavoritesTree(container, tabFolder);
+		}
+		if (tabToShow == 2 || tabToShow == 0) {
+			initializeFavoritesDO();
+			createFavoritesDOTree(container, tabFolder);
+		}
 		return container;
 	}
 
