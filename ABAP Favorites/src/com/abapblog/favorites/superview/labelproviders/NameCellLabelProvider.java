@@ -117,7 +117,7 @@ public class NameCellLabelProvider extends StyledCellLabelProvider {
 
 	}
 
-	public Image getImage(Object element) {
+	public static Image getImage(Object element) {
 		String imageKey = ISharedImages.IMG_OBJ_ELEMENT;
 		if (element instanceof TreeParent)
 			if (((TreeParent) element).getDevObjProject() == true) {

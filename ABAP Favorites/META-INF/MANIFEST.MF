@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.abapblog.favorites;singleton:=true
-Bundle-Version: 1.0.64.qualifier
+Bundle-Version: 1.0.65.qualifier
 Bundle-Activator: com.abapblog.favorites.Activator
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
@@ -16,7 +16,13 @@ Require-Bundle: org.eclipse.core.runtime,
  com.sap.adt.destinations;bundle-version="2.102.0",
  com.sap.adt.destinations.ui;bundle-version="2.102.0",
  org.eclipse.jface,
- com.sap.conn.jco
+ com.sap.conn.jco,
+ org.eclipse.core.databinding,
+ org.eclipse.core.databinding.beans,
+ org.eclipse.core.databinding.observable,
+ org.eclipse.core.databinding.property,
+ org.eclipse.jface.databinding,
+ com.ibm.icu
 Bundle-RequiredExecutionEnvironment: JavaSE-9
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,

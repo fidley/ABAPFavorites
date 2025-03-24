@@ -8,6 +8,33 @@
 </head>
 
 <body id="doc-body">
+	<h1 class="heading">ABAP Favorites - Changelog version 1.0.65</h1>
+	<h2>URL opening in a browser from Eclipse Preferences</h2>
+	<p>From this version, the URLs will be opened in the web browser selected in the Eclipse Preferences.<br>
+	They can be adapted in Windows->Preferences->General->Web Browser.</p>
+	<p>Added on a base of GH <a href="https://github.com/fidley/ABAPFavorites/issues/99">issue 99</a>.</p>
+	<figure>
+		<img src="../../media/1.0.65 browser selection.png">
+		<figcaption><strong>Figure 1:</strong> Copy and move with drag & drop</figcaption>
+	</figure>
+	</p>
+
+
+	<h2>New view Favorites Buttons added.</h2>
+	<p>From this version, new view Favorites Buttons was added.<br>
+	   Since version 1.0.62 it was possible to assign key bindings [1] to 10 favorites. But it was hard to find what is current assignment.</p>
+
+	<figure>
+		<img src="../../media/1.0.65 favorite command.png">
+		<figcaption><strong>Figure 2:</strong>Command assignment</figcaption>
+	</figure>
+<br>To make it easier, new view Favorites Buttons[2] was added. It shows the buttons with the assigned favorites and its key binding[3].<br>Additionally, you can use it to run the favorite object by clicking on the buttons.</p>
+	<figure>
+		<img src="../../media/1.0.65 favorites buttons.png">
+		<figcaption><strong>Figure 3:</strong>Favorites Buttons view</figcaption>
+	</figure>
+	<p>If the favorite is linked with the project, then the project name is shown on the button [4] and in default favorite will be run in the context of the project.<br>In case of need, you can keep CTRL button while clicking on the button, then the selection dialog for ABAP project will appear.<br><br>In case of favorites without project assignment, they will be run in currently active project. If current project is not of ABAP type, the project selection dialog will be also opened.</p>
+
 <h1 class="heading">ABAP Favorites - Changelog version 1.0.64</h1>
 	<h2>Correction of Drag & Drop behaviour</h2>
 	<p>Due to bug after last update, drag & drop wasn't working anymore. Now, beside bringing it back, new functionality arrived, when using Ctrl button during dropping of element, the selected entry will be copied instead of moved.</p>

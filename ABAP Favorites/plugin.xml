@@ -15,6 +15,14 @@
             class="com.abapblog.favorites.views.Favorites"
             id="com.abapblog.favorites.views.Favorites">
       </view>
+      <view
+            category="com.abapblog.favorites"
+            class="com.abapblog.favorites.views.Buttons"
+            icon="icons/favorite16.png"
+            id="com.abapblog.favorites.views.Buttons"
+            name="Favorites Buttons"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
@@ -165,6 +173,34 @@
                              style="push">
                        </command>
                     </menuContribution>
+                    <menuContribution
+                          allPopups="false"
+                          locationURI="menu:com.abapblog.favorites.views.Buttons">
+                       <command
+                             commandId="com.abapblog.favorites.openPreferences"
+                             icon="icons/preferences.png"
+                             label="Preferences"
+                             style="push">
+                       </command>
+                       <command
+                             commandId="com.abapblog.favorites.ReleaseInfo"
+                             icon="platform:/plugin/org.eclipse.ui/icons/full/obj16/info_tsk.png"
+                             label="Release Info"
+                             style="push">
+                       </command>
+                       <command
+                             commandId="com.abapblog.favorites.openGithub"
+                             icon="icons/github.png"
+                             label="Feedback, Bugs &amp; Enhancements"
+                             style="push">
+                       </command>
+                       <command
+                             commandId="com.abapblog.favorites.buyABeer"
+                             icon="icons/beer.png"
+                             label="Buy Me a Beer"
+                             style="push">
+                       </command>
+                    </menuContribution>
     </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -201,6 +237,12 @@
             description="Dynamic Command for ABAP Favorites asssignment (0)"
             id="com.abapblog.favorites.commands.command0"
             name="Favorite 0">
+         <commandParameter
+               id="com.abapblog.favorites.commands.parameter.callSelectionDialog"
+               name="CallSelectionDialog"
+               optional="true"
+               values="com.abapblog.favorites.commands.CallSelectionDialogParameter">
+         </commandParameter>
       </command>
       <command
             categoryId="com.abapblog.favorites.commands.category"
@@ -208,6 +250,12 @@
             description="Dynamic Command for ABAP Favorites asssignment (1)"
             id="com.abapblog.favorites.commands.command1"
             name="Favorite 1">
+         <commandParameter
+               id="com.abapblog.favorites.commands.parameter.callSelectionDialog"
+               name="CallSelectionDialog"
+               optional="true"
+               values="com.abapblog.favorites.commands.CallSelectionDialogParameter">
+         </commandParameter>
       </command>
       <command
             categoryId="com.abapblog.favorites.commands.category"
@@ -215,6 +263,12 @@
             description="Dynamic Command for ABAP Favorites asssignment (2)"
             id="com.abapblog.favorites.commands.command2"
             name="Favorite 2">
+         <commandParameter
+               id="com.abapblog.favorites.commands.parameter.callSelectionDialog"
+               name="CallSelectionDialog"
+               optional="true"
+               values="com.abapblog.favorites.commands.CallSelectionDialogParameter">
+         </commandParameter>
       </command>
       <command
             categoryId="com.abapblog.favorites.commands.category"
@@ -222,6 +276,12 @@
             description="Dynamic Command for ABAP Favorites asssignment (3)"
             id="com.abapblog.favorites.commands.command3"
             name="Favorite 3">
+         <commandParameter
+               id="com.abapblog.favorites.commands.parameter.callSelectionDialog"
+               name="CallSelectionDialog"
+               optional="true"
+               values="com.abapblog.favorites.commands.CallSelectionDialogParameter">
+         </commandParameter>
       </command>
       <command
             categoryId="com.abapblog.favorites.commands.category"
@@ -229,6 +289,12 @@
             description="Dynamic Command for ABAP Favorites asssignment (4)"
             id="com.abapblog.favorites.commands.command4"
             name="Favorite 4">
+         <commandParameter
+               id="com.abapblog.favorites.commands.parameter.callSelectionDialog"
+               name="CallSelectionDialog"
+               optional="true"
+               values="com.abapblog.favorites.commands.CallSelectionDialogParameter">
+         </commandParameter>
       </command>
       <command
             categoryId="com.abapblog.favorites.commands.category"
@@ -236,6 +302,12 @@
             description="Dynamic Command for ABAP Favorites asssignment (5)"
             id="com.abapblog.favorites.commands.command5"
             name="Favorite 5">
+         <commandParameter
+               id="com.abapblog.favorites.commands.parameter.callSelectionDialog"
+               name="CallSelectionDialog"
+               optional="true"
+               values="com.abapblog.favorites.commands.CallSelectionDialogParameter">
+         </commandParameter>
       </command>
       <command
             categoryId="com.abapblog.favorites.commands.category"
@@ -243,6 +315,12 @@
             description="Dynamic Command for ABAP Favorites asssignment (6)"
             id="com.abapblog.favorites.commands.command6"
             name="Favorite 6">
+         <commandParameter
+               id="com.abapblog.favorites.commands.parameter.callSelectionDialog"
+               name="CallSelectionDialog"
+               optional="true"
+               values="com.abapblog.favorites.commands.CallSelectionDialogParameter">
+         </commandParameter>
       </command>
       <command
             categoryId="com.abapblog.favorites.commands.category"
@@ -250,6 +328,12 @@
             description="Dynamic Command for ABAP Favorites asssignment (7)"
             id="com.abapblog.favorites.commands.command7"
             name="Favorite 7">
+         <commandParameter
+               id="com.abapblog.favorites.commands.parameter.callSelectionDialog"
+               name="CallSelectionDialog"
+               optional="true"
+               values="com.abapblog.favorites.commands.CallSelectionDialogParameter">
+         </commandParameter>
       </command>
       <command
             categoryId="com.abapblog.favorites.commands.category"
@@ -257,6 +341,12 @@
             description="Dynamic Command for ABAP Favorites asssignment (8)"
             id="com.abapblog.favorites.commands.command8"
             name="Favorite 8">
+         <commandParameter
+               id="com.abapblog.favorites.commands.parameter.callSelectionDialog"
+               name="CallSelectionDialog"
+               optional="true"
+               values="com.abapblog.favorites.commands.CallSelectionDialogParameter">
+         </commandParameter>
       </command>
       <command
             categoryId="com.abapblog.favorites.commands.category"
@@ -264,6 +354,12 @@
             description="Dynamic Command for ABAP Favorites asssignment (9)"
             id="com.abapblog.favorites.commands.command9"
             name="Favorite 9">
+         <commandParameter
+               id="com.abapblog.favorites.commands.parameter.callSelectionDialog"
+               name="CallSelectionDialog"
+               optional="true"
+               values="com.abapblog.favorites.commands.CallSelectionDialogParameter">
+         </commandParameter>
       </command>
       <command
             defaultHandler="com.abapblog.favorites.commands.OpenPreferences"

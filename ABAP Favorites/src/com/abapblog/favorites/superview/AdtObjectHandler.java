@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,6 +25,7 @@ import com.sap.adt.ris.search.AdtRisQuickSearchFactory;
 import com.sap.adt.ris.search.RisQuickSearchNotSupportedException;
 import com.sap.adt.sapgui.ui.editors.AdtSapGuiEditorUtilityFactory;
 import com.sap.adt.tools.core.model.adtcore.IAdtObjectReference;
+import com.sap.adt.tools.core.ui.dialogs.AbapProjectSelectionDialog;
 import com.sap.adt.tools.core.ui.navigation.AdtNavigationServiceFactory;
 import com.sap.adt.tools.core.wbtyperegistry.WorkbenchAction;
 
@@ -60,10 +62,19 @@ public class AdtObjectHandler {
 	 *                          project will be ensured, otherwise it is the
 	 *                          responsibility of the caller
 	 */
-	public static void executeTreeObject(final TreeObject nodeObject, final IProject project,
-			final boolean navigateToEclipse, final boolean checkLogonState) {
+	public static void executeTreeObject(final TreeObject nodeObject, IProject project, final boolean navigateToEclipse,
+			final boolean checkLogonState) {
 		try {
-			if (checkLogonState) {
+
+			if (project == null && checkNotURL(nodeObject)) {
+				project = AbapProjectSelectionDialog
+						.open(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), null);
+				if (project == null) {
+					return;
+				}
+			}
+
+			if (checkLogonState && checkNotURL(nodeObject)) {
 				if (!AdtLogonServiceUIFactory.createLogonServiceUI().ensureLoggedOn(project).isOK()) {
 					return;
 				}
@@ -91,7 +102,7 @@ public class AdtObjectHandler {
 				break;
 			case URL:
 				try {
-					PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser()
+					PlatformUI.getWorkbench().getBrowserSupport().createBrowser(UUID.randomUUID().toString())
 							.openURL(new URL(nodeObject.getTechnicalName()));
 				} catch (PartInitException | MalformedURLException e) {
 					e.printStackTrace();
@@ -109,6 +120,10 @@ public class AdtObjectHandler {
 			e.printStackTrace();
 		}
 
+	}
+
+	private static boolean checkNotURL(final TreeObject nodeObject) {
+		return nodeObject.getType() != TypeOfEntry.URL;
 	}
 
 	/**
