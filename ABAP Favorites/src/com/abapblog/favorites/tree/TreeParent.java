@@ -15,7 +15,6 @@ public class TreeParent extends TreeObject {
 	private String project;
 	private TypeOfXMLNode typeOfFolder;
 	private String folderID;
-	private IFavorites favorite;
 
 	public TreeParent(String name, String description, boolean projectIndependent, String project,
 			String longDescription, IFavorites favorite, boolean devObjProj, String folderID) {
@@ -29,7 +28,6 @@ public class TreeParent extends TreeObject {
 		} else {
 			setTypeOfFolder(TypeOfXMLNode.folderDONode);
 		}
-		this.favorite = favorite;
 		this.setFolderID(folderID);
 		if (this.getFolderID().equals("")) {
 			this.setFolderID(UUID.randomUUID().toString());

@@ -36,6 +36,7 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.
 	 * BundleContext)
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
@@ -47,11 +48,12 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.
 	 * BundleContext)
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
-		if (Common.Favorite !=null)
-		Favorites.savePluginSettings(Common.Favorite);
-		if (Common.FavoriteDO !=null)
-		FavoritesDO.savePluginSettings(Common.FavoriteDO);
+		if (Common.Favorite != null)
+			Favorites.savePluginSettings(Common.Favorite);
+		if (Common.FavoriteDO != null)
+			FavoritesDO.savePluginSettings(Common.FavoriteDO);
 		plugin = null;
 		super.stop(context);
 	}
@@ -69,8 +71,7 @@ public class Activator extends AbstractUIPlugin {
 	 * Returns an image descriptor for the image file at the given plug-in relative
 	 * path
 	 *
-	 * @param path
-	 *            the path
+	 * @param path the path
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {

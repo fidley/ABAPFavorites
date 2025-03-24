@@ -82,6 +82,7 @@ import com.abapblog.favorites.tree.ColumnControlListener;
 import com.abapblog.favorites.tree.TreeExpansionListener;
 import com.abapblog.favorites.tree.TreeObject;
 import com.abapblog.favorites.tree.TreeParent;
+import com.abapblog.favorites.views.Buttons;
 import com.abapblog.favorites.xml.XMLhandler;
 import com.sap.adt.project.IAdtCoreProject;
 import com.sap.adt.project.ui.util.ProjectUtil;
@@ -982,6 +983,11 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 			viewer.refresh();
 			viewer.setExpandedElements(expandedFolders.toArray());
 			viewer.getControl().setRedraw(true);
+			try {
+				Buttons.refreshButtons();
+			} catch (Exception e) {
+
+			}
 		}
 	}
 

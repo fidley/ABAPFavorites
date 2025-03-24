@@ -9,7 +9,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.viewers.ISelection;
@@ -20,17 +19,12 @@ import org.eclipse.ui.PlatformUI;
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.common.CommonTypes.TypeOfObject;
 import com.abapblog.favorites.superview.IFavorites;
-import com.sap.adt.destinations.logon.AdtLogonServiceFactory;
-import com.sap.adt.destinations.logon.IAdtLogonService;
-import com.sap.adt.destinations.ui.logon.AdtLogonServiceUIFactory;
-import com.sap.adt.destinations.ui.logon.IAdtLogonServiceUI;
 import com.sap.adt.logging.AdtLogging;
 import com.sap.adt.project.IAdtCoreProject;
 import com.sap.adt.project.ui.util.ProjectUtil;
 import com.sap.adt.ris.search.AdtRisQuickSearchFactory;
 import com.sap.adt.ris.search.RisQuickSearchNotSupportedException;
 import com.sap.adt.tools.core.model.adtcore.IAdtObjectReference;
-
 
 @SuppressWarnings("restriction")
 public class Common {
@@ -43,54 +37,55 @@ public class Common {
 	public Common() {
 	}
 
-		public static TypeOfEntry getTypeOfEntryFromSAPType(String sapType) {
-			final String amdpType = TypeOfObject.AMDPType.toString();
-			final String cdsviewType = TypeOfObject.CDSViewType.toString();
-			final String classType = TypeOfObject.classType.toString();
-			final String fgType = TypeOfObject.FunctionGroupType.toString();
-			final String fgIncludeTYpe = TypeOfObject.FunctionGroupIncludeType.toString();
-			final String fmType	 = TypeOfObject.FunctionModuleType.toString();
-			final String icludeType = TypeOfObject.includeType.toString();
-			final String interfaceType = TypeOfObject.interfaceType.toString();
-			final String messageClassType = TypeOfObject.MessageClassType.toString();
-			final String searchHelpType = TypeOfObject.SearchHelpType.toString();
-			final String programType = TypeOfObject.programType.toString();
-			final String tableType = TypeOfObject.TableType.toString();
-			final String transactionType = TypeOfObject.TransactionType.toString();
-			final String viewType = TypeOfObject.ViewType.toString();
+	public static TypeOfEntry getTypeOfEntryFromSAPType(String sapType) {
+		final String amdpType = TypeOfObject.AMDPType.toString();
+		final String cdsviewType = TypeOfObject.CDSViewType.toString();
+		final String classType = TypeOfObject.classType.toString();
+		final String fgType = TypeOfObject.FunctionGroupType.toString();
+		final String fgIncludeTYpe = TypeOfObject.FunctionGroupIncludeType.toString();
+		final String fmType = TypeOfObject.FunctionModuleType.toString();
+		final String icludeType = TypeOfObject.includeType.toString();
+		final String interfaceType = TypeOfObject.interfaceType.toString();
+		final String messageClassType = TypeOfObject.MessageClassType.toString();
+		final String searchHelpType = TypeOfObject.SearchHelpType.toString();
+		final String programType = TypeOfObject.programType.toString();
+		final String tableType = TypeOfObject.TableType.toString();
+		final String transactionType = TypeOfObject.TransactionType.toString();
+		final String viewType = TypeOfObject.ViewType.toString();
 
-			if (sapType.equals(amdpType))
-				return TypeOfEntry.AMDP;
-			if (sapType.equals(cdsviewType))
-				return TypeOfEntry.CDSView;
-			if (sapType.equals(classType))
-				return TypeOfEntry.Class;
-			if (sapType.equals(fgType))
-				return TypeOfEntry.FunctionGroup;
-			if (sapType.equals(fgIncludeTYpe))
-				return TypeOfEntry.Program;
-			if (sapType.equals(fmType))
-				return TypeOfEntry.FunctionModule;
-			if (sapType.equals(icludeType))
-				return TypeOfEntry.Include;
-			if (sapType.equals(interfaceType))
-				return TypeOfEntry.Interface;
-			if (sapType.equals(messageClassType))
-				return TypeOfEntry.MessageClass;
-			if (sapType.equals(searchHelpType))
-				return TypeOfEntry.SearchHelp;
-			if (sapType.equals(programType))
-				return TypeOfEntry.Program;
-			if (sapType.equals(tableType))
-				return TypeOfEntry.Table;
-			if (sapType.equals(viewType))
-				return TypeOfEntry.View;
-			if (sapType.equals(transactionType))
-				return TypeOfEntry.Transaction;
+		if (sapType.equals(amdpType))
+			return TypeOfEntry.AMDP;
+		if (sapType.equals(cdsviewType))
+			return TypeOfEntry.CDSView;
+		if (sapType.equals(classType))
+			return TypeOfEntry.Class;
+		if (sapType.equals(fgType))
+			return TypeOfEntry.FunctionGroup;
+		if (sapType.equals(fgIncludeTYpe))
+			return TypeOfEntry.Program;
+		if (sapType.equals(fmType))
+			return TypeOfEntry.FunctionModule;
+		if (sapType.equals(icludeType))
+			return TypeOfEntry.Include;
+		if (sapType.equals(interfaceType))
+			return TypeOfEntry.Interface;
+		if (sapType.equals(messageClassType))
+			return TypeOfEntry.MessageClass;
+		if (sapType.equals(searchHelpType))
+			return TypeOfEntry.SearchHelp;
+		if (sapType.equals(programType))
+			return TypeOfEntry.Program;
+		if (sapType.equals(tableType))
+			return TypeOfEntry.Table;
+		if (sapType.equals(viewType))
+			return TypeOfEntry.View;
+		if (sapType.equals(transactionType))
+			return TypeOfEntry.Transaction;
 
-			return null;
+		return null;
 
-		}
+	}
+
 	public static String getProjectName() {
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		IWorkbenchWindow window = page.getWorkbenchWindow();
@@ -181,7 +176,7 @@ public class Common {
 		case CDSView:
 			return "CDS View";
 		case Package:
-			return "Package";			
+			return "Package";
 		default:
 			return "object";
 		}
@@ -205,12 +200,12 @@ public class Common {
 		if (sapType.equals(TypeOfObject.FunctionModuleType.toString()) && type == TypeOfEntry.FunctionModule)
 			return true;
 
-		//if (sapType.equals(TypeOfObject.FunctionModuleRFCType.toString()) && type == TypeOfEntry.FunctionModule) {
-		//	return true;
-		//}
+		// if (sapType.equals(TypeOfObject.FunctionModuleRFCType.toString()) && type ==
+		// TypeOfEntry.FunctionModule) {
+		// return true;
+		// }
 
-
-		if (sapType.equals(TypeOfObject.includeType.toString()) && type == TypeOfEntry.Program)
+		if (sapType.equals(TypeOfObject.includeType.toString()) && type == TypeOfEntry.Include)
 			return true;
 
 		if (sapType.equals(TypeOfObject.programType.toString()) && type == TypeOfEntry.Program)

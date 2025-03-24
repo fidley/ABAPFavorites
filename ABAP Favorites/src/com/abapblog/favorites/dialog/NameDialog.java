@@ -80,8 +80,13 @@ public class NameDialog extends TitleAreaDialog {
 		createDescription(container);
 		createLongDescr(container);
 		createCommandsLists(container);
-
+		createEmptyLine(container);
 		return area;
+	}
+
+	private void createEmptyLine(Composite container) {
+		new Label(container, SWT.NONE);
+
 	}
 
 	private void createCommandsLists(Composite container) {

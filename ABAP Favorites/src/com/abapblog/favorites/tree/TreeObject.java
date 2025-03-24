@@ -150,7 +150,7 @@ public class TreeObject implements IAdaptable {
 	}
 
 	public void setCommandID(String commandID) {
-		if (this.commandID != null || this.commandID.isEmpty()) {
+		if (this.commandID != null & !this.commandID.isEmpty()) {
 			DynamicCommandHandler.commandsLink.remove(commandID);
 		}
 		this.commandID = commandID;
@@ -168,7 +168,6 @@ public class TreeObject implements IAdaptable {
 						linkedCommandObject.getDescription(), linkedCommandObject.getLongDescription(),
 						linkedCommandObject.getTechnicalName(), linkedCommandObject.getParent().getFolderID(),
 						linkedCommandObject.getParent().getTypeOfFolder(), linkedCommandObject.getCommandID());
-
 			}
 			DynamicCommandHandler.commandsLink.put(commandID, this);
 		}

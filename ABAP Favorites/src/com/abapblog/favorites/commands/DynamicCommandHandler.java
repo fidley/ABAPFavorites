@@ -14,12 +14,14 @@ import org.eclipse.ui.PlatformUI;
 
 import com.abapblog.favorites.Activator;
 import com.abapblog.favorites.common.Common;
+import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
 import com.abapblog.favorites.preferences.PreferenceConstants;
 import com.abapblog.favorites.superview.AdtObjectHandler;
 import com.abapblog.favorites.tree.TreeObject;
 import com.abapblog.favorites.tree.TreeParent;
 import com.sap.adt.project.IAdtCoreProject;
 import com.sap.adt.project.ui.util.ProjectUtil;
+import com.sap.adt.tools.core.ui.dialogs.AbapProjectSelectionDialog;
 
 public class DynamicCommandHandler implements IHandler {
 	public static final String COM_ABAPBLOG_FAVORITES_COMMANDS_COMMAND9 = "com.abapblog.favorites.commands.command9";
@@ -48,31 +50,49 @@ public class DynamicCommandHandler implements IHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-
+		Boolean callSelectionDialog = Boolean
+				.parseBoolean(event.getParameter("com.abapblog.favorites.commands.parameter.callSelectionDialog"));
 		TreeObject treeObject = commandsLink.get(event.getCommand().getId());
 		if (treeObject == null)
 			return null;
 
 		final boolean enableEclipseNavigation = Activator.getDefault().getPreferenceStore()
 				.getBoolean(PreferenceConstants.P_NAVIGATE_TO_ECLIPSE_FOR_SUPPORTED_DEV_OBJECTS);
-
-		AdtObjectHandler.executeTreeObject(treeObject, getProject(treeObject), enableEclipseNavigation, true);
+		IProject project = getProject(treeObject, callSelectionDialog);
+		if (project == null & !treeObject.getType().equals(TypeOfEntry.URL))
+			return null;
+		AdtObjectHandler.executeTreeObject(treeObject, project, enableEclipseNavigation, true);
 
 		return false;
 	}
 
-	private IProject getProject(TreeObject treeObject) {
+	private IProject getProject(TreeObject treeObject, Boolean callSelectionDialog) {
 		if (treeObject instanceof TreeParent)
 			return null;
+		if (treeObject.getType().equals(TypeOfEntry.URL))
+			return null;
+
+		if (callSelectionDialog) {
+			return getProjectPopup();
+		}
 
 		if (treeObject.getParent().getProjectIndependent()) {
 			final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 			final IWorkbenchWindow window = page.getWorkbenchWindow();
 			final ISelection selection = window.getSelectionService().getSelection();
-			return ProjectUtil.getActiveAdtCoreProject(selection, null, null, IAdtCoreProject.ABAP_PROJECT_NATURE);
+			IProject project = ProjectUtil.getActiveAdtCoreProject(selection, null, null,
+					IAdtCoreProject.ABAP_PROJECT_NATURE);
+			if (project == null) {
+				project = getProjectPopup();
+			}
+			return project;
 		} else {
 			return Common.getProjectByName(treeObject.getParent().getProject());
 		}
+	}
+
+	private IProject getProjectPopup() {
+		return AbapProjectSelectionDialog.open(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), null);
 	}
 
 	@Override

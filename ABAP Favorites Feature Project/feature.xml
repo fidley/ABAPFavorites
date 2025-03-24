@@ -2,7 +2,7 @@
 <feature
       id="ABAP_Favorites_Feature_Project"
       label="ABAP Favorites"
-      version="1.0.64.qualifier"
+      version="1.0.65.qualifier"
       provider-name="ABAPBlog.com"
       plugin="com.abapblog.branding">
 
@@ -61,7 +61,7 @@ END OF TERMS AND CONDITIONS
    </license>
 
    <url>
-      <update label="ABAPBlog.com ABAPFavorites Update Site" url="http://abapblog.com/eclipse/plugin/ABAPFavorites"/>
+      <update label="ABAPBlog.com ABAPFavorites Update Site" url="https://fidley.github.io/ADTPluginsUpdateSite/UpdateSite/"/>
    </url>
 
    <requires>
