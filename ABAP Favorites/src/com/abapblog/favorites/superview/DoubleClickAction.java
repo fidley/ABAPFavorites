@@ -120,7 +120,7 @@ public class DoubleClickAction extends Action implements ITreeNodeAction {
 					treeObjProxy.setProject(projectForAll);
 				} else {
 					final TreeParent nodeParent = treeObj.getParent();
-					if (!nodeParent.getProjectIndependent()) {
+					if (nodeParent.getProjectDependent()) {
 						treeObjProxy.setProject(Common.getProjectByName(nodeParent.getProject()));
 					} else {
 						treeObjProxy.setProject(currentProject);

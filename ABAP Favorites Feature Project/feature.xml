@@ -2,7 +2,7 @@
 <feature
       id="ABAP_Favorites_Feature_Project"
       label="ABAP Favorites"
-      version="1.0.65.qualifier"
+      version="1.0.66.qualifier"
       provider-name="ABAPBlog.com"
       plugin="com.abapblog.branding">
 

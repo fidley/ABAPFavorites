@@ -57,7 +57,7 @@ public class FavoritesFromGUIRaw {
 		if (root == null)
 			return;
 		String rootId = XMLhandler.addFolderToXML(newFolderName, projectName + " GUI Favorites", "", false, projectName,
-				false, "", TypeOfXMLNode.folderNode);
+				false, "", TypeOfXMLNode.folderNode, "", "", false, false);
 		if (rootId.isEmpty())
 			return;
 
@@ -73,7 +73,7 @@ public class FavoritesFromGUIRaw {
 			switch (favorite.getType()) {
 			case Folder:
 				String newFolderId = XMLhandler.addFolderToXML(favorite.getText(), "", "", false, projectName, false,
-						parentId, TypeOfXMLNode.folderNode);
+						parentId, TypeOfXMLNode.folderNode, "", "", false, false);
 				addChildren(favorite.getChildren(), newFolderId);
 				break;
 

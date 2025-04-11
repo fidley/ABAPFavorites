@@ -9,11 +9,14 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkingSet;
+import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
 
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
@@ -117,7 +120,7 @@ public class Common {
 		for (int i = 0; i < projects.length; i++) {
 			IProject project = projects[i];
 			try {
-				if (project.hasNature(IAdtCoreProject.ABAP_PROJECT_NATURE)) {
+				if (project.isOpen() && project.hasNature(IAdtCoreProject.ABAP_PROJECT_NATURE)) {
 					projectList.add(project);
 				}
 			} catch (CoreException ce) {
@@ -230,6 +233,10 @@ public class Common {
 			return true;
 		if (sapType.equals(TypeOfObject.PackageType.toString()) && type == TypeOfEntry.Package)
 			return true;
+
+		if (sapType.equals(TypeOfObject.TransactionType.toString()) && type == TypeOfEntry.Transaction)
+			return true;
+
 		return false;
 	}
 
@@ -259,4 +266,58 @@ public class Common {
 		}
 		return "";
 	}
+
+	public static String getWorkingSetName() {
+		String currentProjectName = Common.getProjectName();
+		if (currentProjectName.isEmpty()) {
+			return null; // No active project
+		}
+
+		IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
+
+		IWorkingSet[] workingSets = workingSetManager.getAllWorkingSets();
+
+		for (IWorkingSet workingSet : workingSets) {
+			if (workingSet != null && workingSet.getElements() != null) {
+				for (IAdaptable element : workingSet.getElements()) {
+					if (element.getAdapter(org.eclipse.core.resources.IProject.class) != null) {
+						IProject project = element.getAdapter(org.eclipse.core.resources.IProject.class);
+						if (project != null && project.getName().equals(currentProjectName)) {
+							return workingSet.getName(); // Return the working set containing the current project
+						}
+					}
+				}
+			}
+		}
+		return ""; // No working set found for the current project
+	}
+
+	public static Boolean isProjectInWorkingSet(String projectName, String workingSetName) {
+
+		if (projectName.isEmpty()) {
+			return false; // No active project
+		}
+
+		IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
+
+		IWorkingSet[] workingSets = workingSetManager.getAllWorkingSets();
+
+		for (IWorkingSet workingSet : workingSets) {
+			if (workingSet.getName().equals(workingSetName)) {
+				if (workingSet != null && workingSet.getElements() != null) {
+					for (IAdaptable element : workingSet.getElements()) {
+						if (element.getAdapter(org.eclipse.core.resources.IProject.class) != null) {
+							IProject projectInWorkingSet = element
+									.getAdapter(org.eclipse.core.resources.IProject.class);
+							if (projectInWorkingSet != null && projectInWorkingSet.getName().equals(projectName)) {
+								return true; // Project is in the working set
+							}
+						}
+					}
+				}
+			}
+		}
+		return false; // Project is not in any working set
+	}
+
 }

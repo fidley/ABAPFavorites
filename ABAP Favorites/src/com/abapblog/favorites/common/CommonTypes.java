@@ -340,13 +340,31 @@ public class CommonTypes {
 				return "longDescription";
 			}
 		},
-		projectIndependent {
+		independent {
 			@Override
 			public String toString() {
 				return "projectIndependent";
 			}
 		},
+		projectDependent {
+			@Override
+			public String toString() {
+				return "projectDependent";
+			}
+		},
+		workingSetDependent {
+			@Override
+			public String toString() {
+				return "workingSetDependent";
+			}
+		},
 		project {
+			@Override
+			public String toString() {
+				return "project";
+			}
+		},
+		workingSet {
 			@Override
 			public String toString() {
 				return "project";
@@ -368,6 +386,12 @@ public class CommonTypes {
 			@Override
 			public String toString() {
 				return "folderID";
+			}
+		},
+		folderUrl {
+			@Override
+			public String toString() {
+				return "folderUrl";
 			}
 		},
 		devObjFolder {

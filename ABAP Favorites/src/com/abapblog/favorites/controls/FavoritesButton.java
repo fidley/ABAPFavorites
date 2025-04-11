@@ -152,8 +152,13 @@ public class FavoritesButton extends Composite {
 
 		projectStyledString = new StyledString();
 		if (linkedTreeObject.getParent().getProject() != null
-				&& linkedTreeObject.getParent().getProjectIndependent() == false) {
+				&& linkedTreeObject.getParent().getProjectDependent() == true) {
 			projectStyledString.append(" [" + linkedTreeObject.getParent().getProject() + "]",
+					StyledString.COUNTER_STYLER);
+		}
+		if (linkedTreeObject.getParent().getWorkingSet() != null
+				&& linkedTreeObject.getParent().getWorkingSetDependent() == true) {
+			projectStyledString.append(" [" + linkedTreeObject.getParent().getWorkingSet() + "]",
 					StyledString.COUNTER_STYLER);
 		}
 

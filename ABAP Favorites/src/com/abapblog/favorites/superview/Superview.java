@@ -487,7 +487,9 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 
 	@Override
 	public void disableLinkingOfEditor() {
-		this.linkWithEditorAction.setEnabled(false);
+		if (this.linkWithEditorAction != null) {
+			this.linkWithEditorAction.setEnabled(false);
+		}
 	}
 
 	private void setTreeColumns(final ColumnControlListener columnListener, final Tree tree, TreeViewer viewer) {
@@ -518,6 +520,9 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 
 	@Override
 	public void showHideLongDescriptionColumn() {
+		if (ColumnLongDescription == null) {
+			return;
+		}
 		loadColumnSettings(ColumnLongDescription.getColumn());
 		if (store.getBoolean(PreferenceConstants.P_SHOW_LONG_TEXT_COLUMN)) {
 			if (ColumnLongDescription.getColumn().getWidth() == 0)
@@ -531,6 +536,9 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 
 	@Override
 	public void showHideLinkedToColumn() {
+		if (ColumnLinkedTo == null) {
+			return;
+		}
 		loadColumnSettings(ColumnLinkedTo.getColumn());
 		if (store.getBoolean(PreferenceConstants.P_SHOW_LINKED_TO_COLUMN)) {
 			if (ColumnLinkedTo.getColumn().getWidth() == 0)
@@ -787,6 +795,12 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 		 * Keyboard listeners
 		 */
 		new TreeSelectionEventAdapter(this, this.actions.actDoubleClick);
+
+		/**
+		 * Folder double click
+		 */
+
+		this.getTreeViewer().addDoubleClickListener(new FolderDoubleClick());
 	}
 
 	@Override
@@ -820,7 +834,8 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 			LinkedEditorProject = Favorite.getLinkedEditorProject();
 		}
 
-		final TreeParent invisibleRoot = new TreeParent("", "", true, "", "", Favorite, false, "root");
+		final TreeParent invisibleRoot = new TreeParent("", "", true, "", "", Favorite, false, "root", "", false, false,
+				"");
 
 		final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
@@ -881,13 +896,26 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 
 		if (subNode.getNodeName().equalsIgnoreCase(folderXMLNode.toString())) {
 
+			boolean projectDependent = Boolean
+					.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.projectDependent.toString()));
+			final boolean workingSetDependent = Boolean
+					.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.workingSetDependent.toString()));
+			final boolean independent = Boolean
+					.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.independent.toString()));
+			// Old code mapping
+			if (projectDependent == false && workingSetDependent == false && independent == false) {
+				projectDependent = true;
+
+			}
+
 			final TreeParent parent = new TreeParent(subNode.getAttribute(TypeOfXMLAttr.name.toString()),
-					subNode.getAttribute(TypeOfXMLAttr.description.toString()),
-					Boolean.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.projectIndependent.toString())),
+					subNode.getAttribute(TypeOfXMLAttr.description.toString()), independent,
 					subNode.getAttribute(TypeOfXMLAttr.project.toString()),
 					subNode.getAttribute(TypeOfXMLAttr.longDescription.toString()), favorite,
 					Boolean.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.devObjFolder.toString())),
-					subNode.getAttribute(TypeOfXMLAttr.folderID.toString()));
+					subNode.getAttribute(TypeOfXMLAttr.folderID.toString()),
+					subNode.getAttribute(TypeOfXMLAttr.folderUrl.toString()), projectDependent, workingSetDependent,
+					subNode.getAttribute(TypeOfXMLAttr.workingSet.toString()));
 
 			String FolderID = "";
 			FolderID = subNode.getAttribute(TypeOfXMLAttr.folderID.toString());
@@ -900,15 +928,17 @@ public abstract class Superview extends ViewPart implements ILinkedWithEditorVie
 				favorite.getExpandedParentNodes().add(parent);
 			}
 
-			final boolean projectIsIndependent = Boolean
-					.parseBoolean(subNode.getAttribute(TypeOfXMLAttr.projectIndependent.toString()));
-			if (projectIsIndependent == false && isHideOfDepProject() == true) {
+			if ((projectDependent == true || workingSetDependent == true) && isHideOfDepProject() == true) {
 				String ProjectName = linkedEditorProject;
 				if (ProjectName.equals("")) {
 					ProjectName = Common.getProjectName();
 				}
 
-				if (!parent.getProject().equals(ProjectName)) {
+				if (projectDependent == true && !parent.getProject().equals(ProjectName)) {
+					return;
+				}
+				if (workingSetDependent == true && !Common.isProjectInWorkingSet(ProjectName,
+						subNode.getAttribute(TypeOfXMLAttr.workingSet.toString()))) {
 					return;
 				}
 			}

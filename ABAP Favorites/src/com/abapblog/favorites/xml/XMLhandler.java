@@ -36,9 +36,9 @@ public class XMLhandler {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static String addFolderToXML(String name, String description, String longDescription,
-			Boolean projectIndependent, String projectName, Boolean devObjFolder, String parentID,
-			TypeOfXMLNode parentType) {
+	public static String addFolderToXML(String name, String description, String longDescription, Boolean Independent,
+			String projectName, Boolean devObjFolder, String parentID, TypeOfXMLNode parentType, String folderURL,
+			String workingSet, Boolean ProjectDependent, Boolean WorksingSetDependent) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		String newFolderId = UUID.randomUUID().toString();
@@ -53,11 +53,14 @@ public class XMLhandler {
 				folder.setAttribute(TypeOfXMLAttr.name.toString(), name);
 				folder.setAttribute(TypeOfXMLAttr.description.toString(), description);
 				folder.setAttribute(TypeOfXMLAttr.longDescription.toString(), longDescription);
-				folder.setAttribute(TypeOfXMLAttr.projectIndependent.toString(), projectIndependent.toString());
+				folder.setAttribute(TypeOfXMLAttr.independent.toString(), Independent.toString());
 				folder.setAttribute(TypeOfXMLAttr.project.toString(), projectName);
 				folder.setAttribute(TypeOfXMLAttr.devObjFolder.toString(), devObjFolder.toString());
 				folder.setAttribute(TypeOfXMLAttr.folderID.toString(), newFolderId);
-
+				folder.setAttribute(TypeOfXMLAttr.folderUrl.toString(), folderURL);
+				folder.setAttribute(TypeOfXMLAttr.projectDependent.toString(), ProjectDependent.toString());
+				folder.setAttribute(TypeOfXMLAttr.workingSetDependent.toString(), WorksingSetDependent.toString());
+				folder.setAttribute(TypeOfXMLAttr.workingSet.toString(), workingSet);
 				if (parentID.equals("")) {
 					Element root = doc.getDocumentElement();
 					root.appendChild(folder);
@@ -260,7 +263,8 @@ public class XMLhandler {
 	}
 
 	public static void editFolderInXML(String FolderID, String Name, String Description, String LongDescription,
-			Boolean ProjectIndependent, String ProjectName, Boolean DevObjFolder, TypeOfXMLNode ParentNodeType) {
+			Boolean Independent, String ProjectName, Boolean DevObjFolder, TypeOfXMLNode ParentNodeType,
+			String folderURL, String workingSet, Boolean ProjectDependent, Boolean WorkingSetDependent) {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {
@@ -283,11 +287,14 @@ public class XMLhandler {
 						FolderEl.setAttribute(TypeOfXMLAttr.name.toString(), Name);
 						FolderEl.setAttribute(TypeOfXMLAttr.description.toString(), Description);
 						FolderEl.setAttribute(TypeOfXMLAttr.longDescription.toString(), LongDescription);
-						FolderEl.setAttribute(TypeOfXMLAttr.projectIndependent.toString(),
-								ProjectIndependent.toString());
+						FolderEl.setAttribute(TypeOfXMLAttr.independent.toString(), Independent.toString());
+						FolderEl.setAttribute(TypeOfXMLAttr.projectDependent.toString(), ProjectDependent.toString());
+						FolderEl.setAttribute(TypeOfXMLAttr.workingSetDependent.toString(),
+								WorkingSetDependent.toString());
 						FolderEl.setAttribute(TypeOfXMLAttr.project.toString(), ProjectName);
 						FolderEl.setAttribute(TypeOfXMLAttr.devObjFolder.toString(), DevObjFolder.toString());
-
+						FolderEl.setAttribute(TypeOfXMLAttr.folderUrl.toString(), folderURL);
+						FolderEl.setAttribute(TypeOfXMLAttr.workingSet.toString(), workingSet);
 						DOMSource source = new DOMSource(doc);
 
 						TransformerFactory transformerFactory = TransformerFactory.newInstance();
