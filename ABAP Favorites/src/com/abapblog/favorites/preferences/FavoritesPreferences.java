@@ -27,7 +27,7 @@ public class FavoritesPreferences extends FieldEditorPreferencePage implements I
 	@Override
 	public void createFieldEditors() {
 		addField(new BooleanFieldEditor(PreferenceConstants.P_HIDE_PROJECT_DEP_FOLDERS,
-				"&Hide project dependent folders", getFieldEditorParent()));
+				"&Hide project or working set dependent folders", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(PreferenceConstants.P_KEEP_THE_EXPANDED_FOLDERS_AT_START,
 				"&Save state of folder expansion", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(PreferenceConstants.P_NAVIGATE_TO_ECLIPSE_FOR_SUPPORTED_DEV_OBJECTS,

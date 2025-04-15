@@ -24,6 +24,7 @@ import com.sap.adt.destinations.ui.logon.AdtLogonServiceUIFactory;
 import com.sap.adt.destinations.ui.logon.IAdtLogonServiceUI;
 import com.sap.adt.project.IAdtCoreProject;
 import com.sap.adt.project.ui.util.ProjectUtil;
+import com.sap.adt.tools.core.project.AdtProjectServiceFactory;
 import com.sap.adt.tools.core.ui.dialogs.AbapProjectSelectionDialog;
 
 /**
@@ -106,14 +107,9 @@ public class DoubleClickAction extends Action implements ITreeNodeAction {
 				IProject projectForAll = null;
 				IProject currentProject = null;
 				if (doubleClickBehavior == DoubleClickBehavior.OPEN_VIA_PROJECT_DIALOG) {
-					projectForAll = getProjectFromProjectChooserDialog();
+					projectForAll = getProjectFromProjectChooserDialog("");
 					if (projectForAll == null) {
 						return null;
-					}
-				} else {
-					currentProject = getCurrentAbapProject();
-					if (currentProject == null) {
-						currentProject = getProjectFromProjectChooserDialog();
 					}
 				}
 				if (projectForAll != null) {
@@ -122,7 +118,19 @@ public class DoubleClickAction extends Action implements ITreeNodeAction {
 					final TreeParent nodeParent = treeObj.getParent();
 					if (nodeParent.getProjectDependent()) {
 						treeObjProxy.setProject(Common.getProjectByName(nodeParent.getProject()));
-					} else {
+					}
+
+					else if (nodeParent.getWorkingSetDependent()) {
+						treeObjProxy
+								.setProject(getProjectFromProjectChooserDialog(treeObj.getParent().getWorkingSet()));
+					}
+
+					else {
+						currentProject = getCurrentAbapProject();
+						if (currentProject == null) {
+							currentProject = getProjectFromProjectChooserDialog("");
+						}
+
 						treeObjProxy.setProject(currentProject);
 					}
 				}
@@ -163,8 +171,30 @@ public class DoubleClickAction extends Action implements ITreeNodeAction {
 	/*
 	 * Returns project from ABAP project selection dialog
 	 */
-	private IProject getProjectFromProjectChooserDialog() {
-		return AbapProjectSelectionDialog.open(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), null);
+	private IProject getProjectFromProjectChooserDialog(String workingSet) {
+
+		if (workingSet == "")
+			return AbapProjectSelectionDialog.open(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+					null);
+
+		List<IProject> workingSetProjects = new ArrayList<>();
+		for (IProject abapProject : AdtProjectServiceFactory.createProjectService().getAvailableAbapProjects()) {
+			if (Common.isProjectInWorkingSet(abapProject.getName(), workingSet)) {
+				workingSetProjects.add(abapProject);
+			}
+		}
+		if (workingSetProjects.isEmpty()) {
+			return null;
+		}
+		IProject[] projects = workingSetProjects.toArray(new IProject[workingSetProjects.size()]);
+		AbapProjectSelectionDialog apsd = new AbapProjectSelectionDialog(
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), projects);
+		if (apsd.open() == AbapProjectSelectionDialog.OK) {
+			return apsd.getProject();
+		}
+
+		return null;
+
 	}
 
 	private class TreeObjectProxy {

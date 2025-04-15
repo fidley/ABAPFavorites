@@ -160,8 +160,8 @@ public class NameDialog extends TitleAreaDialog {
 				try {
 					IProject project = AbapProjectSelectionDialog
 							.open(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), null);
-					setDescription(
-							AdtObjectHandler.lookupObjectReference(project, Name, typeOfObject).getDescription());
+					setDescription(AdtObjectHandler.lookupObjectReference(project, txtName.getText(), typeOfObject)
+							.getDescription());
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}

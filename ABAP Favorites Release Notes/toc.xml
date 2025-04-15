@@ -2,6 +2,8 @@
 <?NLS TYPE="org.eclipse.help.toc"?>
 <toc label="abapBlog.com - ABAP Favorites" topic="html/maintopic.html">
       <topic href="html/changelog.html" label="Changelog">
+         <topic href="html/changelog/version1.0.66.html" label="1.0.66">
+         </topic>
          <topic href="html/changelog/version1.0.65.html" label="1.0.65">
          </topic>
          <topic href="html/changelog/version1.0.64.html" label="1.0.64">
