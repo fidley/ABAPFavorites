@@ -198,9 +198,11 @@ public class Actions {
 
 						if (Folder instanceof TreeParent) {
 							XMLhandler.addFolderToXML(FolderDialog.getName(), FolderDialog.getDescription(),
-									FolderDialog.getLongDescription(), FolderDialog.getPrjInd(),
+									FolderDialog.getLongDescription(), FolderDialog.getIndependent(),
 									Common.getProjectName(), FolderDialog.getDevObjectFolder(),
-									((TreeParent) Folder).getFolderID(), ((TreeParent) Folder).getTypeOfFolder());
+									((TreeParent) Folder).getFolderID(), ((TreeParent) Folder).getTypeOfFolder(),
+									FolderDialog.getURLToOpen(), Common.getWorkingSetName(),
+									FolderDialog.getProjectDependent(), FolderDialog.getWorkingSetDependent());
 							Superview.refreshViewer(superview.viewer);
 						}
 
@@ -235,8 +237,10 @@ public class Actions {
 				if (FolderDialog.open() == Window.OK) {
 
 					XMLhandler.addFolderToXML(FolderDialog.getName(), FolderDialog.getDescription(),
-							FolderDialog.getLongDescription(), FolderDialog.getPrjInd(), Common.getProjectName(),
-							FolderDialog.getDevObjectFolder(), "", superview.FolderNode);
+							FolderDialog.getLongDescription(), FolderDialog.getIndependent(), Common.getProjectName(),
+							FolderDialog.getDevObjectFolder(), "", superview.FolderNode, FolderDialog.getURLToOpen(),
+							Common.getWorkingSetName(), FolderDialog.getProjectDependent(),
+							FolderDialog.getWorkingSetDependent());
 					Superview.refreshViewer(superview.viewer);
 				}
 
@@ -645,9 +649,12 @@ public class Actions {
 
 				FoDialog.setName(Name);
 				FoDialog.setDescription(Folder.getDescription());
-				FoDialog.setPrjInd(Folder.getProjectIndependent());
+				FoDialog.setIndependent(Folder.getIndependent());
+				FoDialog.setWorkingSetDependent(Folder.getWorkingSetDependent());
+				FoDialog.setProjectDependent(Folder.getProjectDependent());
 				FoDialog.setDevObjectFolder(Folder.getDevObjProject());
 				FoDialog.setLongDescription(Folder.getLongDescription());
+				FoDialog.setURLToOpen(Folder.getUrlToOpen());
 				if (FoDialog.open() == Window.OK) {
 
 					Name = FoDialog.getName();
@@ -656,8 +663,10 @@ public class Actions {
 					}
 
 					XMLhandler.editFolderInXML(Folder.getFolderID(), Name, FoDialog.getDescription(),
-							FoDialog.getLongDescription(), FoDialog.getPrjInd(), Common.getProjectName(),
-							FoDialog.getDevObjectFolder(), Folder.getTypeOfFolder());
+							FoDialog.getLongDescription(), FoDialog.getIndependent(), Common.getProjectName(),
+							FoDialog.getDevObjectFolder(), Folder.getTypeOfFolder(), FoDialog.getURLToOpen(),
+							Common.getWorkingSetName(), FoDialog.getProjectDependent(),
+							FoDialog.getWorkingSetDependent());
 
 					Superview.refreshViewer(viewer);
 				}
@@ -792,10 +801,9 @@ public class Actions {
 					if (NameToUpper) {
 						Name = Name.toUpperCase();
 					}
-					XMLhandler.addObjectToXML(Type, Name, NaDialog.getDescription(),
-							((TreeParent) Folder).getLongDescription(), ((TreeParent) Folder).getTechnicalName(),
-							((TreeParent) Folder).getFolderID(), ((TreeParent) Folder).getTypeOfFolder(),
-							NaDialog.getCommandID());
+					XMLhandler.addObjectToXML(Type, Name, NaDialog.getDescription(), Folder.getLongDescription(),
+							Folder.getTechnicalName(), ((TreeParent) Folder).getFolderID(),
+							((TreeParent) Folder).getTypeOfFolder(), NaDialog.getCommandID());
 					Superview.refreshViewer(viewer);
 				}
 

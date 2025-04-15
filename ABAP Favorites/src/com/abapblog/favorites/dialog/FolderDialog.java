@@ -10,6 +10,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -18,15 +19,24 @@ public class FolderDialog extends TitleAreaDialog {
 
 	private Text txtName;
 	private Text txtDescription;
-	private Button butPrjInd;
 	private Button butDevObj;
 	private String Name;
 	private String Description;
 	private String LongDescription;
 	private Text txtLongDescr;
-	private boolean ProjectIndependent;
+	private Text txtUrlToOpen;
+	private String UrlToOpen;
+	private Button btnProjectDependent;
+	private Button btnWorkingSetDependent;
+	private Button btnIndependent;
+	private boolean Independent;
+	private boolean WorkingSetDependent;
+	private boolean ProjectDependent;
 	private boolean DevObjectFolder;
 
+	/**
+	 * @wbp.parser.constructor
+	 */
 	public FolderDialog(Shell parentShell) {
 		super(parentShell);
 	}
@@ -64,11 +74,27 @@ public class FolderDialog extends TitleAreaDialog {
 		createName(container);
 		createDescription(container);
 		createProjectIndependent(container);
+		createURLToOpen(container);
 		if (!getDevObjectFolder()) {
 			createDevObjFolder(container);
 		}
 		createLongDescr(container);
+		createEmptyLine(container);
+
 		return area;
+	}
+
+	private void createURLToOpen(Composite container) {
+		Label lbtUrl = new Label(container, SWT.NONE);
+		lbtUrl.setText("URL to open on double click");
+
+		GridData dataURL = new GridData();
+		dataURL.grabExcessHorizontalSpace = true;
+		dataURL.horizontalAlignment = GridData.FILL;
+
+		txtUrlToOpen = new Text(container, SWT.BORDER);
+		txtUrlToOpen.setLayoutData(dataURL);
+
 	}
 
 	private void createName(Composite container) {
@@ -99,22 +125,53 @@ public class FolderDialog extends TitleAreaDialog {
 
 	private void createProjectIndependent(Composite container) {
 		Label lbtPrjInd = new Label(container, SWT.NONE);
-		lbtPrjInd.setText("Project Independent?");
+		lbtPrjInd.setText("Folder Dependency");
+//
+//		GridData dataFirstName = new GridData();
+//		dataFirstName.grabExcessHorizontalSpace = true;
+//		dataFirstName.horizontalAlignment = GridData.FILL;
+		// Create a group to hold the radio buttons
+		Group radioGroup = new Group(container, SWT.NONE);
+		// radioGroup.setText("Folder Dependency");
+		radioGroup.setLayout(new GridLayout(1, false));
+		radioGroup.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-		GridData dataFirstName = new GridData();
-		dataFirstName.grabExcessHorizontalSpace = true;
-		dataFirstName.horizontalAlignment = GridData.FILL;
+		// Create radio buttons
+		btnProjectDependent = new Button(radioGroup, SWT.RADIO);
+		btnProjectDependent.setText("Project Dependent");
+		btnProjectDependent.setSelection(true); // Set default selection
 
-		butPrjInd = new Button(container, SWT.CHECK);
-		butPrjInd.setLayoutData(dataFirstName);
-		butPrjInd.addSelectionListener(new SelectionAdapter() {
+		btnWorkingSetDependent = new Button(radioGroup, SWT.RADIO);
+		btnWorkingSetDependent.setText("Working Set Dependent");
 
+		btnIndependent = new Button(radioGroup, SWT.RADIO);
+		btnIndependent.setText("Independent");
+
+		// Add selection listener to handle selection events
+		SelectionAdapter selectionListener = new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent event) {
-				Button btn = (Button) event.getSource();
-				ProjectIndependent = btn.getSelection();
+			public void widgetSelected(SelectionEvent e) {
+				Button selectedButton = (Button) e.getSource();
+				if (selectedButton == btnProjectDependent) {
+					Independent = false;
+					setWorkingSetDependent(false);
+					setProjectDependent(true);
+				} else if (selectedButton == btnWorkingSetDependent) {
+					Independent = false;
+					setWorkingSetDependent(true);
+					setProjectDependent(false);
+				} else if (selectedButton == btnIndependent) {
+					Independent = true;
+					setWorkingSetDependent(false);
+					setProjectDependent(false);
+				}
 			}
-		});
+		};
+
+		btnProjectDependent.addSelectionListener(selectionListener);
+		btnWorkingSetDependent.addSelectionListener(selectionListener);
+		btnIndependent.addSelectionListener(selectionListener);
+
 	}
 
 	private void createDevObjFolder(Composite container) {
@@ -148,6 +205,12 @@ public class FolderDialog extends TitleAreaDialog {
 		txtDescription.setLayoutData(dataLastName);
 	}
 
+	private void createEmptyLine(Composite container) {
+		new Label(container, SWT.NONE);
+		new Label(container, SWT.NONE);
+
+	}
+
 	@Override
 	protected boolean isResizable() {
 		return true;
@@ -159,6 +222,7 @@ public class FolderDialog extends TitleAreaDialog {
 		Name = txtName.getText();
 		Description = txtDescription.getText();
 		LongDescription = txtLongDescr.getText();
+		UrlToOpen = txtUrlToOpen.getText();
 	}
 
 	@Override
@@ -171,8 +235,8 @@ public class FolderDialog extends TitleAreaDialog {
 		return Name;
 	}
 
-	public Boolean getPrjInd() {
-		return ProjectIndependent;
+	public Boolean getIndependent() {
+		return Independent;
 	}
 
 	public String getDescription() {
@@ -184,9 +248,9 @@ public class FolderDialog extends TitleAreaDialog {
 		txtName.setText(Name);
 	}
 
-	public void setPrjInd(Boolean PrjInd) {
-		this.ProjectIndependent = PrjInd;
-		butPrjInd.setSelection(ProjectIndependent);
+	public void setIndependent(Boolean PrjInd) {
+		this.Independent = PrjInd;
+		btnIndependent.setSelection(Independent);
 	}
 
 	public void setDescription(String Description) {
@@ -212,4 +276,32 @@ public class FolderDialog extends TitleAreaDialog {
 		LongDescription = longDescription;
 		txtLongDescr.setText(LongDescription);
 	}
+
+	public String getURLToOpen() {
+		return UrlToOpen;
+	}
+
+	public void setURLToOpen(String urlToOpen) {
+		UrlToOpen = urlToOpen;
+		txtUrlToOpen.setText(UrlToOpen);
+	}
+
+	public boolean getWorkingSetDependent() {
+		return WorkingSetDependent;
+	}
+
+	public void setWorkingSetDependent(boolean workspaceDependent) {
+		WorkingSetDependent = workspaceDependent;
+		btnWorkingSetDependent.setSelection(WorkingSetDependent);
+	}
+
+	public boolean getProjectDependent() {
+		return ProjectDependent;
+	}
+
+	public void setProjectDependent(boolean projectDependent) {
+		ProjectDependent = projectDependent;
+		btnProjectDependent.setSelection(ProjectDependent);
+	}
+
 }

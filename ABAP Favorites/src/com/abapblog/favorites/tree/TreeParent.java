@@ -10,17 +10,22 @@ import com.abapblog.favorites.views.Favorites;
 
 public class TreeParent extends TreeObject {
 	private ArrayList<TreeObject> children;
-	private boolean projectIndependent;
+	private boolean independent;
+	private boolean projectDependent;
+	private boolean workingSetDependent;
 	private boolean devObjProject;
 	private String project;
 	private TypeOfXMLNode typeOfFolder;
 	private String folderID;
+	private String urlToOpen;
+	private String workingSet;
 
-	public TreeParent(String name, String description, boolean projectIndependent, String project,
-			String longDescription, IFavorites favorite, boolean devObjProj, String folderID) {
+	public TreeParent(String name, String description, boolean independent, String project, String longDescription,
+			IFavorites favorite, boolean devObjProj, String folderID, String urlToOpen, boolean projectDependent,
+			boolean workingSetDependent, String workingSet) {
 		super(name, TypeOfEntry.Folder, description, "", longDescription, favorite, "");
 		children = new ArrayList<>();
-		this.projectIndependent = projectIndependent;
+		this.independent = independent;
 		this.setProject(project);
 		this.setDevObjProject(devObjProj);
 		if (favorite instanceof Favorites) {
@@ -32,6 +37,10 @@ public class TreeParent extends TreeObject {
 		if (this.getFolderID().equals("")) {
 			this.setFolderID(UUID.randomUUID().toString());
 		}
+		this.setUrlToOpen(urlToOpen);
+		this.setProjectDependent(projectDependent);
+		this.setWorkingSetDependent(workingSetDependent);
+		this.setWorkingSet(workingSet);
 	}
 
 	public void addChild(TreeObject child) {
@@ -76,8 +85,8 @@ public class TreeParent extends TreeObject {
 		this.typeOfFolder = typeOfFolder;
 	}
 
-	public Boolean getProjectIndependent() {
-		return projectIndependent;
+	public Boolean getIndependent() {
+		return independent;
 	}
 
 	public String getFolderID() {
@@ -86,5 +95,37 @@ public class TreeParent extends TreeObject {
 
 	public void setFolderID(String folderID) {
 		this.folderID = folderID;
+	}
+
+	public String getUrlToOpen() {
+		return urlToOpen;
+	}
+
+	public void setUrlToOpen(String urlToOpen) {
+		this.urlToOpen = urlToOpen;
+	}
+
+	public boolean getProjectDependent() {
+		return projectDependent;
+	}
+
+	public void setProjectDependent(boolean projectDependent) {
+		this.projectDependent = projectDependent;
+	}
+
+	public boolean getWorkingSetDependent() {
+		return workingSetDependent;
+	}
+
+	public void setWorkingSetDependent(boolean worskspaceDependent) {
+		this.workingSetDependent = worskspaceDependent;
+	}
+
+	public String getWorkingSet() {
+		return workingSet;
+	}
+
+	public void setWorkingSet(String workspace) {
+		this.workingSet = workspace;
 	}
 }

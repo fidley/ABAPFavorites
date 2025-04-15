@@ -76,7 +76,7 @@ public class DynamicCommandHandler implements IHandler {
 			return getProjectPopup();
 		}
 
-		if (treeObject.getParent().getProjectIndependent()) {
+		if (treeObject.getParent().getIndependent()) {
 			final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 			final IWorkbenchWindow window = page.getWorkbenchWindow();
 			final ISelection selection = window.getSelectionService().getSelection();

@@ -1,20 +1,27 @@
 package com.abapblog.favorites.dialog;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.wb.swt.ResourceManager;
 
 import com.abapblog.favorites.commands.DynamicCommands;
 import com.abapblog.favorites.common.Common;
 import com.abapblog.favorites.common.CommonTypes.TypeOfEntry;
+import com.abapblog.favorites.superview.AdtObjectHandler;
+import com.sap.adt.tools.core.ui.dialogs.AbapProjectSelectionDialog;
 
 public class NameDialog extends TitleAreaDialog {
 
@@ -24,10 +31,11 @@ public class NameDialog extends TitleAreaDialog {
 	private Combo commandSelection;
 	private String ObjectName;
 	private String Name = "";
-	private String Description;
+	private String Description = "";
 	private String LongDescription;
 	private String commandID;
 	private TypeOfEntry typeOfObject;
+	private Composite composite;
 
 	/**
 	 * @wbp.parser.constructor
@@ -71,25 +79,29 @@ public class NameDialog extends TitleAreaDialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite area = (Composite) super.createDialogArea(parent);
-		Composite container = new Composite(area, SWT.NONE);
-		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		GridLayout layout = new GridLayout(2, false);
-		container.setLayout(layout);
+		composite = new Composite(area, SWT.NONE);
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		GridLayout gl_container_1 = new GridLayout(3, false);
+		composite.setLayout(gl_container_1);
 
-		createName(container);
-		createDescription(container);
-		createLongDescr(container);
-		createCommandsLists(container);
-		createEmptyLine(container);
+		createName(composite);
+		createDescription(composite);
+		createLongDescr(composite);
+		createCommandsLists(composite);
+		createEmptyLine(composite);
+//		new Label(composite, SWT.NONE);
+//		new Label(composite, SWT.NONE);
 		return area;
 	}
 
 	private void createEmptyLine(Composite container) {
 		new Label(container, SWT.NONE);
+		new Label(container, SWT.NONE);
 
 	}
 
 	private void createCommandsLists(Composite container) {
+		new Label(composite, SWT.NONE);
 		Label lblNewLabel = new Label(container, SWT.NONE);
 		lblNewLabel.setText("Command");
 
@@ -124,6 +136,38 @@ public class NameDialog extends TitleAreaDialog {
 	}
 
 	private void createLongDescr(Composite container) {
+
+		Button btnReadDescrFromSystem = new Button(composite, SWT.NONE);
+		btnReadDescrFromSystem
+				.setImage(ResourceManager.getPluginImage("com.abapblog.favorites", "icons/importdir_wiz.png"));
+		btnReadDescrFromSystem.setText("Import");
+		btnReadDescrFromSystem.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseDoubleClick(org.eclipse.swt.events.MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseDown(org.eclipse.swt.events.MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseUp(org.eclipse.swt.events.MouseEvent e) {
+				try {
+					IProject project = AbapProjectSelectionDialog
+							.open(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), null);
+					setDescription(AdtObjectHandler.lookupObjectReference(project, txtName.getText(), typeOfObject)
+							.getDescription());
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+
+			}
+		});
 		Label lbtLongDescr = new Label(container, SWT.TOP);
 		lbtLongDescr.setText("Long Description");
 
@@ -138,6 +182,7 @@ public class NameDialog extends TitleAreaDialog {
 	}
 
 	private void createDescription(Composite container) {
+		new Label(composite, SWT.NONE);
 		Label lbtLastName = new Label(container, SWT.NONE);
 		lbtLastName.setText("Description");
 
@@ -146,6 +191,7 @@ public class NameDialog extends TitleAreaDialog {
 		dataLastName.horizontalAlignment = GridData.FILL;
 		txtDescription = new Text(container, SWT.BORDER);
 		txtDescription.setLayoutData(dataLastName);
+		txtDescription.setText(Description);
 
 	}
 
@@ -190,7 +236,11 @@ public class NameDialog extends TitleAreaDialog {
 
 	public void setDescription(String Description) {
 		this.Description = Description;
-		txtDescription.setText(Description);
+		try {
+			txtDescription.setText(Description);
+		} catch (Exception e) {
+			// ignore
+		}
 	}
 
 	public String getLongDescription() {

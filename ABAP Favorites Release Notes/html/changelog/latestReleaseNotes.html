@@ -8,6 +8,41 @@
 </head>
 
 <body id="doc-body">
+	<h1 class="heading">ABAP Favorites - Changelog version 1.0.66</h1>
+		<h2>Favorite description from backend</h2>
+		<p>Since this version, whenever you use the "Add to Favorites" button on Project Explorer or in the ADT Editor, the description of the object is automatically fetched from the backend.</p>
+		<p>In case of manual creation of favorites from the view menu, you can use Import button, found next to description field to achieve the same goal. <br/>Each time the button is pressed, system selection is provided. You must be logged on to the system in order to fetch the description. No installation of any backend component is needed.  </p>
+		<p>Added on a base of GH <a href="https://github.com/fidley/ABAPFavorites/issues/107">issue 107</a>.</p>
+		<figure>
+			<img src="../../media/1.0.66 import button.png">
+			<figcaption><strong>Figure 1:</strong> New object dialog with Import button</figcaption>
+		</figure>
+		</p>
+
+
+
+		<h2>Folder double click action</h2>
+		<p>Since this version, whenever you use double-click on the folder it will be automatically expanded or collapsed.</p>
+		<p>If in the folder creation/edit dialog you will fill the field "URL to open on double-click", instead of expand/collapse, the saved URL will be opened.</p>
+		<p>Added on a base of GH <a href="https://github.com/fidley/ABAPFavorites/issues/106">issue 106</a>.</p>
+		<figure>
+			<img src="../../media/1.0.66 url field in folder.png">
+			<figcaption><strong>Figure 2:</strong> New field on the Folder dialog</figcaption>
+		</figure>
+		</p>
+
+		<h2>Folder dependency update - now it's possible to link folder with working sets</h2>
+		<p>So far it was possible to choose if the folder is linked to project or not. Since this version you can also decide if the folder is linked to working set.</p>
+		<p>To enable this, the folder creation/edit dialog was adapted. You can find there now respective radio button for each dependency type.</p>
+		<p>Folder linked to working sets are hidden/shown exactly the same way like project dependent folders.</p>
+		<br/><p>Double-click behavior for objects stored in the working set dependent folders has been adapted in the way, that popup with the projects linked to working set of folder is displayed, before the execution/opening of the object is done.</p>
+		<p>Added on a base of GH <a href="https://github.com/fidley/ABAPFavorites/issues/97">issue 97</a>.</p>
+		<figure>
+			<img src="../../media/1.0.66 new folder dependency.png">
+			<figcaption><strong>Figure 3:</strong> New folder dependency selection</figcaption>
+		</figure>
+		</p>
+
 	<h1 class="heading">ABAP Favorites - Changelog version 1.0.65</h1>
 	<h2>URL opening in a browser from Eclipse Preferences</h2>
 	<p>From this version, the URLs will be opened in the web browser selected in the Eclipse Preferences.<br>

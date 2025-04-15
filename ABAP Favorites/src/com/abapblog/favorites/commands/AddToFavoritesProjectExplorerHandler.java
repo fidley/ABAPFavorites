@@ -35,6 +35,7 @@ public class AddToFavoritesProjectExplorerHandler extends AbstractHandler {
 						AdtObjectReference AdtRef = item.getAdapter(AdtObjectReference.class);
 						String objectType = AdtRef.getType();
 						String objectName = AdtRef.getName();
+						String objectDescription = AdtRef.getDescription();
 						TypeOfEntry typeOfEntry = Common.getTypeOfEntryFromSAPType(objectType);
 
 						if (Items.length == 1 || FolderSelected == false) {
@@ -45,6 +46,7 @@ public class AddToFavoritesProjectExplorerHandler extends AbstractHandler {
 									NameDialog newObjectDialog = new NameDialog(null,
 											selectFolderDialog.getTypeOfEntry(),
 											selectFolderDialog.getObjectName().toUpperCase());
+									newObjectDialog.setDescription(objectDescription);
 									if (newObjectDialog.open() == Window.OK) {
 										XMLhandler.addObjectToXML(selectFolderDialog.getTypeOfEntry(),
 												newObjectDialog.getName(), newObjectDialog.getDescription(),

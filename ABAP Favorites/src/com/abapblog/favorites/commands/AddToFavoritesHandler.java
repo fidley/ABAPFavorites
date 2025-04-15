@@ -16,6 +16,7 @@ import com.abapblog.favorites.superview.Superview;
 import com.abapblog.favorites.ui.AbapEditorPathParser;
 import com.abapblog.favorites.ui.SelectFolderDialog;
 import com.abapblog.favorites.xml.XMLhandler;
+import com.sap.adt.tools.core.ui.editors.IAdtFormEditor;
 
 public class AddToFavoritesHandler extends AbstractHandler {
 
@@ -38,6 +39,14 @@ public class AddToFavoritesHandler extends AbstractHandler {
 			if (selectFolderDialog.open() == Window.OK) {
 				NameDialog newObjectDialog = new NameDialog(null, selectFolderDialog.getTypeOfEntry(),
 						selectFolderDialog.getObjectName().toUpperCase());
+				if (editor instanceof IAdtFormEditor) {
+					try {
+						IAdtFormEditor adtFE = (IAdtFormEditor) editor;
+						newObjectDialog.setDescription(adtFE.getModel().getDescription());
+					} catch (Exception e) {
+						// ignore
+					}
+				}
 				if (newObjectDialog.open() == Window.OK) {
 					XMLhandler.addObjectToXML(selectFolderDialog.getTypeOfEntry(), newObjectDialog.getName(),
 							newObjectDialog.getDescription(), newObjectDialog.getLongDescription(), "",
