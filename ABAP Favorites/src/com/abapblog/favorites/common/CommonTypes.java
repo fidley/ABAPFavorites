@@ -367,7 +367,7 @@ public class CommonTypes {
 		workingSet {
 			@Override
 			public String toString() {
-				return "project";
+				return "workingSet";
 			}
 		},
 		technicalName {

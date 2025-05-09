@@ -29,10 +29,10 @@ public class FolderDialog extends TitleAreaDialog {
 	private Button btnProjectDependent;
 	private Button btnWorkingSetDependent;
 	private Button btnIndependent;
-	private boolean Independent;
-	private boolean WorkingSetDependent;
-	private boolean ProjectDependent;
-	private boolean DevObjectFolder;
+	private boolean Independent = false;
+	private boolean WorkingSetDependent = false;
+	private boolean ProjectDependent = true;
+	private boolean DevObjectFolder = false;
 
 	/**
 	 * @wbp.parser.constructor
